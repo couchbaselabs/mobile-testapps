@@ -33,6 +33,8 @@ public class RequestHandlerDispatcher {
             } else {
                 Method target;
                 Object requestHandler;
+                System.out.println("PASSSSSSS");
+                System.out.println(handlerType);
                 switch (handlerType) {
                     case "databaseConfiguration":
                         target = DatabaseConfigurationRequestHandler.class.getMethod(method, Args.class);
@@ -105,6 +107,11 @@ public class RequestHandlerDispatcher {
                     case "peerToPeer":
                         target = PeerToPeerRequestHandler.class.getMethod(method, Args.class);
                         requestHandler = new PeerToPeerRequestHandler();
+                        break;
+                    case "listenerAuthenticator":
+                        System.out.println("PASSSSSSS");
+                        target = ListenerAuthenticatorRequestHandler.class.getMethod(method, Args.class);
+                        requestHandler = new ListenerAuthenticatorRequestHandler();
                         break;
                     case "predictiveQuery":
                         target = PredictiveQueriesRequestHandler.class.getMethod(method, Args.class);

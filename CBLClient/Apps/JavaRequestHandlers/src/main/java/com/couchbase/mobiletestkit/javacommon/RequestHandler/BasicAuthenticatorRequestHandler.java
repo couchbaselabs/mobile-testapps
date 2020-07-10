@@ -24,4 +24,5 @@ public class BasicAuthenticatorRequestHandler {
         BasicAuthenticator authenticator = args.get("authenticator");
         return authenticator.getUsername();
     }
+
 }
