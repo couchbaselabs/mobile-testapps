@@ -34,11 +34,13 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
     private static final String TAG = "P2PHANDLER";
 
     final ReplicatorRequestHandler replicatorRequestHandlerObj = new ReplicatorRequestHandler();
-//    private Object URLEndpointListener;
+
 
     public void clientStart(Args args) {
         Replicator replicator = args.get("replicator");
-        replicator.start();
+        replicator.start(
+                false
+        );
         Log.i(TAG, "Replication started .... ");
     }
 
@@ -55,7 +57,7 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
         Boolean pull_filter = args.get("pull_filter");
         String filter_callback_func = args.get("filter_callback_func");
         String conflict_resolver = args.get("conflict_resolver");
-        Authenticator authenticator = args.get("basic_auth");
+//        Authenticator authenticator = args.get("basic_auth");
 
         ReplicatorConfiguration config;
         Replicator replicator;
@@ -159,9 +161,9 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
                 config.setConflictResolver(ConflictResolver.DEFAULT);
                 break;
         }
-        if (authenticator != null) {
-            config.setAuthenticator(authenticator);
-        }
+//        if (authenticator != null) {
+//            config.setAuthenticator(authenticator);
+//        }
 
         replicator = new Replicator(config);
         return replicator;
@@ -185,7 +187,6 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
         Database sourceDb = args.get("database");
         int securePort =  args.get("secure_port");
         ListenerAuthenticator listenerAuthenticator = args.get("basic_auth");
-        String listenerType = args.get("listener_type");
         URLEndpointListenerConfiguration.Builder configBuilder;
         configBuilder = new URLEndpointListenerConfiguration.Builder(sourceDb);
         if (args.get("port") != null) {
@@ -205,8 +206,10 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
     public ReplicatorTcpListener messageEndpointListenerStart(Args args) throws IOException, CouchbaseLiteException {
         int port = args.get("port");
         Database sourceDb = args.get("database");
+        System.out.println("*******start TCP*********");
         MessageEndpointListener messageEndpointListener = new MessageEndpointListener(new MessageEndpointListenerConfiguration(sourceDb, ProtocolType.BYTE_STREAM));
         ReplicatorTcpListener p2ptcpListener = new ReplicatorTcpListener(sourceDb, port);
+        System.out.println(p2ptcpListener.getURL());
         return p2ptcpListener;
     }
 
