@@ -38,13 +38,11 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
 
     public void clientStart(Args args) {
         Replicator replicator = args.get("replicator");
-        replicator.start(
-                false
-        );
+        replicator.start();
         Log.i(TAG, "Replication started .... ");
     }
 
-    public Replicator configure(Args args) throws Exception {
+    public Replicator configureMessage(Args args) throws Exception {
         String ipaddress = args.get("host");
         int port = args.get("port");
         Database sourceDb = args.get("database");
@@ -57,8 +55,6 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
         Boolean pull_filter = args.get("pull_filter");
         String filter_callback_func = args.get("filter_callback_func");
         String conflict_resolver = args.get("conflict_resolver");
-//        Authenticator authenticator = args.get("basic_auth");
-
         ReplicatorConfiguration config;
         Replicator replicator;
 
@@ -83,7 +79,6 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
             config = new ReplicatorConfiguration(sourceDb, urlEndPoint);
         }
         else if (endPointType.equals("MessageEndPoint")) {
-            System.out.println("MessageEndpoint");
             MessageEndpoint messageEndPoint = new MessageEndpoint("p2p", uri, ProtocolType.BYTE_STREAM, this);
             config = new ReplicatorConfiguration(sourceDb, messageEndPoint);
         }
@@ -161,10 +156,6 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
                 config.setConflictResolver(ConflictResolver.DEFAULT);
                 break;
         }
-//        if (authenticator != null) {
-//            config.setAuthenticator(authenticator);
-//        }
-
         replicator = new Replicator(config);
         return replicator;
     }
@@ -220,16 +211,12 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
             p2ptcpListener.stop();
         } else {
             URLEndpointListener p2ptcpListener = args.get("replicatorTcpListener");
-            System.out.println("*******stop*********");
-            System.out.println(p2ptcpListener);
-            System.out.println(p2ptcpListener.getPort());
             p2ptcpListener.stop();
         }
     }
 
     public int getServerPort(Args args) {
         URLEndpointListener p2ptcpListener = args.get("replicatorTcpListener");
-        System.out.println("*******getPORT*********");
         System.out.println();
         return p2ptcpListener.getPort();
     }
