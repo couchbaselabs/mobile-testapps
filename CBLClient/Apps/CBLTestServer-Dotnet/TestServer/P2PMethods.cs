@@ -56,7 +56,7 @@ namespace Couchbase.Lite.Testing
             string tlsAuthType = postBody["tls_auth_type"].ToString();
             Boolean disableTls = Convert.ToBoolean(postBody[V].ToString());
             Boolean tls_authenticator = Convert.ToBoolean(postBody["tls_authenticator"].ToString());
-
+            Boolean enableDeltaSync = Convert.ToBoolean(postBody["enable_delta_sync"].ToString());
 
             AddStatus("URL Start SERVER");
             if (port > 0)
@@ -68,6 +68,7 @@ namespace Couchbase.Lite.Testing
             {
                urlEndpointListenerConfig.Authenticator = MemoryMap.Get<ListenerPasswordAuthenticator>(postBody["basic_auth"].ToString());
             }
+    
             urlEndpointListenerConfig.DisableTLS = disableTls;
             if (tlsAuthType == "self_signed")
             {
@@ -105,6 +106,8 @@ namespace Couchbase.Lite.Testing
                 var auth = new ListenerCertificateAuthenticator(new X509Certificate2Collection(rootCert));
                 urlEndpointListenerConfig.Authenticator = auth;
             }
+
+            urlEndpointListenerConfig.EnableDeltaSync = enableDeltaSync;
 
             URLEndpointListener urlEndpointListener = new URLEndpointListener(urlEndpointListenerConfig);
             urlEndpointListener.Start();
@@ -162,7 +165,6 @@ namespace Couchbase.Lite.Testing
             ReplicatorConfiguration config = null;
             string tlsAuthType = postBody["tls_auth_type"].ToString();
             Boolean tls_authenticator = Convert.ToBoolean(postBody["tls_authenticator"].ToString());
-            
             Boolean server_verification_mode = Convert.ToBoolean(postBody["server_verification_mode"].ToString());
 
             Uri host;
@@ -306,6 +308,7 @@ namespace Couchbase.Lite.Testing
                     config.ConflictResolver = ConflictResolver.Default;
                     break;
             }
+       
             Replicator replicator = new Replicator(config);
 
             response.WriteBody(MemoryMap.Store(replicator));
