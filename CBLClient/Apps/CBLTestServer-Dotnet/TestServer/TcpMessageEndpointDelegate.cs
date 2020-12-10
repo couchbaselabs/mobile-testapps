@@ -1,3 +1,4 @@
+#if COUCHBASE_ENTERPRISE
 using Couchbase.Lite.P2P;
 using System;
 using System.Collections.Generic;
@@ -16,3 +17,4 @@ namespace Couchbase.Lite.Testing
         }
     }
 }
+#endif

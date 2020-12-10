@@ -59,8 +59,10 @@ namespace Couchbase.Lite.Testing
                 {
                     With<Database>(postBody, "targetDB", tdb =>
                     {
+                        #if COUCHBASE_ENTERPRISE
                         DatabaseEndpoint dbEndPoint = new DatabaseEndpoint(tdb);
                         response.WriteBody(MemoryMap.New<ReplicatorConfiguration>(sdb, dbEndPoint));
+                        #endif
                     });
                 }
                 else
@@ -88,6 +90,7 @@ namespace Couchbase.Lite.Testing
                     URLEndpoint targetUrl = new URLEndpoint(uri);
                     config = new ReplicatorConfiguration(sdb, targetUrl);
                 }
+#if COUCHBASE_ENTERPRISE
                 else if (postBody.ContainsKey("target_db"))
                 {
                     With<Database>(postBody, "target_db", tdb =>
@@ -96,6 +99,7 @@ namespace Couchbase.Lite.Testing
                         config = new ReplicatorConfiguration(sdb, dbEndPoint);
                     });
                 }
+#endif
                 else
                 {
                     throw new Exception("Illegal arguments provided");

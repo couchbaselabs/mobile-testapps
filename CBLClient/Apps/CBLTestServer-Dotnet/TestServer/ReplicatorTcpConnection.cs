@@ -13,7 +13,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-
+#if COUCHBASE_ENTERPRISE
 using System;
 using System.Linq;
 using System.Text;
@@ -33,14 +33,14 @@ namespace Couchbase.Lite.Testing
     /// </summary>
     public sealed class ReplicatorTcpConnection : IMessageEndpointConnection
     {
-        #region Constants
+#region Constants
 
         internal const int Port = 5000;
         private const int ReceiveBufferSize = 8192;
 
-        #endregion
+#endregion
 
-        #region Variables
+#region Variables
 
         private readonly CancellationTokenSource _cancelSource = new CancellationTokenSource();
         private bool _connected;
@@ -48,9 +48,9 @@ namespace Couchbase.Lite.Testing
         TcpClient _client;
         Stream _networkStream; //NetworkStream, SslStream
 
-        #endregion
+#endregion
 
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Constructs a new replicator Active Peer connection instance via Tcp Connection
@@ -63,9 +63,9 @@ namespace Couchbase.Lite.Testing
             _networkStream = _client.GetStream();
         }
 
-        #endregion
+#endregion
 
-        #region Private Methods
+#region Private Methods
 
         private async void ReceiveLoop()
         {
@@ -90,9 +90,9 @@ namespace Couchbase.Lite.Testing
             }
         }
 
-        #endregion
+#endregion
 
-        #region IMessageEndpointConnection -- Passive Peer
+#region IMessageEndpointConnection -- Passive Peer
 
         /// <summary>
         /// Closes the connection to the remote endpoint
@@ -143,7 +143,7 @@ namespace Couchbase.Lite.Testing
             await _networkStream.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
         }
 
-        #endregion
+#endregion
     }
 
     /*internal static class StreamExt
@@ -193,3 +193,4 @@ namespace Couchbase.Lite.Testing
         } 
     } */
 }
+#endif
