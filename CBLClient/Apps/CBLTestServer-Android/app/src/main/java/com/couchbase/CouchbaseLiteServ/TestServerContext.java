@@ -1,8 +1,6 @@
 package com.couchbase.CouchbaseLiteServ;
 
 import com.couchbase.lite.CouchbaseLiteException;
-import com.couchbase.lite.KeyStoreUtils;
-import com.couchbase.lite.TLSIdentity;
 import com.couchbase.mobiletestkit.javacommon.Context;
 import com.couchbase.mobiletestkit.javacommon.util.Log;
 
@@ -91,47 +89,6 @@ public class TestServerContext implements Context {
     }
 
     @Override
-    public TLSIdentity getCreateIdentity() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.YEAR, 2);
-        Date certTime = calendar.getTime();
-        HashMap<String, String> X509Attributes = new HashMap<String, String>();
-        X509Attributes.put(TLSIdentity.CERT_ATTRIBUTE_COMMON_NAME, "CBL Test");
-        X509Attributes.put(TLSIdentity.CERT_ATTRIBUTE_ORGANIZATION, "Couchbase");
-        X509Attributes.put(TLSIdentity.CERT_ATTRIBUTE_ORGANIZATION_UNIT, "Mobile");
-        X509Attributes.put(TLSIdentity.CERT_ATTRIBUTE_EMAIL_ADDRESS, "lite@couchbase.com");
-        String alias = UUID.randomUUID().toString();
-        TLSIdentity identity = null;
-        try {
-            identity = TLSIdentity.createIdentity(true, X509Attributes, certTime, alias);
-        } catch (CouchbaseLiteException e) {
-            e.printStackTrace();
-        }
-        System.out.println("CreateIdentity API");
-        return identity;
-    }
-
-    @Override
-    public TLSIdentity getSelfSignedIdentity() {
-        TLSIdentity identity = null;
-        try {
-             InputStream serverCert = this.getCertFile("certs.p12");
-             KeyStoreUtils.importEntry("PKCS12",
-                        serverCert,
-                        "123456".toCharArray(),
-                        "testkit",
-                        "123456".toCharArray(), "Servercerts");
-             identity = TLSIdentity.getIdentity("Servercerts");
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (CouchbaseLiteException | KeyStoreException | CertificateException | NoSuchAlgorithmException | UnrecoverableEntryException e) {
-                e.printStackTrace();
-            }
-        return identity;
-    }
-
-    @Override
     public List<Certificate> getAuthenticatorCertsList() {
         List<Certificate> certsList = new ArrayList<>();
         try {
@@ -149,40 +106,6 @@ public class TestServerContext implements Context {
             e.printStackTrace();
         }
         return certsList;
-    }
-
-    @Override
-    public TLSIdentity getClientCertsIdentity() {
-        TLSIdentity identity = null;
-        try {
-            try (InputStream clientCert = this.getCertFile("client.p12")) {
-                try {
-                    try {
-                        KeyStoreUtils.importEntry("PKCS12",
-                                clientCert,
-                                "123456".toCharArray(),
-                                "testkit",
-                                "123456".toCharArray(), "ClientCertsSelfsigned");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (UnrecoverableEntryException e) {
-                        e.printStackTrace();
-                    }
-                    identity = TLSIdentity.getIdentity("clientcerts");
-                } catch (KeyStoreException e) {
-                        e.printStackTrace();
-                } catch (CertificateException e) {
-                        e.printStackTrace();
-                } catch (NoSuchAlgorithmException e) {
-                        e.printStackTrace();
-                } catch (CouchbaseLiteException e) {
-                    e.printStackTrace();
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return identity;
     }
 
     @Override

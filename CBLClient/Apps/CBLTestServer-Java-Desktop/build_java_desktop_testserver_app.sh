@@ -36,8 +36,8 @@ echo "Building version ${MAVEN_UPLOAD_VERSION}"
 export PATH=$PATH:$JAVA_HOME
 
 # Build TestServer
-echo ./gradlew clean -Dversion=${MAVEN_UPLOAD_VERSION} assemble
-./gradlew clean -Dversion=${MAVEN_UPLOAD_VERSION} assemble
+echo ./gradlew clean -Dversion=${MAVEN_UPLOAD_VERSION} -Dedition=${EDITION} assemble
+./gradlew clean -Dversion=${MAVEN_UPLOAD_VERSION} -Dedition=${EDITION} assemble
 
 cp "./build/libs/CBLTestServer-Java-Desktop-${MAVEN_UPLOAD_VERSION}-${EDITION}.jar" "CBLTestServer-Java-Desktop-${MAVEN_UPLOAD_VERSION}-${EDITION}.jar"
 

@@ -11,8 +11,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Base64;
 
-import com.couchbase.lite.TLSIdentity;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.cert.Certificate;
@@ -115,81 +113,6 @@ public class TestServerContext implements Context {
     }
 
     @Override
-    public TLSIdentity getCreateIdentity() {
-        final String EXTERNAL_KEY_STORE_TYPE = "PKCS12";
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.YEAR, 1);
-        Date certTime = calendar.getTime();
-        HashMap<String, String> X509Attributes = new HashMap<String, String>();
-        X509Attributes.put(TLSIdentity.CERT_ATTRIBUTE_COMMON_NAME, "CBL Test");
-        X509Attributes.put(TLSIdentity.CERT_ATTRIBUTE_ORGANIZATION, "Couchbase");
-        X509Attributes.put(TLSIdentity.CERT_ATTRIBUTE_ORGANIZATION_UNIT, "Mobile");
-        X509Attributes.put(TLSIdentity.CERT_ATTRIBUTE_EMAIL_ADDRESS, "lite@couchbase.com");
-        KeyStore externalStore = null;
-        try {
-            externalStore = KeyStore.getInstance(EXTERNAL_KEY_STORE_TYPE);
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        }
-        try {
-            externalStore.load(null, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
-        String alias = UUID.randomUUID().toString();
-        TLSIdentity identity = null;
-        try {
-            identity = TLSIdentity.createIdentity(true,
-                    X509Attributes,
-                    certTime,
-                    externalStore,
-                    alias,
-                    "pass".toCharArray()
-            );
-        } catch (CouchbaseLiteException e) {
-            e.printStackTrace();
-        }
-        return identity;
-    }
-
-    @Override
-    public TLSIdentity getSelfSignedIdentity() {
-        TLSIdentity identity = null;
-        try (InputStream ServerCert = this.getCertFile("certs.p12")) {
-            char[] pass = "123456".toCharArray();
-            KeyStore trustStore = null;
-            try {
-                trustStore = KeyStore.getInstance("PKCS12");
-                trustStore.load(null, null);
-                trustStore.load(ServerCert, pass);
-
-                KeyStore.ProtectionParameter protParam = new KeyStore.PasswordProtection(pass);
-                KeyStore.Entry newEntry = null;
-                newEntry = trustStore.getEntry("testkit", protParam);
-                trustStore.setEntry("Servercerts", newEntry, protParam);
-                identity = TLSIdentity.getIdentity(trustStore, "Servercerts", pass);
-            } catch (CouchbaseLiteException e) {
-                e.printStackTrace();
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (CertificateException e) {
-                e.printStackTrace();
-            } catch (UnrecoverableEntryException e) {
-                e.printStackTrace();
-            } catch (KeyStoreException e) {
-                e.printStackTrace();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return identity;
-    }
-
-    @Override
     public List<Certificate> getAuthenticatorCertsList() {
         List<Certificate> certsList = new ArrayList<>();
         try (InputStream ClientCert = this.getCertFile("client-ca.der")) {
@@ -205,33 +128,6 @@ public class TestServerContext implements Context {
             e.printStackTrace();
         }
         return certsList;
-    }
-
-    @Override
-    public TLSIdentity getClientCertsIdentity() {
-        TLSIdentity identity = null;
-        try (InputStream ClientCert = this.getCertFile("client.p12")) {
-            char[] pass = "123456".toCharArray();
-            KeyStore trustStore = KeyStore.getInstance("PKCS12");
-            trustStore.load(null, null);
-            trustStore.load(ClientCert, pass);
-            KeyStore.ProtectionParameter protParam = new KeyStore.PasswordProtection(pass);
-            KeyStore.Entry newEntry = trustStore.getEntry("testkit", protParam);
-            trustStore.setEntry("Clientcerts", newEntry, protParam);
-            identity = TLSIdentity.getIdentity(trustStore, "Clientcerts", pass);
-
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (CertificateException | CouchbaseLiteException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (UnrecoverableEntryException e) {
-            e.printStackTrace();
-        }
-        return identity;
     }
 
     private InputStream getCertFile(String fileName) {

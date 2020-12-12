@@ -5,7 +5,8 @@ apply plugin: 'com.bmuschko.tomcat'
 sourceCompatibility = 1.8
 
 ext {
-    COUCHBASE_LITE_JAVA_VERSION = System.getProperty('version', "2.7.0-94")
+    COUCHBASE_LITE_JAVA_VERSION = System.getProperty('version', "3.0.0-36")
+	COUCHBASE_LITE_JAVA_EDITION = System.getProperty('edition', "enterprise")
 
     JAVA_COMMON_DIR = "${projectDir}/../JavaRequestHandlers"
     ASSET_DIR = "${JAVA_COMMON_DIR}/src/main/assets"
@@ -15,7 +16,7 @@ war {
     archiveBaseName = "CBLTestServer-Java"
     archiveAppendix = "WS"
     archiveVersion = COUCHBASE_LITE_JAVA_VERSION
-    archiveClassifier = "enterprise"
+    archiveClassifier = COUCHBASE_LITE_JAVA_EDITION
 }
 
 repositories {
@@ -37,7 +38,7 @@ sourceSets {
 }
 
 dependencies {
-    providedCompile "com.couchbase.lite:couchbase-lite-java-ee:${COUCHBASE_LITE_JAVA_VERSION}"
+    providedCompile "com.couchbase.lite:couchbase-lite-java:${COUCHBASE_LITE_JAVA_VERSION}"
     implementation 'com.google.code.gson:gson:2.8.5'
     testCompile group: 'junit', name: 'junit', version: '4.12'
     providedCompile "javax.servlet:javax.servlet-api:4.0.1"
