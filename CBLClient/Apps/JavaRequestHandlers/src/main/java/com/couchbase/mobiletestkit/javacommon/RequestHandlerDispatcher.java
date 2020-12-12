@@ -1,6 +1,5 @@
 package com.couchbase.mobiletestkit.javacommon;
 
-import com.couchbase.lite.ListenerAuthenticator;
 import com.couchbase.mobiletestkit.javacommon.RequestHandler.*;
 import com.couchbase.mobiletestkit.javacommon.util.Log;
 
@@ -102,18 +101,6 @@ public class RequestHandlerDispatcher {
                     case "array":
                         target = ArrayRequestHandler.class.getMethod(method, Args.class);
                         requestHandler = new ArrayRequestHandler();
-                        break;
-                    case "peerToPeer":
-                        target = PeerToPeerRequestHandler.class.getMethod(method, Args.class);
-                        requestHandler = new PeerToPeerRequestHandler();
-                        break;
-                    case "listenerAuthenticator":
-                        target = ListenerAuthenticatorRequestHandler.class.getMethod(method, Args.class);
-                        requestHandler = new ListenerAuthenticatorRequestHandler();
-                        break;
-                    case "predictiveQuery":
-                        target = PredictiveQueriesRequestHandler.class.getMethod(method, Args.class);
-                        requestHandler = new PredictiveQueriesRequestHandler();
                         break;
                     case "logging":
                         target = LoggingRequestHandler.class.getMethod(method, Args.class);

@@ -19,7 +19,6 @@ import com.couchbase.lite.Conflict;
 import com.couchbase.lite.ConflictResolver;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
-import com.couchbase.lite.DatabaseEndpoint;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.DocumentFlag;
 import com.couchbase.lite.MutableDocument;
@@ -40,11 +39,7 @@ public class ReplicatorConfigurationRequestHandler {
         if (args.get("targetURI") != null) {
             targetURI = new URI((String) args.get("targetURI"));
         }
-        if (targetDb != null) {
-            DatabaseEndpoint target = new DatabaseEndpoint(targetDb);
-            return new ReplicatorConfiguration(sourceDb, target);
-        }
-        else if (targetURI != null) {
+        if (targetURI != null) {
             URLEndpoint target = new URLEndpoint(targetURI);
             return new ReplicatorConfiguration(sourceDb, target);
         }
@@ -89,10 +84,6 @@ public class ReplicatorConfigurationRequestHandler {
         ReplicatorConfiguration config;
         if (sourceDb != null && targetURL != null) {
             URLEndpoint target = new URLEndpoint(targetURL);
-            config = new ReplicatorConfiguration(sourceDb, target);
-        }
-        else if (sourceDb != null && targetDb != null) {
-            DatabaseEndpoint target = new DatabaseEndpoint(targetDb);
             config = new ReplicatorConfiguration(sourceDb, target);
         }
         else {

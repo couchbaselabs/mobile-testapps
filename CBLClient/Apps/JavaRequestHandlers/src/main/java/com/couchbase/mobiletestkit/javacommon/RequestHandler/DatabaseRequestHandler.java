@@ -24,7 +24,6 @@ import com.couchbase.lite.DatabaseChange;
 import com.couchbase.lite.DatabaseChangeListener;
 import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
-import com.couchbase.lite.EncryptionKey;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.Meta;
@@ -230,15 +229,6 @@ public class DatabaseRequestHandler {
         catch (CouchbaseLiteException ex) {
             Log.e(TAG, "deleteDB() ERROR !!!!!!", ex);
         }
-    }
-
-    public void changeEncryptionKey(Args args) throws CouchbaseLiteException {
-        Database database = args.get("database");
-        String password = args.get("password");
-        EncryptionKey encryptionKey;
-        if (password.equals("nil")) { encryptionKey = null; }
-        else { encryptionKey = new EncryptionKey(password); }
-        database.changeEncryptionKey(encryptionKey);
     }
 
     public void deleteDbByName(Args args) throws CouchbaseLiteException {

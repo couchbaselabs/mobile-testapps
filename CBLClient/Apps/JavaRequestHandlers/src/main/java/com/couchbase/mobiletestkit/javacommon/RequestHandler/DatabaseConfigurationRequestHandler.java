@@ -5,7 +5,6 @@ import com.couchbase.mobiletestkit.javacommon.Args;
 import com.couchbase.mobiletestkit.javacommon.RequestHandlerDispatcher;
 import com.couchbase.mobiletestkit.javacommon.util.Log;
 import com.couchbase.lite.DatabaseConfiguration;
-import com.couchbase.lite.EncryptionKey;
 
 public class DatabaseConfigurationRequestHandler {
     private static final String TAG = "DATABASE_CONFIG";
@@ -19,12 +18,7 @@ public class DatabaseConfigurationRequestHandler {
         DatabaseConfiguration config = new DatabaseConfiguration();
         config.setDirectory(directory);
 
-        EncryptionKey encryptionKey;
         String password = args.get("password");
-        if (password != null) {
-            encryptionKey = new EncryptionKey(password);
-            config.setEncryptionKey(encryptionKey);
-        }
         return config;
     }
 
@@ -36,11 +30,6 @@ public class DatabaseConfigurationRequestHandler {
     public String getDirectory(Args args) {
         DatabaseConfiguration config = args.get("config");
         return config.getDirectory();
-    }
-
-    public EncryptionKey getEncryptionKey(Args args) {
-        DatabaseConfiguration config = args.get("config");
-        return config.getEncryptionKey();
     }
 
     /*public DatabaseConfiguration setConflictResolver(Args args){
@@ -55,10 +44,4 @@ public class DatabaseConfigurationRequestHandler {
         return config.setDirectory(directory);
     }
 
-    public DatabaseConfiguration setEncryptionKey(Args args) {
-        DatabaseConfiguration config = args.get("config");
-        String password = args.get("password");
-        EncryptionKey encryptionKey = new EncryptionKey(password);
-        return config.setEncryptionKey(encryptionKey);
-    }
 }
