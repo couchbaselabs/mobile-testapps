@@ -1,4 +1,6 @@
+#if COUCHBASE_ENTERPRISE
 using Couchbase.Lite.P2P;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,7 +16,7 @@ namespace Couchbase.Lite.Testing
 {
     public sealed class TcpMessageEndpointConnection : IMessageEndpointConnection
     {
-        #region Constants
+#region Constants
 
         internal const int Port = 5000;
         private const int ReceiveBufferSize = 8192;
@@ -27,9 +29,9 @@ namespace Couchbase.Lite.Testing
             TIMEOUT //15 sec
         }
 
-        #endregion
+#endregion
 
-        #region Variables
+#region Variables
 
         private readonly CancellationTokenSource _cancelSource = new CancellationTokenSource();
         private bool _connected;
@@ -44,9 +46,9 @@ namespace Couchbase.Lite.Testing
         public event StatusUpdatedEventHandler StatusUpdated;
         public TcpClient Client;
 
-        #endregion
+#endregion
 
-        #region Constructors
+#region Constructors
 
         public TcpMessageEndpointConnection(Uri uri)
         {
@@ -67,9 +69,9 @@ namespace Couchbase.Lite.Testing
             _networkStream = Client.GetStream();
         }
 
-        #endregion
+#endregion
 
-        #region IMessageEndpointConnection
+#region IMessageEndpointConnection
 
         /// <summary>
         /// Closes the connection to the remote endpoint
@@ -147,9 +149,9 @@ namespace Couchbase.Lite.Testing
             }
         }
 
-        #endregion
+#endregion
 
-        #region Private Methods
+#region Private Methods
 
         private async void ReceiveLoop()
         {
@@ -184,7 +186,7 @@ namespace Couchbase.Lite.Testing
             }
         }
 
-        #endregion
+#endregion
     }
 
     internal static class StreamExt
@@ -235,3 +237,4 @@ namespace Couchbase.Lite.Testing
         }
     }
 }
+#endif

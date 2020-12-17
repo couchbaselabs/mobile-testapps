@@ -59,7 +59,6 @@ namespace Couchbase.Lite.Testing
                 ["basicAuthenticator_create"] = BasicAuthenticationMethods.Create,
                 ["sessionAuthenticator_create"] = SessionAuthenticationMethods.Create,
                 ["databaseConfiguration_configure"] = DatabaseConfigurationMethods.Configure,
-                ["databaseConfiguration_setEncryptionKey"] = DatabaseConfigurationMethods.SetEncryptionKey,
                 ["database_create"] = DatabaseMethods.DatabaseCreate,
                 ["database_compact"] = DatabaseMethods.DatabaseCompact,
                 ["database_close"] = DatabaseMethods.DatabaseClose,
@@ -84,7 +83,10 @@ namespace Couchbase.Lite.Testing
                 ["database_updateDocument"] = DatabaseMethods.DatabaseUpdateDocument,
                 ["database_updateDocuments"] = DatabaseMethods.DatabaseUpdateDocuments,
                 ["database_exists"] = DatabaseMethods.DatabaseExists,
+#if COUCHBASE_ENTERPRISE
                 ["database_changeEncryptionKey"] = DatabaseMethods.DatabaseChangeEncryptionKey,
+                ["databaseConfiguration_setEncryptionKey"] = DatabaseConfigurationMethods.SetEncryptionKey,
+#endif
                 ["database_copy"] = DatabaseMethods.DatabaseCopy, 
                 ["database_getPreBuiltDb"] = DatabaseMethods.DatabaseGetPreBuiltDb,
                 ["dictionary_contains"] = DictionaryMethods.DictionaryContains,
@@ -233,17 +235,18 @@ namespace Couchbase.Lite.Testing
                 ["datatype_compareDouble"] = DataTypeMethods.DataTypeCompareDouble,
                 ["datatype_setDate"] = DataTypeMethods.DataTypeSetDate,
                 ["datatype_compareDate"] = DataTypeMethods.DataTypeCompareDate,
+                ["peerToPeer_addReplicatorEventChangeListener"] = ReplicationMethods.AddReplicatorEventChangeListener,
+                ["peerToPeer_removeReplicatorEventListener"] = ReplicationMethods.RemoveReplicatorEventListener,
+                ["peerToPeer_replicatorEventGetChanges"] = ReplicationMethods.ReplicatorEventGetChanges,
+                ["peerToPeer_replicatorEventChangesCount"] = ReplicationMethods.ReplicatorEventChangesCount,
+#if COUCHBASE_ENTERPRISE
+                ["listenerAuthenticator_create"] = ListenerAuthenticatorMethods.Create,
                 ["peerToPeer_serverStart"] = P2PMethods.Start_Server,
                 ["peerToPeer_messageEndpointListenerStart"] = P2PMethods.Message_Endpoint_Listener_Start,
                 ["peerToPeer_getListenerPort"] = P2PMethods.Get_Listener_Port,
                 ["peerToPeer_serverStop"] = P2PMethods.Stop_Server,
                 ["peerToPeer_clientStart"] = P2PMethods.Start_Client,
                 ["peerToPeer_configure"] = P2PMethods.Configure,
-                ["listenerAuthenticator_create"] = ListenerAuthenticatorMethods.Create,
-                ["peerToPeer_addReplicatorEventChangeListener"] = ReplicationMethods.AddReplicatorEventChangeListener,
-                ["peerToPeer_removeReplicatorEventListener"] = ReplicationMethods.RemoveReplicatorEventListener,
-                ["peerToPeer_replicatorEventGetChanges"] = ReplicationMethods.ReplicatorEventGetChanges,
-                ["peerToPeer_replicatorEventChangesCount"] = ReplicationMethods.ReplicatorEventChangesCount,
                 ["predictiveQuery_registerModel"] = PredictiveQueriesMethods.RegisterModel,
                 ["predictiveQuery_unRegisterModel"] = PredictiveQueriesMethods.UnRegisterModel,
                 ["predictiveQuery_getPredictionQueryResult"] = PredictiveQueriesMethods.GetPredictionQueryResult,
@@ -252,6 +255,7 @@ namespace Couchbase.Lite.Testing
                 ["predictiveQuery_getSquaredEuclideanDistance"] = PredictiveQueriesMethods.GetSquaredEuclideanDistance,
                 ["predictiveQuery_getCosineDistance"] = PredictiveQueriesMethods.GetCosineDistance,
                 ["predictiveQuery_getNumberOfCalls"] = PredictiveQueriesMethods.GetNumberOfCalls,
+#endif
                 ["logging_configure"] = FileLoggingMehtod.Configure,
                 ["logging_getPlainTextStatus"] = FileLoggingMehtod.GetPlainTextStatus,
                 ["logging_getMaxRotateCount"] = FileLoggingMehtod.GetMaxRotateCount,
@@ -282,9 +286,9 @@ namespace Couchbase.Lite.Testing
                 ["flushMemory"] = flushMemory
             };
 
-        #endregion
+#endregion
 
-        #region Public Methods
+#region Public Methods
 
         public static void Extend([NotNull]IDictionary<string, HandlerAction> extensions)
         {
@@ -297,9 +301,9 @@ namespace Couchbase.Lite.Testing
             }
         }
 
-        #endregion
+#endregion
 
-        #region Internal Methods
+#region Internal Methods
 
         internal static void Handle([NotNull]Uri endpoint, [NotNull]Stream body, [NotNull]HttpListenerResponse response)
         {
@@ -343,9 +347,9 @@ namespace Couchbase.Lite.Testing
             }
         }
 
-        #endregion
+#endregion
 
-        #region Private Methods
+#region Private Methods
 
         private static void ReleaseObject([NotNull]NameValueCollection args,
             [NotNull]IReadOnlyDictionary<string, object> postBody,
@@ -413,6 +417,6 @@ namespace Couchbase.Lite.Testing
             }
         }
 
-        #endregion
+#endregion
     }
 }

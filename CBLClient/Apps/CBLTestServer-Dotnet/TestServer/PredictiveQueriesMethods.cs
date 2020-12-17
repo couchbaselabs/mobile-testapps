@@ -18,7 +18,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 // 
-
+#if COUCHBASE_ENTERPRISE
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -27,6 +27,7 @@ using System.Net;
 using JetBrains.Annotations;
 
 using Couchbase.Lite.Enterprise.Query;
+
 
 using static Couchbase.Lite.Testing.DatabaseMethods;
 using static Couchbase.Lite.Query.QueryBuilder;
@@ -37,7 +38,7 @@ namespace Couchbase.Lite.Testing
 {
     internal static class PredictiveQueriesMethods
     {
-        #region Public Methods
+#region Public Methods
         public static void RegisterModel([NotNull] NameValueCollection args,
                                   [NotNull] IReadOnlyDictionary<string, object> postBody,
                                   [NotNull] HttpListenerResponse response)
@@ -180,7 +181,7 @@ namespace Couchbase.Lite.Testing
                 response.WriteBody(resultArray);
             });
         }
-        #endregion
+#endregion
     }
 
     internal sealed class EchoModel : IPredictiveModel
@@ -206,3 +207,4 @@ namespace Couchbase.Lite.Testing
 
     }
 }
+#endif

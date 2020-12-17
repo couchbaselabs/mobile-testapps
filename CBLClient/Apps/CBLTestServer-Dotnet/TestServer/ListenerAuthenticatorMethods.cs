@@ -1,4 +1,4 @@
-﻿
+﻿#if COUCHBASE_ENTERPRISE
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -30,3 +30,4 @@ namespace Couchbase.Lite.Testing
 
 
 }
+#endif

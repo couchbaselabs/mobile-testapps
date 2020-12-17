@@ -130,7 +130,7 @@ namespace Couchbase.Lite.Testing
             With<Database>(postBody, "database", db => db.Compact());
             response.WriteEmptyBody();
         }
-
+#if COUCHBASE_ENTERPRISE
         internal static void DatabaseChangeEncryptionKey([NotNull] NameValueCollection args,
                                              [NotNull] IReadOnlyDictionary<string, object> postBody,
                                              [NotNull] HttpListenerResponse response)
@@ -149,7 +149,7 @@ namespace Couchbase.Lite.Testing
             });
             response.WriteEmptyBody();
         }
-
+#endif
         internal static void DatabaseCreate([NotNull]NameValueCollection args,
             [NotNull]IReadOnlyDictionary<string, object> postBody,
             [NotNull]HttpListenerResponse response)
@@ -548,7 +548,7 @@ namespace Couchbase.Lite.Testing
 
 
 
-        #endregion
+#endregion
     }
 
     internal sealed class DatabaseChangeListenerProxy

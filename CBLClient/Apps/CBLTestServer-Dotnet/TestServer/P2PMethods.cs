@@ -1,8 +1,10 @@
+#if COUCHBASE_ENTERPRISE
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
+
 using Couchbase.Lite.P2P;
 using System.Threading.Tasks;
 
@@ -358,3 +360,4 @@ namespace Couchbase.Lite.Testing
         }
     }
 }
+#endif

@@ -30,8 +30,11 @@ namespace Couchbase.Lite.Testing
             if (postBody.ContainsKey("password"))
             {
                 var password = postBody["password"].ToString();
+
+#if COUCHBASE_ENTERPRISE
                 var encryptionKey = new EncryptionKey(password);
                 databaseConfig.EncryptionKey = encryptionKey;
+#endif
             }
             var databaseConfigId = MemoryMap.Store(databaseConfig);
             response.WriteBody(databaseConfigId);
@@ -51,22 +54,21 @@ namespace Couchbase.Lite.Testing
         {
             With<DatabaseConfiguration>(postBody, "config", dbconfig => response.WriteBody(dbconfig.Directory));
         }
-
+        public static void SetDirectory([NotNull] NameValueCollection args,
+            [NotNull] IReadOnlyDictionary<string, object> postBody,
+            [NotNull] HttpListenerResponse response)
+        {
+            var directory = postBody["directory"].ToString();
+            With<DatabaseConfiguration>(postBody, "config", dbconfig => dbconfig.Directory = directory);
+            response.WriteEmptyBody();
+        }
+#if COUCHBASE_ENTERPRISE
         public static void GetEncryptionKey([NotNull] NameValueCollection args,
             [NotNull] IReadOnlyDictionary<string, object> postBody,
             [NotNull] HttpListenerResponse response)
             {
                 With<DatabaseConfiguration>(postBody, "config", dbconfig => response.WriteBody(dbconfig.EncryptionKey));
             }
-
-        public static void SetDirectory([NotNull] NameValueCollection args,
-         [NotNull] IReadOnlyDictionary<string, object> postBody,
-         [NotNull] HttpListenerResponse response)
-        {
-            var directory = postBody["directory"].ToString();
-            With<DatabaseConfiguration>(postBody, "config", dbconfig => dbconfig.Directory = directory);
-            response.WriteEmptyBody();
-        }
 
         public static void SetEncryptionKey([NotNull] NameValueCollection args,
              [NotNull] IReadOnlyDictionary<string, object> postBody,
@@ -82,5 +84,6 @@ namespace Couchbase.Lite.Testing
                 response.WriteBody(databaseConfigId);
             });
         }
+#endif
     }
 }
