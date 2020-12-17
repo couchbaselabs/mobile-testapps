@@ -17,10 +17,6 @@ function Modify-Packages {
         if($isMatch) {
             $oldPackageName = $matches[1]
             $packageName = $oldPackageName.Replace(".Enterprise", "")
-            if(-Not $community) {
-                $packageName = ".Enterprise" + $packageName;
-            }
-
             $isMatch = $line -match ".*?Version=`"(.*?)`""
             if($isMatch) {
                 $oldVersion = $matches[1]
