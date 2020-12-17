@@ -21,8 +21,7 @@
     <ConsolePause>false</ConsolePause>
     <MtouchArch>x86_64</MtouchArch>
     <MtouchLink>SdkOnly</MtouchLink>
-    <MtouchDebug>true</MtouchDebug>
-    <DefineConstants>COUCHBASE_ENTERPRISE</DefineConstants>    
+    <MtouchDebug>true</MtouchDebug> 
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -33,7 +32,6 @@
     <MtouchLink>SdkOnly</MtouchLink>
     <MtouchArch>x86_64</MtouchArch>
     <ConsolePause>false</ConsolePause>
-    <DefineConstants>COUCHBASE_ENTERPRISE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -46,8 +44,7 @@
     <ConsolePause>false</ConsolePause>
     <MtouchArch>ARM64</MtouchArch>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-    <CodesignKey>iPhone Developer</CodesignKey>
-    <DefineConstants>COUCHBASE_ENTERPRISE</DefineConstants>    
+    <CodesignKey>iPhone Developer</CodesignKey>    
     <MtouchDebug>true</MtouchDebug>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
@@ -60,7 +57,6 @@
     <MtouchArch>ARM64</MtouchArch>
     <ConsolePause>false</ConsolePause>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <DefineConstants>COUCHBASE_ENTERPRISE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Ad-Hoc|iPhone' ">
     <DebugType>none</DebugType>
@@ -86,7 +82,6 @@
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <CodesignProvision>Automatic:AppStore</CodesignProvision>
     <CodesignKey>iPhone Distribution</CodesignKey>
-    <DefineConstants>COUCHBASE_ENTERPRISE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
@@ -121,10 +116,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Couchbase.Lite.Enterprise.Support.iOS">
+    <PackageReference Include="Couchbase.Lite.Support.iOS">
       <Version>2.8.0-b0143</Version>
     </PackageReference>
-    <PackageReference Include="Couchbase.Lite.Enterprise">
+    <PackageReference Include="Couchbase.Lite">
       <Version>2.8.0-b0143</Version>
     </PackageReference>
   </ItemGroup>

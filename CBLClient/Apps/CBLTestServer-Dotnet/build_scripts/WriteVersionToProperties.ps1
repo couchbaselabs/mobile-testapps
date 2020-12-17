@@ -5,7 +5,7 @@
 
 if(!$Version.Contains("-")) {
     if(-Not $Community) {
-        $nugetDirectory = "$HOME\.nuget\packages\couchbase.lite.enterprise"
+        $nugetDirectory = "$HOME\.nuget\packages\couchbase.lite"
     } else {
         $nugetDirectory = "$HOME\.nuget\packages\couchbase.lite"
     }
