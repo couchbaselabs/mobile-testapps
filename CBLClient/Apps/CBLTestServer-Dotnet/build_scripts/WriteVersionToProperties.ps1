@@ -4,12 +4,7 @@
 )
 
 if(!$Version.Contains("-")) {
-    if(-Not $Community) {
-        $nugetDirectory = "$HOME\.nuget\packages\couchbase.lite"
-    } else {
-        $nugetDirectory = "$HOME\.nuget\packages\couchbase.lite"
-    }
-        
+    $nugetDirectory = "$HOME\.nuget\packages\couchbase.lite" 
     $fullVersion = Get-ChildItem $nugetDirectory -Filter "$Version-b*" | Select-Object -Last 1 -ExpandProperty Name
 } else {
     $fullVersion = $Version
