@@ -33,7 +33,7 @@ jar {
 repositories {
     mavenCentral()
     maven {
-        url "http://mobile.maven.couchbase.com/maven2/internalmaven/"
+        url "http://proget.build.couchbase.com/maven2/internalmaven/"
     }
     maven {
         url "https://oss.sonatype.org/content/repositories/snapshots"
