@@ -49,8 +49,6 @@
 		29F7869B1F9FC4180035178F /* GCDWebServerErrorResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 29F7868C1F9FC4180035178F /* GCDWebServerErrorResponse.m */; };
 		29F7869C1F9FC4180035178F /* GCDWebServerFileResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 29F7868E1F9FC4180035178F /* GCDWebServerFileResponse.m */; };
 		29F7869D1F9FC4180035178F /* GCDWebServerStreamedResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 29F786901F9FC4180035178F /* GCDWebServerStreamedResponse.m */; };
-		2E2A8411238E555E00F8043F /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E2A840F238E550C00F8043F /* Zip.framework */; };
-		2E2A8412238E555E00F8043F /* Zip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2E2A840F238E550C00F8043F /* Zip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2E8631EF229F2C8C00859424 /* Files in Resources */ = {isa = PBXBuildFile; fileRef = 2E8631EE229F2C8C00859424 /* Files */; };
 		410E9313235D91EF002AC728 /* CouchbaseLiteSwift.framework.dSYM in Resources */ = {isa = PBXBuildFile; fileRef = 410E9311235D91EF002AC728 /* CouchbaseLiteSwift.framework.dSYM */; };
 		41DAF0882362D6D400BE60C0 /* CouchbaseLiteSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 410E9310235D91EF002AC728 /* CouchbaseLiteSwift.framework */; };
@@ -97,8 +95,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				2E2A8412238E555E00F8043F /* Zip.framework in Embed Frameworks */,
-				41DAF0892362D6D400BE60C0 /* CouchbaseLiteSwift.framework in Embed Frameworks */,
+				7494704F25C4DEB600355244 /* CouchbaseLiteSwift.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -207,8 +204,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2E2A8411238E555E00F8043F /* Zip.framework in Frameworks */,
-				41DAF0882362D6D400BE60C0 /* CouchbaseLiteSwift.framework in Frameworks */,
+				7494704E25C4DEB600355244 /* CouchbaseLiteSwift.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
