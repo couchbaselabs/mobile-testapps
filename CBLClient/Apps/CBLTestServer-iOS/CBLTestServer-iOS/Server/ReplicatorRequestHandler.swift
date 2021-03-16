@@ -100,6 +100,10 @@ public class ReplicatorRequestHandler {
             let changeListener : MyReplicationChangeListener = (args.get(name: "changeListener"))!
             replication_obj.removeChangeListener(withToken: changeListener.listenerToken!)
 
+        case "replicator_removeListener":
+            let token: ListenerToken = (args.get(name: "token"))!
+            token.remove()
+
         case "replicator_changeListenerChangesCount":
             let changeListener: MyReplicationChangeListener = (args.get(name: "changeListener"))!
             return changeListener.getChanges().count

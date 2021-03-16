@@ -170,6 +170,10 @@ public class DatabaseRequestHandler {
             let changeListener: ListenerToken = (args.get(name: "changeListener"))!
 
             database.removeChangeListener(withToken: changeListener)
+        
+        case "database_removeListener":
+            let token: ListenerToken = (args.get(name: "changeListener"))!
+            token.remove()
 
         case "database_databaseChangeListenerChangesCount":
             let changeListener: MyDatabaseChangeListener = (args.get(name: "changeListener"))!
