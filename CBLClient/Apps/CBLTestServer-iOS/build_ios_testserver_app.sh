@@ -1,4 +1,3 @@
-#!/bin/bash
 
 EDITION=$1
 VERSION=$2
@@ -24,7 +23,7 @@ if [[ -d ${FRAMEWORK_DIR} ]]; then rm -rf ${FRAMEWORK_DIR}/*; fi
 
 pushd ${FRAMEWORK_DIR}
 pwd
-IOS_ZIP=${WORKSPACE}/artifacts/couchbase-lite-swift_${EDITION}_${VERSION}-${BLD_NUM}.zip
+IOS_ZIP=${WORKSPACE}/artifacts/couchbase-lite-swift_xc_${EDITION}_${VERSION}-${BLD_NUM}.zip
 if [[ -f ${IOS_ZIP} ]]; then
     unzip ${IOS_ZIP}
 else
