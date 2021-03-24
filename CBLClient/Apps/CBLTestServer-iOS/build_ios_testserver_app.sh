@@ -1,3 +1,4 @@
+#!/bin/bash
 
 EDITION=$1
 VERSION=$2
@@ -8,7 +9,7 @@ set -e
 if [[ ! -d Frameworks ]]; then mkdir Frameworks; fi
 
 # Prepare framework
-if [ EDITION = "community" ]
+if [[ $EDITION == "community" ]]
 then
 SCHEME=CBLTestServer-iOS
 else
@@ -16,6 +17,7 @@ SCHEME=CBLTestServer-iOS-EE
 fi
 SDK=iphonesimulator
 SDK_DEVICE=iphoneos
+
 FRAMEWORK_DIR=${WORKSPACE}/mobile-testapps/CBLClient/Apps/CBLTestServer-iOS/Frameworks
 
 if [[ -d build ]]; then rm -rf build/*; fi
@@ -23,6 +25,7 @@ if [[ -d ${FRAMEWORK_DIR} ]]; then rm -rf ${FRAMEWORK_DIR}/*; fi
 
 pushd ${FRAMEWORK_DIR}
 pwd
+echo ${WORKSPACE}
 IOS_ZIP=${WORKSPACE}/artifacts/couchbase-lite-swift_xc_${EDITION}_${VERSION}-${BLD_NUM}.zip
 if [[ -f ${IOS_ZIP} ]]; then
     unzip ${IOS_ZIP}
@@ -41,7 +44,7 @@ TESTSERVER_APP_DEVICE_CP=${SCHEME}-${VERSION}-${BLD_NUM}-Device.app
 TESTSERVER_DEBUG_APP_CP=${SCHEME}-${VERSION}-${BLD_NUM}-debug.app
 TESTSERVER_DEBUG_APP_DEVICE_CP=${SCHEME}-${VERSION}-${BLD_NUM}-Device-debug.app
 TESTSERVER_ZIP=CBLTestServer-iOS-${EDITION}-${VERSION}-${BLD_NUM}.zip
-if [ EDITION = "community" ]
+if [[ $EDITION == "community" ]]
 then
 configuration=Release
 product_location=Release-${SDK}
@@ -57,6 +60,7 @@ debug_configuration=Debug-EE
 debug_product_location=Debug-EE-${SDK}
 debug_device_prod_loc=Debug-EE-${SDK_DEVICE}
 fi
+
 xcodebuild CURRENT_PROJECT_VERSION=${BLD_NUM} CBL_VERSION_STRING=${VERSION} -scheme ${SCHEME} -sdk ${SDK} -configuration ${configuration} -derivedDataPath build
 xcodebuild CURRENT_PROJECT_VERSION=${BLD_NUM} CBL_VERSION_STRING=${VERSION} -scheme ${SCHEME} -sdk ${SDK_DEVICE} -configuration ${configuration} -derivedDataPath build-device -allowProvisioningUpdates
 xcodebuild CURRENT_PROJECT_VERSION=${BLD_NUM} CBL_VERSION_STRING=${VERSION} -scheme ${SCHEME} -sdk ${SDK} -configuration ${debug_configuration} -derivedDataPath build
