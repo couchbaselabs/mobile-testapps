@@ -3,6 +3,7 @@ package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.couchbase.lite.ReplicatorStatus;
 import com.couchbase.mobiletestkit.javacommon.Args;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.DocumentReplication;
@@ -122,7 +123,7 @@ public class ReplicatorRequestHandler {
         return change.getReplicator();
     }
 
-    public Replicator.Status changeGetStatus(Args args) {
+    public ReplicatorStatus changeGetStatus(Args args) {
         ReplicatorChange change = args.get("change");
         return change.getStatus();
     }
