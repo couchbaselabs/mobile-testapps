@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <base-config cleartextTrafficPermitted="false">
-        <domain-config cleartextTrafficPermitted="true">
-            <domain includeSubdomains="true">couchbase.com</domain>
-            <trust-anchors>
-                 <certificates src="@raw/my_ca"/>
-            </trust-anchors>
-        </domain-config>
-    </base-config>
+   <domain-config cleartextTrafficPermitted="true">
+       <domain includeSubdomains="true">couchbase.com</domain>
+   </domain-config>
 </network-security-config>
