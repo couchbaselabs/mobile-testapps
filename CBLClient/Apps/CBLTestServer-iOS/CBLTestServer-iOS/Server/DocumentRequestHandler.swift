@@ -221,7 +221,6 @@ public class DocumentRequestHandler {
             
         case "document_getId":
             let document: Document = args.get(name: "document")!
-            
             return document.id
 
         case "document_count":
