@@ -328,7 +328,7 @@ namespace replicator_configuration_methods {
                 tolower(autoPurge);
                 if(autoPurge == "disabled") {
                     config->disableAutoPurge = true;
-                } else {
+                } else if(autoPurge == "enabled") {
                     config->disableAutoPurge = false;
                 }
             }
