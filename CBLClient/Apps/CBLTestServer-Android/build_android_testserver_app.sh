@@ -4,6 +4,7 @@ EDITION=$1
 VERSION=$2
 BUILD_NUM=$3
 NDK_VERSION="22.0.7026061"
+${SDK_CMD} --install "ndk;${NDK_VERSION}"
 
 FAIL=0
 if [ -z "${ANDROID_HOME}" ] || [ ! -d "${ANDROID_HOME}" ]; then
