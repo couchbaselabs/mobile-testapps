@@ -3,6 +3,7 @@
 EDITION=$1
 VERSION=$2
 BUILD_NUM=$3
+NDK_VERSION="22.0.7026061"
 
 FAIL=0
 if [ -z "${ANDROID_HOME}" ] || [ ! -d "${ANDROID_HOME}" ]; then
