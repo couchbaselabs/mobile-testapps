@@ -32,6 +32,8 @@ public class Server {
     let databaseRequestHandler: DatabaseRequestHandler!
     let documentRequestHandler: DocumentRequestHandler!
     let replicatorRequestHandler: ReplicatorRequestHandler!
+    let collectionRequestHandler: CollectionRequestHandler!
+    let scopeRequestHandler: ScopeRequestHandler!
     let arrayRequestHandler: ArrayRequestHandler!
     let sessionauthenticatorRequestHandler: SessionAuthenticatorRequestHandler!
     let encryptionkeyRequestHandler: EncryptionKeyRequestHandler!
@@ -60,6 +62,8 @@ public class Server {
         documentRequestHandler = DocumentRequestHandler()
         replicatorRequestHandler = ReplicatorRequestHandler()
         arrayRequestHandler = ArrayRequestHandler()
+        collectionRequestHandler = CollectionRequestHandler()
+        scopeRequestHandler = ScopeRequestHandler()
         sessionauthenticatorRequestHandler = SessionAuthenticatorRequestHandler()
         encryptionkeyRequestHandler = EncryptionKeyRequestHandler()
         blobRequestHandler = BlobRequestHandler()
