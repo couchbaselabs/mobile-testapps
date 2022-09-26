@@ -12,7 +12,7 @@ public class CollectionRequestHandler {
         switch method {
         case "collection_defaultCollection":
             let database: Database = (args.get(name:"database"))!
-            let collection: Collection = try (database.defaultCollection())!
+            let collection: Collection? = try database.defaultCollection()
             return collection
             
         case "collection_getCollectionName":
