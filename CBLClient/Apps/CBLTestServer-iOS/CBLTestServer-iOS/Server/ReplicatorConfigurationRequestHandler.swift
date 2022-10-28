@@ -65,9 +65,7 @@ public class ReplicatorConfigurationRequestHandler {
                 replicatorConfiguration.addCollection((collection), config: collectionConfiguration)
             }
             else {
-                var k = CollectionConfiguration()
-                k.channels=["ABC"]
-                replicatorConfiguration.addCollection(collection, config: k)
+                replicatorConfiguration.addCollection(collection)
             }
         
         case "replicatorConfiguration_addCollections":
@@ -203,9 +201,6 @@ public class ReplicatorConfigurationRequestHandler {
             
             if let col = collections {
                 config.addCollection(col)
-            }
-            if (collections != nil) {
-                config.addCollection(collections!)
             }
             return config
             
