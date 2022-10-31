@@ -124,7 +124,8 @@ public class ReplicatorConfigurationRequestHandler {
             let continuous: Bool? = args.get(name: "continuous")
             let authValue: AnyObject? = args.get(name: "authenticator")
             let authenticator: Authenticator? = authValue as? Authenticator
-            let collections: Collection? = args.get(name: "collections")
+            let collections: [Collection]? = args.get(name: "collections")
+            let collectionConfigurations: [CollectionConfiguration]? = args.get(name: "configuration")
             let headers: Dictionary<String, String>? = args.get(name: "headers")!
             let pinnedservercert: String? = args.get(name: "pinnedservercert")!
             let heartbeat: String? = args.get(name: "heartbeat")
@@ -200,7 +201,20 @@ public class ReplicatorConfigurationRequestHandler {
             }
             
             if let col = collections {
-                config.addCollection(col)
+                if let colConfig = collectionConfigurations {
+                    if colConfig.count == 1 {
+                        config.addCollections(col, config: colConfig[0])
+                    }
+                    else {
+                        assert(colConfig.count == col.count)
+                        for (i, j) in colConfig.enumerated() {
+                            config.addCollection(col[i], config: j)
+                        }
+                    }
+                }
+                else {
+                    config.addCollections(col)
+                }
             }
             return config
             
@@ -356,17 +370,6 @@ public class ReplicatorConfigurationRequestHandler {
             if let auto_purge: String = args.get(name: "auto_purge") {
                 config.enableAutoPurge = auto_purge.lowercased() == "enabled"
             }
-            if let cols = collections {
-                if collection_configuration?.count == 1 {
-                    let colConfig = collection_configuration?[0]
-                    config.addCollections(cols, config: colConfig)
-                        } else {
-                            assert(collection_configuration?.count == cols.count)
-                            for (i, colConfig) in collection_configuration!.enumerated() {
-                                config.addCollection(cols[i], config: colConfig)
-                            }
-                        }
-                    }
             return config
 
         case "replicatorConfiguration_getAuthenticator":
