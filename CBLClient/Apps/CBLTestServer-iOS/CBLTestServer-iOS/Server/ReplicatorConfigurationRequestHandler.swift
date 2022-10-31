@@ -236,8 +236,6 @@ public class ReplicatorConfigurationRequestHandler {
             let heartbeat: String? = args.get(name: "heartbeat")
             let maxRetries: String? = args.get(name: "max_retries")
             let maxRetryWaitTime: String? = args.get(name: "max_timeout")
-            let collections: [Collection]? = args.get(name: "collections")
-            let collection_configuration: [CollectionConfiguration]? = args.get(name: "configuration")
             
             var replicatorType = ReplicatorType.pushAndPull
             
