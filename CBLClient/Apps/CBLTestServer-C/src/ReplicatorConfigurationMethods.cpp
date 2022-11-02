@@ -201,8 +201,19 @@ static void CBLReplicatorConfig_EntryDelete(void* ptr) {
     free(config);
 }
 
+static void CBLReplicatorConfigCollection_EntryDelete(void* ptr) {
+    auto* config = (CBLReplicatorConfiguration *)ptr;
+    if(config->pinnedServerCertificate.buf) {
+        free((void *)config->pinnedServerCertificate.buf);
+    }
+    FLDict_Release(config->headers);
+    free(config);
+}
+
 static void CBLCollectionConfig_EntryDelete(void* ptr) {
     auto* config = (CBLReplicationCollection *) ptr;
+    FLArray_Release(config->documentIDs);
+    FLArray_Release(config->channels);
     free(config);
 }
 
@@ -376,7 +387,7 @@ void replicatorConfigurationCollection(json& body, mg_connection* conn) {
                 config->context = context;
             }
 #endif
-    write_serialized_body(conn, memory_map::store(config, CBLReplicatorConfig_EntryDelete));
+    write_serialized_body(conn, memory_map::store(config, CBLReplicatorConfigCollection_EntryDelete));
 }
 
     void replicatorConfiguration_create(json& body, mg_connection* conn) {
