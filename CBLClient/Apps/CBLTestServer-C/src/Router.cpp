@@ -55,6 +55,7 @@ static const unordered_map<string, endpoint_handler> ROUTE_MAP = {
     { "basicAuthenticator_create", basic_authentication_methods::basic_authentication_create },
     { "sessionAuthenticator_create", session_authentication_methods::session_authentication_create },
     { "databaseConfiguration_configure", database_configuration_methods::database_configuration_configure },
+    {"databaseConfiguration_configure_old", database_configuration_methods::database_configuration_configure_old },
     { "databaseConfiguration_setEncryptionKey", database_configuration_methods::database_configuration_setEncryptionKey },
     { "database_create", database_methods::database_create },
     { "database_compact", database_methods::database_compact },
