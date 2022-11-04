@@ -219,7 +219,6 @@ static void CBLCollectionConfig_EntryDelete(void* ptr) {
 
 namespace replicator_configuration_methods {
 void replicatorCollectionConfiguration(json& body, mg_connection* conn) {
-//    CBLReplicationCollection config = {};
     auto config = static_cast<CBLReplicationCollection *>(malloc(sizeof(CBLReplicationCollection)));
     memset(config, 0, sizeof(CBLReplicationCollection));
     auto collection = static_cast<CBLCollection *>(memory_map::get(body["collection"].get<string>()));
