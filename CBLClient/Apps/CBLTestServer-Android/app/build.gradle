@@ -14,14 +14,13 @@ ext {
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "29.0.3"
-    ndkVersion "25.0.8775105"
+    namespace "com.couchbase.CouchbaseLiteServ"
+    compileSdkVersion 33
+    buildToolsVersion '33.0.1'
 
     defaultConfig {
-        applicationId "com.couchbase.TestServerApp"
         minSdkVersion 22
-        targetSdkVersion 30
+        targetSdkVersion 32
         versionCode 1
         versionName DEF_VERSION
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -58,7 +57,6 @@ android {
         }
     }
 
-
     buildTypes {
         release {
             minifyEnabled false
@@ -69,20 +67,28 @@ android {
 }
 
 repositories {
-    // for build version < 3.0.0-160, use below maven url
-    // maven { url "http://proget.build.couchbase.com/maven2/internalmaven" }
-    maven { url "http://mobile.nuget.couchbase.com/maven2/internalmaven/"}
+    if (null == COUCHBASE_LITE_VERSION) {
+        mavenLocal()
+        COUCHBASE_LITE_VERSION = "3.1.0-SNAPSHOT"
+    }
+    else {
+        // for build version < 3.0.0-160, use below maven url
+        // maven { url "http://proget.build.couchbase.com/maven2/internalmaven" }
+        maven { url "http://mobile.nuget.couchbase.com/maven2/internalmaven/" }
+    }
+
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+
     google()
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    //noinspection GradleCompatible
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+
+    implementation 'com.google.code.gson:gson:2.8.9'
 
     // Using snapshot code to validate our product is incredibly dubious...
     implementation 'org.nanohttpd:nanohttpd:2.3.2-SNAPSHOT'
@@ -91,9 +97,10 @@ dependencies {
     // implementation "com.couchbase.lite:couchbase-lite-android-ee:${COUCHBASE_LITE_VERSION}"
     // for build version > 3.0.0-160 but < 3.0.0-177, use below package name
     // implementation "com.couchbase.lite:couchbase-lite-kt-android-ee:${COUCHBASE_LITE_VERSION}"
+    // for build version > 3.0.0-177, use below package name
     implementation "com.couchbase.lite:couchbase-lite-android-ee-ktx:${COUCHBASE_LITE_VERSION}"
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
 
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.2"
+    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
 }

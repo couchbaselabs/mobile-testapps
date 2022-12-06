@@ -11,8 +11,8 @@ public class SessionAuthenticatorRequestHandler {
     /* ------------------------ */
 
     public SessionAuthenticator create(Args args) {
-        String sessionId = args.get("sessionId");
-        String cookieName = args.get("cookieName");
+        String sessionId = args.getString("sessionId");
+        String cookieName = args.getString("cookieName");
         if (cookieName == null) {
             return new SessionAuthenticator(sessionId);
         }
@@ -20,12 +20,12 @@ public class SessionAuthenticatorRequestHandler {
     }
 
     public String getSessionId(Args args) {
-        SessionAuthenticator session = args.get("session");
+        SessionAuthenticator session = args.get("session", SessionAuthenticator.class);
         return session.getSessionID();
     }
 
     public String getCookieName(Args args) {
-        SessionAuthenticator session = args.get("session");
+        SessionAuthenticator session = args.get("session", SessionAuthenticator.class);
         return session.getCookieName();
     }
 }

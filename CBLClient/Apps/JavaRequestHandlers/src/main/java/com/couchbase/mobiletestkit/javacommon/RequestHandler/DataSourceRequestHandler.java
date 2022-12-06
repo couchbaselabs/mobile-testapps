@@ -9,7 +9,7 @@ import com.couchbase.lite.Database;
 public class DataSourceRequestHandler {
 
     public DataSource database(Args args) {
-        Database database = args.get("database");
+        Database database = args.get("database", Database.class);
         return DataSource.database(database);
     }
 }

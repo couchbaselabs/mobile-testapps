@@ -17,19 +17,18 @@ package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 //
 
 
-import com.couchbase.mobiletestkit.javacommon.RequestHandlerDispatcher;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Random;
+
+import com.couchbase.CouchbaseLiteServ.TestServerApp;
 
 
 // Websocket based client connection
 public final class ReplicatorTcpClientConnection extends ReplicatorTcpConnection {
-    private URI uri;
+    private final URI uri;
 
     public ReplicatorTcpClientConnection(URI uri) {
         super();
@@ -54,15 +53,15 @@ public final class ReplicatorTcpClientConnection extends ReplicatorTcpConnection
         String key = generateWebSocketKey();
         String path = uri.getPath() + "/_blipsync";
 
-        byte[] request = new StringBuilder().append("GET ").append(path).append(" HTTP/1.1").append("\r\n")
-            .append("Sec-WebSocket-Version: 13").append("\r\n")
-            .append("Sec-WebSocket-Protocol: BLIP_3+CBMobile_2").append("\r\n")
-            .append("Sec-WebSocket-Key: ").append(key).append("\r\n")
-            .append("Upgrade: websocket").append("\r\n")
-            .append("Connection: Upgrade").append("\r\n")
-            .append("Host: ").append(host).append("\r\n")
-            .append("\r\n")
-            .toString().getBytes(StandardCharsets.UTF_8);
+        byte[] request = ("GET " + path + " HTTP/1.1" + "\r\n"
+            + "Sec-WebSocket-Version: 13" + "\r\n"
+            + "Sec-WebSocket-Protocol: BLIP_3+CBMobile_2" + "\r\n"
+            + "Sec-WebSocket-Key: " + key + "\r\n"
+            + "Upgrade: websocket" + "\r\n"
+            + "Connection: Upgrade" + "\r\n"
+            + "Host: " + host + "\r\n"
+            + "\r\n")
+            .getBytes(StandardCharsets.UTF_8);
 
         outputStream.write(request);
         outputStream.flush();
@@ -94,7 +93,6 @@ public final class ReplicatorTcpClientConnection extends ReplicatorTcpConnection
         Random random = new Random();
         random.nextBytes(keyBytes);
 
-        return RequestHandlerDispatcher.context.encodeBase64(keyBytes);
+        return TestServerApp.getApp().encodeBase64(keyBytes);
     }
-
 }

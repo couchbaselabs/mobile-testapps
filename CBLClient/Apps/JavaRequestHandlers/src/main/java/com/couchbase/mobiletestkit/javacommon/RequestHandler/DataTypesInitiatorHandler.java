@@ -16,38 +16,38 @@ public class DataTypesInitiatorHandler {
     }
 
     public Double setDouble(Args args) {
-        return Double.parseDouble(args.get("value").toString());
+        return Double.parseDouble(args.getString("value"));
     }
 
     public Float setFloat(Args args) {
-        return Float.parseFloat(args.get("value").toString());
+        return Float.parseFloat(args.getString("value"));
     }
 
     public Long setLong(Args args) {
-        return Long.parseLong(args.get("value").toString());
+        return Long.parseLong(args.getString("value"));
     }
 
     public Boolean compare(Args args) {
-        String first = args.get("first").toString();
-        String second = args.get("second").toString();
+        String first = args.getString("first");
+        String second = args.getString("second");
         return first.equals(second);
     }
 
     public Boolean compareDate(Args args) {
-        Date first = args.get("date1");
-        Date second = args.get("date2");
+        Date first = args.get("date1", Date.class);
+        Date second = args.get("date2", Date.class);
         return first.equals(second);
     }
 
     public Boolean compareDouble(Args args) {
-        Double first = Double.valueOf(args.get("double1").toString());
-        Double second = Double.valueOf(args.get("double2").toString());
+        Double first = Double.valueOf(args.getString("double1"));
+        Double second = Double.valueOf(args.getString("double2"));
         return first.equals(second);
     }
 
     public Boolean compareLong(Args args) {
-        Long first = args.get("long1");
-        Long second = args.get("long2");
+        Long first = args.getLong("long1");
+        Long second = args.getLong("long2");
         return first.equals(second);
     }
 

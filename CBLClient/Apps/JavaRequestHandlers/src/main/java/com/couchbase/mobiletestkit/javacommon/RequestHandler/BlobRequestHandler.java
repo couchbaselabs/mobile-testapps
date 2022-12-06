@@ -1,7 +1,6 @@
 package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,110 +10,111 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import com.couchbase.mobiletestkit.javacommon.Args;
-import com.couchbase.mobiletestkit.javacommon.RequestHandlerDispatcher;
+import com.couchbase.CouchbaseLiteServ.TestServerApp;
 import com.couchbase.lite.Blob;
-import com.couchbase.mobiletestkit.javacommon.util.ZipUtils;
+import com.couchbase.lite.internal.fleece.FLEncoder;
+import com.couchbase.mobiletestkit.javacommon.Args;
+import com.couchbase.mobiletestkit.javacommon.util.FileUtils;
 
 
 public class BlobRequestHandler {
 
     public Blob create(Args args) throws IOException {
-        String contentType = args.get("contentType");
+        String contentType = args.getString("contentType");
 
-        byte[] content = args.get("content");
+        byte[] content = args.getData("content");
         if (content != null) { return new Blob(contentType, content); }
 
-        InputStream stream = args.get("stream");
+        InputStream stream = args.get("stream", InputStream.class);
         if (stream != null) { return new Blob(contentType, stream); }
 
-        URL fileURL = args.get("fileURL");
+        URL fileURL = args.get("fileURL", URL.class);
         if (fileURL != null) { return new Blob(contentType, fileURL); }
 
         throw new IOException("Incorrect parameters provided");
     }
 
     public byte[] createUTFBytesContent(Args args) {
-        String content = args.get("content");
+        String content = args.getString("content");
         return content.getBytes(StandardCharsets.UTF_8);
     }
 
     public InputStream createImageStream(Args args) throws IOException {
-        String filePath = args.get("image");
+        String filePath = args.getString("image");
         if (filePath == null || filePath.isEmpty()) {
             throw new IOException("Image content file path cannot be null");
         }
 
-        return RequestHandlerDispatcher.context.getAsset(filePath);
+        return TestServerApp.getApp().getAsset(filePath);
     }
 
     public byte[] createImageContent(Args args) throws IOException {
-        String filePath = args.get("image");
+        String filePath = args.getString("image");
         if (filePath == null || filePath.isEmpty()) {
             throw new IOException("Image content file path cannot be null");
         }
 
-        InputStream stream = RequestHandlerDispatcher.context.getAsset(filePath);
+        InputStream stream = TestServerApp.getApp().getAsset(filePath);
         byte[] targetArray = new byte[stream.available()];
         stream.read(targetArray);
 
         return targetArray;
     }
 
-    public URL createImageFileUrl(Args args) throws IOException, MalformedURLException {
-        String filePath = args.get("image");
+    public URL createImageFileUrl(Args args) throws IOException {
+        String filePath = args.getString("image");
         if (filePath == null || filePath.isEmpty()) {
             throw new IOException("Image content file path cannot be null");
         }
 
-        InputStream stream = RequestHandlerDispatcher.context.getAsset(filePath);
+        InputStream stream = TestServerApp.getApp().getAsset(filePath);
 
-        String directory = RequestHandlerDispatcher.context.getFilesDir().getAbsolutePath();
+        String directory = TestServerApp.getApp().getFilesDir().getAbsolutePath();
         File targetFile = new File(directory, filePath);
         OutputStream outStream = new FileOutputStream(targetFile);
-        ZipUtils utils = new ZipUtils();
+        FileUtils utils = new FileUtils();
         utils.copyFile(stream, outStream);
 
         return targetFile.toURI().toURL();
     }
 
     public String digest(Args args) {
-        return ((Blob) args.get("blob")).digest();
+        return args.get("blob", Blob.class).digest();
     }
 
     public void encodeTo(Args args) {
-        ((Blob) args.get("blob")).encodeTo(args.get("encoder"));
+        args.get("blob", Blob.class).encodeTo(args.get("encoder", FLEncoder.class));
     }
 
     public Boolean equals(Args args) {
-        return args.get("blob").equals(args.get("obj"));
+        return args.get("blob", Blob.class).equals(args.get("obj", Blob.class));
     }
 
     public int hashCode(Args args) {
-        return ((Blob) args.get("blob")).hashCode();
+        return args.get("blob", Blob.class).hashCode();
     }
 
     public byte[] getContent(Args args) {
-        return ((Blob) args.get("blob")).getContent();
+        return args.get("blob", Blob.class).getContent();
     }
 
     public Map<String, Object> getProperties(Args args) {
-        return ((Blob) args.get("blob")).getProperties();
+        return args.get("blob", Blob.class).getProperties();
     }
 
     public InputStream getContentStream(Args args) {
-        return ((Blob) args.get("blob")).getContentStream();
+        return args.get("blob", Blob.class).getContentStream();
     }
 
     public String getContentType(Args args) {
-        return ((Blob) args.get("blob")).getContentType();
+        return args.get("blob", Blob.class).getContentType();
     }
 
     public long length(Args args) {
-        return ((Blob) args.get("blob")).length();
+        return args.get("blob", Blob.class).length();
     }
 
     public String toString(Args args) {
-        return args.get("blob").toString();
+        return args.getString("blob");
     }
 }

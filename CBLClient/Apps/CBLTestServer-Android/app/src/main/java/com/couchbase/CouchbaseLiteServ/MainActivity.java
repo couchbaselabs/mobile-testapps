@@ -2,51 +2,52 @@ package com.couchbase.CouchbaseLiteServ;
 
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
 
-import com.couchbase.mobiletestkit.javacommon.Context;
+import com.couchbase.CouchbaseLiteServ.util.Log;
 import com.couchbase.mobiletestkit.javalistener.Server;
-import com.couchbase.mobiletestkit.javacommon.util.Log;
 
 
+public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "UI";
 
-public class MainActivity extends AppCompatActivity{
-    private static final String TAG = "MAIN";
     private Server server;
-    private final static int PORT = 8080;
-    private static Context context;
+    private TextView status;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        context = CouchbaseLiteServ.getTestServerContext();
-        String ip = context.getLocalIpAddress();
-
         setContentView(R.layout.activity_main);
-        TextView textView = findViewById(R.id.textView);
-        textView.setText(getString(R.string.server_running, ip, PORT));
-        Log.init(new TestServerLogger());
+    }
 
-        try {
-            Server.setContext(context);
-            Server.memory.setIpAddress(ip);
-            Log.i(TAG,"Starting the server at " + ip + ", port = " + PORT);
+    @Override
+    protected void onStart() {
+        super.onStart();
 
-            server = new Server(context, PORT);
-            server.start();
-        }
+        final String ip = TestServerApp.getApp().getLocalIpAddress();
+        server = new Server(ip);
+
+        status = findViewById(R.id.status);
+
+        final int port = server.myPort;
+        Log.i(TAG, "Starting server at " + ip + ":" + port);
+        status.setText(getString(R.string.running, ip, port));
+        try { server.start(); }
         catch (IOException e) {
             Log.e(TAG, "Failed starting server", e);
+            status.setText(getString(R.string.fail));
+            finish();
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        status.setText(R.string.stopped);
         if (server != null) { server.stop(); }
     }
 }

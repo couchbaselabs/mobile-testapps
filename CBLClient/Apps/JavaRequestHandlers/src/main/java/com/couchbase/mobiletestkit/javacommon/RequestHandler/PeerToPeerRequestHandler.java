@@ -4,24 +4,45 @@ package com.couchbase.mobiletestkit.javacommon.RequestHandler;
   Created by sridevi.saragadam on 7/9/18.
  */
 
+import androidx.annotation.NonNull;
+
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.couchbase.CouchbaseLiteServ.TestServerApp;
+import com.couchbase.CouchbaseLiteServ.util.Log;
+import com.couchbase.lite.Authenticator;
 import com.couchbase.lite.ClientCertificateAuthenticator;
 import com.couchbase.lite.ConflictResolver;
 import com.couchbase.lite.CouchbaseLiteException;
+import com.couchbase.lite.Database;
 import com.couchbase.lite.ListenerAuthenticator;
 import com.couchbase.lite.ListenerCertificateAuthenticator;
+import com.couchbase.lite.MessageEndpoint;
+import com.couchbase.lite.MessageEndpointConnection;
+import com.couchbase.lite.MessageEndpointDelegate;
+import com.couchbase.lite.MessageEndpointListener;
+import com.couchbase.lite.MessageEndpointListenerConfiguration;
+import com.couchbase.lite.ProtocolType;
+import com.couchbase.lite.Replicator;
+import com.couchbase.lite.ReplicatorChange;
+import com.couchbase.lite.ReplicatorChangeListener;
+import com.couchbase.lite.ReplicatorConfiguration;
+import com.couchbase.lite.ReplicatorType;
 import com.couchbase.lite.TLSIdentity;
+import com.couchbase.lite.URLEndpoint;
 import com.couchbase.lite.URLEndpointListener;
 import com.couchbase.lite.URLEndpointListenerConfiguration;
-import com.couchbase.lite.*;
 import com.couchbase.mobiletestkit.javacommon.Args;
-import com.couchbase.mobiletestkit.javacommon.RequestHandlerDispatcher;
-import com.couchbase.mobiletestkit.javacommon.util.Log;
 
 
 public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
@@ -30,31 +51,33 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
     final ReplicatorRequestHandler replicatorRequestHandlerObj = new ReplicatorRequestHandler();
 
     public void clientStart(Args args) {
-        Replicator replicator = args.get("replicator");
+        Replicator replicator = args.get("replicator", Replicator.class);
         replicator.start();
         Log.i(TAG, "Replication started .... ");
     }
 
-    public Replicator configure(Args args) throws Exception {
-        String ipaddress = args.get("host");
-        int port = args.get("port");
-        Database sourceDb = args.get("database");
-        String serverDBName = args.get("serverDBName");
-        String replicationType = args.get("replicationType");
-        Boolean continuous = args.get("continuous");
-        String endPointType = args.get("endPointType");
-        List<String> documentIds = args.get("documentIDs");
-        Boolean push_filter = args.get("push_filter");
-        Boolean pull_filter = args.get("pull_filter");
-        String filter_callback_func = args.get("filter_callback_func");
-        String conflict_resolver = args.get("conflict_resolver");
-        Boolean disableTls = args.get("tls_disable");
-        String tlsAuthType = args.get("tls_auth_type");
-        Boolean serverVerificationMode = args.get("server_verification_mode");
-        Boolean tlsAuthenticator = args.get("tls_authenticator");
-        String heartbeat = args.get("heartbeat");
-        String maxRetries = args.get("max_retries");
-        String maxTimeout = args.get("max_timeout");
+    public Replicator configure(Args args)
+        throws URISyntaxException, CertificateException, UnrecoverableEntryException, KeyStoreException,
+        NoSuchAlgorithmException, IOException, CouchbaseLiteException {
+        String ipaddress = args.getString("host");
+        int port = args.getInt("port");
+        Database sourceDb = args.get("database", Database.class);
+        String serverDBName = args.getString("serverDBName");
+        String replicationType = args.getString("replicationType");
+        Boolean continuous = args.getBoolean("continuous");
+        String endPointType = args.getString("endPointType");
+        List<String> documentIds = args.getList("documentIDs");
+        Boolean push_filter = args.getBoolean("push_filter");
+        Boolean pull_filter = args.getBoolean("pull_filter");
+        String filter_callback_func = args.getString("filter_callback_func");
+        String conflict_resolver = args.getString("conflict_resolver");
+        Boolean disableTls = args.getBoolean("tls_disable");
+        String tlsAuthType = args.getString("tls_auth_type");
+        Boolean serverVerificationMode = args.getBoolean("server_verification_mode");
+        Boolean tlsAuthenticator = args.getBoolean("tls_authenticator");
+        String heartbeat = args.getString("heartbeat");
+        String maxRetries = args.getString("max_retries");
+        String maxTimeout = args.getString("max_timeout");
 
         ReplicatorConfiguration config;
         Replicator replicator;
@@ -67,37 +90,43 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
         ReplicatorType replType;
         if (replicationType.equals("push")) {
             replType = ReplicatorType.PUSH;
-        } else if (replicationType.equals("pull")) {
+        }
+        else if (replicationType.equals("pull")) {
             replType = ReplicatorType.PULL;
-        } else {
+        }
+        else {
             replType = ReplicatorType.PUSH_AND_PULL;
         }
         Log.i(TAG, "serverDBName is " + serverDBName);
         if (disableTls) {
             uri = new URI("ws://" + ipaddress + ":" + port + "/" + serverDBName);
-        } else {
+        }
+        else {
             uri = new URI("wss://" + ipaddress + ":" + port + "/" + serverDBName);
         }
 
         if (endPointType.equals("URLEndPoint")) {
             URLEndpoint urlEndPoint = new URLEndpoint(uri);
             config = new ReplicatorConfiguration(sourceDb, urlEndPoint);
-        } else if (endPointType.equals("MessageEndPoint")) {
+        }
+        else if (endPointType.equals("MessageEndPoint")) {
             MessageEndpoint messageEndPoint = new MessageEndpoint("p2p", uri, ProtocolType.BYTE_STREAM, this);
             config = new ReplicatorConfiguration(sourceDb, messageEndPoint);
-        } else {
+        }
+        else {
             throw new IllegalArgumentException("Incorrect EndPoint type");
         }
         config.setType(replType);
         if (continuous != null) {
             config.setContinuous(continuous);
-        } else {
+        }
+        else {
             config.setContinuous(false);
         }
         if (documentIds != null) {
             config.setDocumentIDs(documentIds);
         }
-        if (heartbeat != null && !heartbeat.trim().isEmpty()){
+        if (heartbeat != null && !heartbeat.trim().isEmpty()) {
             config.setHeartbeat(Integer.parseInt(heartbeat));
         }
 
@@ -142,12 +171,12 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
                     break;
             }
         }
-        if (args.get("basic_auth") != null) {
-            config.setAuthenticator(args.get("basic_auth"));
+        if (args.getString("basic_auth") != null) {
+            config.setAuthenticator(args.get("basic_auth", Authenticator.class));
         }
 
         if (tlsAuthType.equals("self_signed")) {
-            TLSIdentity tlsIdentity = RequestHandlerDispatcher.context.getSelfSignedIdentity();
+            TLSIdentity tlsIdentity = TestServerApp.getApp().getSelfSignedIdentity();
             if (tlsIdentity != null) {
                 List<Certificate> certs = tlsIdentity.getCerts();
                 X509Certificate cert = (X509Certificate) certs.get(0);
@@ -157,8 +186,9 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
         }
 
         if (tlsAuthenticator) {
-            TLSIdentity identity = RequestHandlerDispatcher.context.getClientCertsIdentity();
-            ClientCertificateAuthenticator clientCertificateAuthenticator = new ClientCertificateAuthenticator(identity);
+            TLSIdentity identity = TestServerApp.getApp().getClientCertsIdentity();
+            ClientCertificateAuthenticator clientCertificateAuthenticator =
+                new ClientCertificateAuthenticator(identity);
             config.setAuthenticator(clientCertificateAuthenticator);
         }
 
@@ -198,7 +228,7 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
         return replicator;
     }
 
-    class MyReplicatorListener implements ReplicatorChangeListener {
+    static class MyReplicatorListener implements ReplicatorChangeListener {
         private final List<ReplicatorChange> changes = new ArrayList<>();
 
         public List<ReplicatorChange> getChanges() {
@@ -206,77 +236,79 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
         }
 
         @Override
-        public void changed(ReplicatorChange change) {
+        public void changed(@NonNull ReplicatorChange change) {
             changes.add(change);
         }
     }
 
-    public URLEndpointListener serverStart(Args args) throws IOException, CouchbaseLiteException {
-        int port = args.get("port");
-        Database sourceDb = args.get("database");
+    public URLEndpointListener serverStart(Args args)
+        throws CouchbaseLiteException, UnrecoverableEntryException, CertificateException, KeyStoreException,
+        NoSuchAlgorithmException, IOException {
+        int port = args.getInt("port");
+        Database sourceDb = args.get("database", Database.class);
         URLEndpointListenerConfiguration config = new URLEndpointListenerConfiguration(sourceDb);
-        Boolean disableTls = args.get("tls_disable");
-        Boolean tlsAuthenticator = args.get("tls_authenticator");
-        String tlsAuthType = args.get("tls_auth_type");
-        System.out.println(tlsAuthType);
+        Boolean disableTls = args.getBoolean("tls_disable");
+        Boolean tlsAuthenticator = args.getBoolean("tls_authenticator");
+        String tlsAuthType = args.getString("tls_auth_type");
+        Log.d(TAG, "tls auth type: " + tlsAuthType);
 
-        if (port > 0) {
-            port = args.get("port");
-            config.setPort(port);
-        }
+        if (port > 0) { config.setPort(port); }
+
         config.setDisableTls(disableTls);
 
-        if (args.get("basic_auth") != null) {
-            ListenerAuthenticator listenerAuthenticator = args.get("basic_auth");
+        if (args.getString("basic_auth") != null) {
+            ListenerAuthenticator listenerAuthenticator = args.get("basic_auth", ListenerAuthenticator.class);
             config.setAuthenticator(listenerAuthenticator);
         }
 
         if (tlsAuthType.equals("self_signed_create")) {
-            TLSIdentity identity = RequestHandlerDispatcher.context.getCreateIdentity();
+            TLSIdentity identity = TestServerApp.getApp().getCreateIdentity();
             config.setTlsIdentity(identity);
         }
 
         if (tlsAuthType.equals("self_signed")) {
-            TLSIdentity identity = RequestHandlerDispatcher.context.getSelfSignedIdentity();
+            TLSIdentity identity = TestServerApp.getApp().getSelfSignedIdentity();
             config.setTlsIdentity(identity);
-            Log.e(TAG,"ServerSide setting the identity");
+            Log.e(TAG, "ServerSide setting the identity");
         }
         if (tlsAuthenticator) {
-            List<Certificate> certsList = RequestHandlerDispatcher.context.getAuthenticatorCertsList();
-            ListenerCertificateAuthenticator listenerCertificateAuthenticator = new ListenerCertificateAuthenticator(certsList);
+            List<Certificate> certsList = TestServerApp.getApp().getAuthenticatorCertsList();
+            ListenerCertificateAuthenticator listenerCertificateAuthenticator
+                = new ListenerCertificateAuthenticator(certsList);
             config.setAuthenticator(listenerCertificateAuthenticator);
         }
 
         URLEndpointListener p2ptcpListener = new URLEndpointListener(config);
         p2ptcpListener.start();
-        System.out.println(p2ptcpListener.getPort());
+        Log.d(TAG, "p2p listener started on port: " + port);
         return p2ptcpListener;
     }
 
     public int getListenerPort(Args args) {
-        URLEndpointListener p2ptcpListener = args.get("listener");
+        URLEndpointListener p2ptcpListener = args.get("listener", URLEndpointListener.class);
         return p2ptcpListener.getPort();
     }
 
     public ReplicatorTcpListener messageEndpointListenerStart(Args args) throws IOException {
-        Database sourceDb = args.get("database");
-        int port = args.get("port");
+        Database sourceDb = args.get("database", Database.class);
+        int port = args.getInt("port");
         MessageEndpointListener messageEndpointListener =
-                new MessageEndpointListener(new MessageEndpointListenerConfiguration(
-                        sourceDb,
-                        ProtocolType.BYTE_STREAM));
+            new MessageEndpointListener(new MessageEndpointListenerConfiguration(
+                sourceDb,
+                ProtocolType.BYTE_STREAM));
         ReplicatorTcpListener p2ptcpListener = new ReplicatorTcpListener(sourceDb, port);
         p2ptcpListener.start();
         return p2ptcpListener;
     }
 
     public void serverStop(Args args) {
-        String endPointType = args.get("endPointType");
+        String endPointType = args.getString("endPointType");
         if (endPointType.equals("MessageEndPoint")) {
-            ReplicatorTcpListener p2ptcpListener = args.get("listener");
+            ReplicatorTcpListener p2ptcpListener = args.get("listener", ReplicatorTcpListener.class);
             p2ptcpListener.stop();
-        } else {
-            URLEndpointListener p2ptcpListener = args.get("listener");
+        }
+        else {
+            URLEndpointListener p2ptcpListener = args.get("listener", URLEndpointListener.class);
             p2ptcpListener.stop();
         }
     }

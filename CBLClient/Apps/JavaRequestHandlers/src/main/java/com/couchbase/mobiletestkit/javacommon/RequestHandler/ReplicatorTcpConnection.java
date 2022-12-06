@@ -28,8 +28,8 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.couchbase.mobiletestkit.javacommon.RequestHandlerDispatcher;
-import com.couchbase.mobiletestkit.javacommon.util.Log;
+import com.couchbase.CouchbaseLiteServ.TestServerApp;
+import com.couchbase.CouchbaseLiteServ.util.Log;
 import com.couchbase.lite.Message;
 import com.couchbase.lite.MessageEndpointConnection;
 import com.couchbase.lite.MessagingCloseCompletion;
@@ -92,12 +92,7 @@ public abstract class ReplicatorTcpConnection implements MessageEndpointConnecti
 
         connected = true;
         replicatorConnection = connection;
-        receiveThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                receiveLoop();
-            }
-        });
+        receiveThread = new Thread(this::receiveLoop);
         receiveThread.start();
     }
 
@@ -133,23 +128,22 @@ public abstract class ReplicatorTcpConnection implements MessageEndpointConnecti
             }
         }
         catch (IOException e) {
-            Log.e(TAG, "DB closing socket", e);
+            Log.w(TAG, "Failed closing socket", e);
         }
     }
 
     private void receiveLoop() {
         Exception error = null;
         byte[] buffer = new byte[RECEIVE_BUFFER_SIZE];
+
         try {
             int length;
             while ((length = inputStream.read(buffer)) != 0) {
                 replicatorConnection.receive(Message.fromData(Arrays.copyOfRange(buffer, 0, length)));
             }
         }
-        catch (Exception e) {
-            if (!(e instanceof InterruptedException)) {
-                error = e;
-            }
+        catch (IOException err) {
+            error = err;
         }
         replicatorConnection.close(error != null ? new MessagingError(error, false) : null);
     }
@@ -163,16 +157,15 @@ public abstract class ReplicatorTcpConnection implements MessageEndpointConnecti
     }
 
     protected String getWebSocketAcceptKey(String key) {
-        String longKey = key.trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
-        MessageDigest md;
         try {
-            md = MessageDigest.getInstance("SHA-1");
+            String longKey = key.trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+            MessageDigest md = MessageDigest.getInstance("SHA-1");
+            byte[] hashBytes = md.digest(longKey.getBytes(StandardCharsets.US_ASCII));
+            return TestServerApp.getApp().encodeBase64(hashBytes);
         }
         catch (NoSuchAlgorithmException e) {
-            return null;
+            Log.w(TAG, "SHA-1 not supported on this machine", e);
         }
-
-        byte[] hashBytes = md.digest(longKey.getBytes(StandardCharsets.US_ASCII));
-        return RequestHandlerDispatcher.context.encodeBase64(hashBytes);
+        return null;
     }
 }

@@ -26,11 +26,12 @@ import java.net.SocketException;
 import java.util.Collections;
 import java.util.List;
 
-import com.couchbase.mobiletestkit.javacommon.util.Log;
+import com.couchbase.CouchbaseLiteServ.util.Log;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.MessageEndpointListener;
 import com.couchbase.lite.MessageEndpointListenerConfiguration;
 import com.couchbase.lite.ProtocolType;
+
 
 // WebSocket based listener
 public final class ReplicatorTcpListener {
@@ -54,12 +55,7 @@ public final class ReplicatorTcpListener {
         if (server != null) { return; }
 
         server = new ServerSocket(port);
-        loopThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                acceptLoop();
-            }
-        });
+        loopThread = new Thread(this::acceptLoop);
         loopThread.start();
     }
 
@@ -72,27 +68,21 @@ public final class ReplicatorTcpListener {
             server = null;
         }
         catch (IOException e) {
-            Log.e(TAG, "Failed closing listener", e);
+            Log.w(TAG, "Failed closing listener", e);
         }
     }
 
-    public String getURL() {
-        try {
-            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
-            for (NetworkInterface i : interfaces) {
-                List<InetAddress> addresses = Collections.list(i.getInetAddresses());
-                for (InetAddress a : addresses) {
-                    if (!a.isLoopbackAddress() && a instanceof Inet4Address) {
-                        return "ws://" + a.getHostAddress().toUpperCase() +
-                            ":" + port + "/" + this.database.getName();
-                    }
+    public String getURL() throws SocketException {
+        List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+        for (NetworkInterface i: interfaces) {
+            List<InetAddress> addresses = Collections.list(i.getInetAddresses());
+            for (InetAddress a: addresses) {
+                if (!a.isLoopbackAddress() && a instanceof Inet4Address) {
+                    return "ws://" + a.getHostAddress().toUpperCase() + ":" + port + "/" + this.database.getName();
                 }
             }
         }
-        catch (SocketException e) {
-            Log.e(TAG, "Failed getting socket address", e);
-        }
-        return null;
+        throw new IllegalStateException("Cannot find a local interface address ");
     }
 
     private void acceptLoop() {

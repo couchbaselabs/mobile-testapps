@@ -9,7 +9,7 @@ import com.couchbase.lite.SelectResult;
 public class SelectResultRequestHandler {
 
     public SelectResult expressionCreate(Args args) {
-        Expression expression = args.get("expression");
+        Expression expression = args.get("expression", Expression.class);
         return SelectResult.expression(expression);
     }
 

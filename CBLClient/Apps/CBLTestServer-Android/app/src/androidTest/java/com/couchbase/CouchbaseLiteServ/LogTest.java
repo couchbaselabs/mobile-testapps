@@ -32,10 +32,10 @@ public class LogTest {
 
     @Test
     public void testLogZipper() throws Exception {
-        RequestHandlerDispatcher.context = CouchbaseLiteServ.getTestServerContext();
+        RequestHandlerDispatcher.context = TestServerApp.getTestServerContext();
         LoggingRequestHandler logRequestHandler = new LoggingRequestHandler();
 
-        final Args args = new Args();
+        final Args args = new Args(args);
         args.put("directory", "");
         args.put("log_level", "verbose");
         args.put("plain_text", false);
@@ -48,7 +48,7 @@ public class LogTest {
         RawData data = logRequestHandler.getLogsInZip(args);
 
         Assert.assertFalse(
-            new File(CouchbaseLiteServ.getAppContext().getExternalFilesDir("zip"), "archive.zip").exists());
+            new File(TestServerApp.getAppContext().getExternalFilesDir("zip"), "archive.zip").exists());
 
         Assert.assertNotNull(data);
         Assert.assertEquals("application/zip", data.contentType);

@@ -15,7 +15,7 @@ import com.couchbase.lite.ReplicatorChangeListener;
 import com.couchbase.lite.ReplicatorConfiguration;
 import com.couchbase.lite.ReplicatorStatus;
 import com.couchbase.mobiletestkit.javacommon.util.ConcurrentExecutor;
-import com.couchbase.mobiletestkit.javacommon.util.Log;
+import com.couchbase.CouchbaseLiteServ.util.Log;
 
 
 public class ReplicatorRequestHandler {
@@ -25,27 +25,22 @@ public class ReplicatorRequestHandler {
     /* -------------- */
 
     public Replicator create(Args args) {
-        ReplicatorConfiguration config = args.get("config");
+        ReplicatorConfiguration config = args.get("config", ReplicatorConfiguration.class);
         return new Replicator(config);
     }
 
-    public ReplicatorConfiguration getConfig(Args args) {
-        Replicator replicator = args.get("replicator");
-        return replicator.getConfig();
-    }
-
     public String status(Args args) {
-        Replicator replicator = args.get("replicator");
+        Replicator replicator = args.get("replicator", Replicator.class);
         return replicator.getStatus().toString();
     }
 
     public String getActivityLevel(Args args) {
-        Replicator replicator = args.get("replicator");
+        Replicator replicator = args.get("replicator", Replicator.class);
         return replicator.getStatus().getActivityLevel().toString().toLowerCase();
     }
 
     public ReplicatorChangeListener addChangeListener(Args args) {
-        Replicator replicator = args.get("replicator");
+        Replicator replicator = args.get("replicator", Replicator.class);
         MyReplicatorListener changeListener = new MyReplicatorListener();
         ListenerToken token = replicator.addChangeListener(ConcurrentExecutor.EXECUTOR, changeListener);
         changeListener.setToken(token);
@@ -53,13 +48,13 @@ public class ReplicatorRequestHandler {
     }
 
     public void removeChangeListener(Args args) {
-        Replicator replicator = args.get("replicator");
-        MyReplicatorListener changeListener = args.get("changeListener");
+        Replicator replicator = args.get("replicator", Replicator.class);
+        MyReplicatorListener changeListener = args.get("changeListener", MyReplicatorListener.class);
         replicator.removeChangeListener(changeListener.getToken());
     }
 
     public MyDocumentReplicatorListener addReplicatorEventChangeListener(Args args) {
-        Replicator replicator = args.get("replicator");
+        Replicator replicator = args.get("replicator", Replicator.class);
         MyDocumentReplicatorListener changeListener = new MyDocumentReplicatorListener();
         ListenerToken token = replicator.addDocumentReplicationListener(ConcurrentExecutor.EXECUTOR, changeListener);
         changeListener.setToken(token);
@@ -67,24 +62,23 @@ public class ReplicatorRequestHandler {
     }
 
     public void removeReplicatorEventListener(Args args) {
-        Replicator replicator = args.get("replicator");
-        MyDocumentReplicatorListener changeListener = args.get("changeListener");
+        Replicator replicator = args.get("replicator", Replicator.class);
+        MyDocumentReplicatorListener changeListener = args.get("changeListener", MyDocumentReplicatorListener.class);
         replicator.removeChangeListener(changeListener.getToken());
     }
 
     public int changeListenerChangesCount(Args args) {
-        MyReplicatorListener changeListener = args.get("changeListener");
+        MyReplicatorListener changeListener = args.get("changeListener", MyReplicatorListener.class);
         return changeListener.getChanges().size();
     }
 
     public List<String> replicatorEventGetChanges(Args args) {
-        MyDocumentReplicatorListener changeListener = args.get("changeListener");
+        MyDocumentReplicatorListener changeListener = args.get("changeListener", MyDocumentReplicatorListener.class);
         List<DocumentReplication> changes = changeListener.getChanges();
         List<String> event_list = new ArrayList<>();
 
         for (DocumentReplication change : changes) {
             for (ReplicatedDocument document : change.getDocuments()) {
-                String event = document.toString();
                 String doc_id = "doc_id: " + document.getID();
                 String error = ", error_code: ";
                 String error_domain = "0";
@@ -104,64 +98,64 @@ public class ReplicatorRequestHandler {
     }
 
     public String toString(Args args) {
-        Replicator replicator = args.get("replicator");
+        Replicator replicator = args.get("replicator", Replicator.class);
         return replicator.toString();
     }
 
     public void start(Args args) {
-        Replicator replicator = args.get("replicator");
+        Replicator replicator = args.get("replicator", Replicator.class);
         replicator.start();
     }
 
     public void stop(Args args) {
-        Replicator replicator = args.get("replicator");
+        Replicator replicator = args.get("replicator", Replicator.class);
         replicator.stop();
     }
 
     public Replicator changeGetReplicator(Args args) {
-        ReplicatorChange change = args.get("change");
+        ReplicatorChange change = args.get("change", ReplicatorChange.class);
         return change.getReplicator();
     }
 
     public ReplicatorStatus changeGetStatus(Args args) {
-        ReplicatorChange change = args.get("change");
+        ReplicatorChange change = args.get("change", ReplicatorChange.class);
         return change.getStatus();
     }
 
     public int replicatorEventChangesCount(Args args) {
-        MyDocumentReplicatorListener changeListener = args.get("changeListener");
+        MyDocumentReplicatorListener changeListener = args.get("changeListener", MyDocumentReplicatorListener.class);
         return changeListener.getChanges().size();
     }
 
     public List<ReplicatorChange> changeListenerGetChanges(Args args) {
-        MyReplicatorListener changeListener = args.get("changeListener");
+        MyReplicatorListener changeListener = args.get("changeListener", MyReplicatorListener.class);
         return changeListener.getChanges();
     }
 
     public CouchbaseLiteException replicatorGetError(Args args) {
-        Replicator replicator = args.get("replicator");
+        Replicator replicator = args.get("replicator", Replicator.class);
         Log.i(TAG, "Replication Error... ");
         Log.i(TAG, "replicator.getStatus().getError()");
         return replicator.getStatus().getError();
     }
 
     public ReplicatorConfiguration config(Args args) {
-        Replicator replicator = args.get("replicator");
+        Replicator replicator = args.get("replicator", Replicator.class);
         return replicator.getConfig();
     }
 
     public long getCompleted(Args args) {
-        Replicator replicator = args.get("replicator");
+        Replicator replicator = args.get("replicator", Replicator.class);
         return replicator.getStatus().getProgress().getCompleted();
     }
 
     public long getTotal(Args args) {
-        Replicator replicator = args.get("replicator");
+        Replicator replicator = args.get("replicator", Replicator.class);
         return replicator.getStatus().getProgress().getTotal();
     }
 
     public String getError(Args args) {
-        Replicator replicator = args.get("replicator");
+        Replicator replicator = args.get("replicator", Replicator.class);
         CouchbaseLiteException error = replicator.getStatus().getError();
         if (error != null) {
             return error.toString();
@@ -170,12 +164,12 @@ public class ReplicatorRequestHandler {
     }
 
     public Boolean isContinuous(Args args) {
-        ReplicatorConfiguration config = args.get("config");
+        ReplicatorConfiguration config = args.get("config", ReplicatorConfiguration.class);
         return config.isContinuous();
     }
 
     public void resetCheckpoint(Args args) {
-        Replicator replicator = args.get("replicator");
+        Replicator replicator = args.get("replicator", Replicator.class);
         replicator.start(true);
     }
 

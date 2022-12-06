@@ -1,12 +1,12 @@
 package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 
 import java.io.File;
+import java.io.IOException;
 
+import com.couchbase.CouchbaseLiteServ.TestServerApp;
 import com.couchbase.mobiletestkit.javacommon.Args;
-import com.couchbase.mobiletestkit.javacommon.RequestHandlerDispatcher;
-import com.couchbase.mobiletestkit.javacommon.RawData;
-import com.couchbase.mobiletestkit.javacommon.util.Log;
-import com.couchbase.mobiletestkit.javacommon.util.ZipUtils;
+import com.couchbase.CouchbaseLiteServ.util.Log;
+import com.couchbase.mobiletestkit.javacommon.util.FileUtils;
 
 import com.couchbase.lite.*;
 
@@ -17,15 +17,15 @@ public class LoggingRequestHandler {
     /* ----------- */
 
     public LogFileConfiguration configure(Args args) {
-        String log_level = args.get("log_level");
-        String directory = args.get("directory");
-        int maxRotateCount = args.get("max_rotate_count");
-        long maxSize = args.get("max_size");
-        boolean plainText = args.get("plain_text");
+        String log_level = args.getString("log_level");
+        String directory = args.getString("directory");
+        int maxRotateCount = args.getInt("max_rotate_count");
+        long maxSize = args.getLong("max_size");
+        boolean plainText = args.getBoolean("plain_text");
 
         if (directory.isEmpty()) {
             long ts = System.currentTimeMillis() / 1000;
-            directory = RequestHandlerDispatcher.context.getFilesDir().getAbsolutePath() + File.separator + "logs_" + ts;
+            directory = TestServerApp.getApp().getFilesDir().getAbsolutePath() + File.separator + "logs_" + ts;
             Log.i(TAG, "File logging configured at: " + directory);
         }
         LogFileConfiguration config = new LogFileConfiguration(directory);
@@ -60,52 +60,42 @@ public class LoggingRequestHandler {
         return config;
     }
 
-    public boolean getPlainTextStatus(Args args) {
-        return Database.log.getFile().getConfig().usesPlaintext();
-    }
+    public boolean getPlainTextStatus() { return Database.log.getFile().getConfig().usesPlaintext(); }
 
-    public int getMaxRotateCount(Args args) {
-        return Database.log.getFile().getConfig().getMaxRotateCount();
-    }
+    public int getMaxRotateCount() { return Database.log.getFile().getConfig().getMaxRotateCount(); }
 
-    public long getMaxSize(Args args) {
-        return Database.log.getFile().getConfig().getMaxSize();
-    }
+    public long getMaxSize() { return Database.log.getFile().getConfig().getMaxSize(); }
 
-    public String getDirectory(Args args) {
-        return Database.log.getFile().getConfig().getDirectory();
-    }
+    public String getDirectory() { return Database.log.getFile().getConfig().getDirectory(); }
 
-    public LogFileConfiguration getConfig(Args args) {
-        return Database.log.getFile().getConfig();
-    }
+    public LogFileConfiguration getConfig() { return Database.log.getFile().getConfig(); }
 
     public LogFileConfiguration setPlainTextStatus(Args args) {
-        LogFileConfiguration config = args.get("config");
-        Boolean plain_text = args.get("plain_text");
+        LogFileConfiguration config = args.get("config", LogFileConfiguration.class);
+        Boolean plain_text = args.getBoolean("plain_text");
         config.setUsePlaintext(plain_text);
         return config;
     }
 
     public LogFileConfiguration setMaxRotateCount(Args args) {
-        LogFileConfiguration config = args.get("config");
-        int max_rotate_count = args.get("max_rotate_count");
+        LogFileConfiguration config = args.get("config", LogFileConfiguration.class);
+        int max_rotate_count = args.getInt("max_rotate_count");
         config.setMaxRotateCount(max_rotate_count);
         return config;
     }
 
     public LogFileConfiguration setMaxSize(Args args) {
-        LogFileConfiguration config = args.get("config");
-        long max_size = args.get("max_size");
+        LogFileConfiguration config = args.get("config", LogFileConfiguration.class);
+        long max_size = args.getLong("max_size");
         config.setMaxSize(max_size);
         return config;
     }
 
     public LogFileConfiguration setConfig(Args args) {
-        String directory = args.get("directory");
+        String directory = args.getString("directory");
         if (directory.isEmpty()) {
             long ts = System.currentTimeMillis() / 1000;
-            directory = RequestHandlerDispatcher.context.getFilesDir().getAbsolutePath() + File.separator + "logs_" + ts;
+            directory = TestServerApp.getApp().getFilesDir().getAbsolutePath() + File.separator + "logs_" + ts;
 
             Log.i(TAG, "File logging configured at: " + directory);
         }
@@ -114,13 +104,11 @@ public class LoggingRequestHandler {
         return config;
     }
 
-    public int getLogLevel(Args args) {
-        return Database.log.getFile().getLevel().ordinal();
-    }
+    public int getLogLevel() { return Database.log.getFile().getLevel().ordinal(); }
 
     public LogFileConfiguration setLogLevel(Args args) {
-        LogFileConfiguration config = args.get("config");
-        String log_level = args.get("log_level");
+        LogFileConfiguration config = args.get("config", LogFileConfiguration.class);
+        String log_level = args.getString("log_level");
         switch (log_level) {
             case "debug":
                 Database.log.getFile().setLevel(LogLevel.DEBUG);
@@ -144,19 +132,20 @@ public class LoggingRequestHandler {
         return config;
     }
 
-    public RawData getLogsInZip(Args args) {
+    public byte[] getLogsInZip() throws IOException {
         LogFileConfiguration fileLoggerConfig = Database.log.getFile().getConfig();
         if (fileLoggerConfig == null) { return null; }
 
-        ZipUtils zipper = new ZipUtils();
+        FileUtils zipper = new FileUtils();
 
-        File zipDir = RequestHandlerDispatcher.context.getExternalFilesDir("zip");
+        File zipDir = TestServerApp.getApp().getExternalFilesDir("zip");
         try {
             File zipFile = new File(zipDir, "archive.zip");
             if (zipFile.exists()) { zipper.deleteRecursive(zipFile); }
 
             zipper.zipDirectory(fileLoggerConfig.getDirectory(), zipFile);
-            return new RawData("application/zip", zipper.readFile(zipFile));
+
+            return zipper.readFile(zipFile);
         }
         finally {
             zipper.deleteRecursive(zipDir);

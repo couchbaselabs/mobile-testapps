@@ -8,8 +8,8 @@ import com.couchbase.lite.EncryptionKey;
 public class EncryptionKeyRequestHandler {
 
     public EncryptionKey create(Args args) {
-        byte[] key = args.get("key");
-        String password = args.get("password");
+        byte[] key = args.getData("key");
+        String password = args.getString("password");
 
         if (password != null) {
             return new EncryptionKey(password);

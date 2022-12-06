@@ -8,8 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.couchbase.mobiletestkit.javacommon.Args;
-import com.couchbase.mobiletestkit.javacommon.util.Log;
+import com.couchbase.CouchbaseLiteServ.util.Log;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Database;
@@ -23,26 +22,28 @@ import com.couchbase.lite.QueryBuilder;
 import com.couchbase.lite.Result;
 import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.SelectResult;
+import com.couchbase.mobiletestkit.javacommon.Args;
+
 
 public class PredictiveQueriesRequestHandler {
 
 
     public EchoModel registerModel(Args args) {
-        String modelName = args.get("model_name");
+        String modelName = args.getString("model_name");
         EchoModel echoModel = new EchoModel(modelName);
         Database.prediction.registerModel(modelName, echoModel);
         return echoModel;
     }
 
     public void unRegisterModel(Args args) {
-        String modelName = args.get("model_name");
+        String modelName = args.getString("model_name");
         Database.prediction.unregisterModel(modelName);
     }
 
     public List<Object> getPredictionQueryResult(Args args) throws CouchbaseLiteException {
-        EchoModel echoModel = args.get("model");
-        Database database = args.get("database");
-        Map<String, Object> dict = args.get("dictionary");
+        EchoModel echoModel = args.get("model", EchoModel.class);
+        Database database = args.get("database", Database.class);
+        Map<String, Object> dict = args.getMap("dictionary");
         Expression input = Expression.value(dict);
         PredictionFunction prediction = Function.prediction(echoModel.getName(), input);
 
@@ -52,16 +53,16 @@ public class PredictiveQueriesRequestHandler {
 
         List<Object> resultArray = new ArrayList<>();
         ResultSet rows = query.execute();
-        for (Result row : rows) {
+        for (Result row: rows) {
             resultArray.add(row.toMap());
         }
         return resultArray;
     }
 
-    public String nonDictionary(Args args) {
-        EchoModel echoModel = args.get("model");
-        Database database = args.get("database");
-        String dict = args.get("nonDictionary");
+    public String nonDictionary(Args args) throws CouchbaseLiteException {
+        EchoModel echoModel = args.get("model", EchoModel.class);
+        Database database = args.get("database", Database.class);
+        String dict = args.getString("nonDictionary");
         Expression input = Expression.value(dict);
         PredictionFunction prediction = Function.prediction(echoModel.getName(), input);
 
@@ -69,21 +70,16 @@ public class PredictiveQueriesRequestHandler {
             .select(SelectResult.expression(prediction))
             .from(DataSource.database(database));
 
-        List<Object> resultArray = new ArrayList<>();
-        try {
-            query.execute();
-        }
-        catch (Exception e) {
-            return e.getLocalizedMessage();
-        }
+        query.execute();
+
         return "success";
     }
 
     public List<Object> getEuclideanDistance(Args args) throws CouchbaseLiteException {
-        Database database = args.get("database");
+        Database database = args.get("database", Database.class);
 
-        String key1 = args.get("key1");
-        String key2 = args.get("key2");
+        String key1 = args.getString("key1");
+        String key2 = args.getString("key2");
         Expression distance = Function.euclideanDistance(Expression.property(key1), Expression.property(key2));
 
         Query query = QueryBuilder
@@ -92,22 +88,22 @@ public class PredictiveQueriesRequestHandler {
 
         List<Object> resultArray = new ArrayList<>();
         ResultSet rows = query.execute();
-        for (Result row : rows) {
+        for (Result row: rows) {
             resultArray.add(row.toMap());
         }
         return resultArray;
     }
 
     public int getNumberOfCalls(Args args) {
-        EchoModel echoModel = args.get("model");
+        EchoModel echoModel = args.get("model", EchoModel.class);
         return echoModel.numberOfCalls;
     }
 
     public List<Object> getSquaredEuclideanDistance(Args args) throws CouchbaseLiteException {
-        Database database = args.get("database");
+        Database database = args.get("database", Database.class);
 
-        String key1 = args.get("key1");
-        String key2 = args.get("key2");
+        String key1 = args.getString("key1");
+        String key2 = args.getString("key2");
         Expression distance = Function.squaredEuclideanDistance(Expression.property(key1), Expression.property(key2));
 
         Query query = QueryBuilder
@@ -116,17 +112,17 @@ public class PredictiveQueriesRequestHandler {
 
         List<Object> resultArray = new ArrayList<>();
         ResultSet rows = query.execute();
-        for (Result row : rows) {
+        for (Result row: rows) {
             resultArray.add(row.toMap());
         }
         return resultArray;
     }
 
     public List<Object> getCosineDistance(Args args) throws CouchbaseLiteException {
-        Database database = args.get("database");
+        Database database = args.get("database", Database.class);
 
-        String key1 = args.get("key1");
-        String key2 = args.get("key2");
+        String key1 = args.getString("key1");
+        String key2 = args.getString("key2");
         Expression distance = Function.cosineDistance(Expression.property(key1), Expression.property(key2));
 
         Query query = QueryBuilder
@@ -135,7 +131,7 @@ public class PredictiveQueriesRequestHandler {
 
         List<Object> resultArray = new ArrayList<>();
         ResultSet rows = query.execute();
-        for (Result row : rows) {
+        for (Result row: rows) {
             resultArray.add(row.toMap());
         }
         return resultArray;
