@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.couchbase.CouchbaseLiteServ.MainActivity">
+    tools:context="com.couchbase.CouchbaseLiteServ.com.couchbase.lite.android.mobiletestkit.MainActivity">
 
     <TextView
         android:id="@+id/status"

@@ -5,8 +5,7 @@ plugins {
 group 'com.couchbase.mobiletestkit'
 
 ext {
-    DEF_VERSION = "3.0.0-38"
-    COUCHBASE_LITE_JAVA_VERSION = System.getProperty('version', DEF_VERSION)
+    COUCHBASE_LITE_JAVA_VERSION = System.getProperty('version', null)
 
     JAVA_COMMON_DIR = "${projectDir}/../JavaRequestHandlers"
     ASSET_DIR = "${JAVA_COMMON_DIR}/src/main/assets"
@@ -30,22 +29,25 @@ jar {
 }
 
 repositories {
-    mavenCentral()
-    maven {
+    if (null == COUCHBASE_LITE_JAVA_VERSION) {
+        mavenLocal()
+        COUCHBASE_LITE_JAVA_VERSION = "3.1.0-SNAPSHOT"
+    }
+    else {
         url "http://proget.build.couchbase.com/maven2/internalmaven/"
     }
-    maven {
-        url "https://oss.sonatype.org/content/repositories/snapshots"
-    }
+
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
 
 java {
     sourceSets {
         main {
             java.srcDirs = [
-                    "src/main/java",
-                    "${JAVA_COMMON_DIR}/src/main/java",
-                    "${JAVA_SERVER_DIR}/src/main/java"
+                "src/main/java",
+                "${JAVA_COMMON_DIR}/src/main/java",
+                "${JAVA_SERVER_DIR}/src/main/java"
             ]
             resources.srcDirs = [ASSET_DIR]
         }
@@ -54,9 +56,10 @@ java {
 
 dependencies {
     implementation 'commons-daemon:commons-daemon:1.2.2'
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
-
-    implementation "com.couchbase.lite:couchbase-lite-java-ee:${COUCHBASE_LITE_JAVA_VERSION}"
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'org.nanohttpd:nanohttpd:2.3.2-SNAPSHOT'
+
+    implementation "com.couchbase.lite:couchbase-lite-java-ee:${COUCHBASE_LITE_JAVA_VERSION}"
+
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }

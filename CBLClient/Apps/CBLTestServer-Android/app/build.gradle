@@ -14,7 +14,7 @@ ext {
 }
 
 android {
-    namespace "com.couchbase.CouchbaseLiteServ"
+    namespace "com.couchbase.lite.android.mobiletestkit"
     compileSdkVersion 33
     buildToolsVersion '33.0.1'
 
@@ -23,7 +23,7 @@ android {
         targetSdkVersion 32
         versionCode 1
         versionName DEF_VERSION
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
 
