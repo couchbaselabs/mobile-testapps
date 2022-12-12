@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group 'com.couchbase.mobiletestkit'
+group 'com.couchbase.lite.javadesktop.mobiletestkit'
 
 ext {
     COUCHBASE_LITE_JAVA_VERSION = System.getProperty('version', null)
@@ -11,8 +11,6 @@ ext {
     ASSET_DIR = "${JAVA_COMMON_DIR}/src/main/assets"
     JAVA_SERVER_DIR = "${projectDir}/../JavaRequestListener"
 }
-
-sourceCompatibility = 1.8
 
 jar {
     archiveBaseName = "CBLTestServer-Java"
@@ -51,6 +49,9 @@ java {
                 "${JAVA_SERVER_DIR}/src/main/java"
             ]
             resources.srcDirs = [ASSET_DIR]
+        }
+        test {
+            java.srcDirs = ["src/test/java"]
         }
     }
 }

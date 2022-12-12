@@ -66,7 +66,7 @@ public abstract class TestKitApp {
 
     public abstract byte[] decodeBase64(String encodedBytes);
 
-    public abstract String getLocalIpAddress();
+    public abstract String getAppId();
 
     public abstract TLSIdentity getCreateIdentity() throws Exception;
 
@@ -74,9 +74,9 @@ public abstract class TestKitApp {
 
     public abstract TLSIdentity getClientCertsIdentity() throws Exception;
 
-    public InputStream getAsset(String name) { return TestKitApp.class.getResourceAsStream("/" + name); }
-
     public Dispatcher getDispatcher() { return dispatcher; }
+
+    public InputStream getAsset(String name) { return TestKitApp.class.getResourceAsStream("/" + name); }
 
     public List<Certificate> getAuthenticatorCertsList() throws CertificateException, IOException {
         CertificateFactory certFactory = CertificateFactory.getInstance("X.509");

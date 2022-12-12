@@ -1,6 +1,5 @@
 package com.couchbase.lite.javadesktop.mobiletestkit;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -80,12 +79,12 @@ public class TestServerApp implements Daemon {
 
     @Override
     public void start() {
-        final String ip = TestKitApp.getApp().getLocalIpAddress();
+        final String id = TestKitApp.getApp().getAppId();
 
-        Server server = new Server(ip);
+        Server server = new Server(id);
         if (SERVER.compareAndSet(null, server)) { throw new IllegalStateException("Attempt to restart server"); }
 
-        Log.i(TAG, "Server launched at " + ip + ":" + server.myPort);
+        Log.i(TAG, "Server launched at " + id + ":" + server.myPort);
     }
 
     @Override
@@ -95,8 +94,7 @@ public class TestServerApp implements Daemon {
     public void destroy() { Log.i(TAG, "TestServer service is destroyed."); }
 
     private void initApp() {
-        String tmpDirPath = System.getProperty("java.io.tmpdir");
-        TestKitApp.init(new JavaDesktopTestkitApp(new File(tmpDirPath, "TestServerTemp")));
+        TestKitApp.init(new JavaDesktopTestkitApp());
         Log.i(TAG, "TestKit App initialized.");
     }
 }

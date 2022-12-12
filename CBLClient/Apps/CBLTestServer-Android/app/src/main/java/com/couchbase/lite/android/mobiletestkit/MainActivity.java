@@ -29,14 +29,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        final String ip = TestKitApp.getApp().getLocalIpAddress();
-        server = new Server(ip);
+        final String id = TestKitApp.getApp().getAppId();
+        server = new Server(id);
 
         status = findViewById(R.id.status);
 
         final int port = server.myPort;
-        Log.i(TAG, "Server launched at " + ip + ":" + port);
-        status.setText(getString(R.string.running, ip, port));
+        Log.i(TAG, "Server launched at " + id + ":" + port);
+        status.setText(getString(R.string.running, id, port));
         try { server.start(); }
         catch (IOException e) {
             Log.e(TAG, "Failed starting server", e);

@@ -35,9 +35,10 @@ public class Server extends NanoHTTPD {
 
     @Override
     public Response handle(IHTTPSession session) {
-        String req = session.getUri();
-        Log.i(TAG, "Request: " + req);
-        try { return dispatchRequest(session, req); }
+        try {
+            Reply reply = dispatchRequest(session.getUri(), getPostData(session));
+            return Response.newFixedLengthResponse(Status.OK, reply.getContentType(), reply.getData());
+        }
         catch (Exception e) {
             Log.w(TAG, "Request failed", e);
             StringWriter sw = new StringWriter();
@@ -47,14 +48,15 @@ public class Server extends NanoHTTPD {
         }
     }
 
-    private Response dispatchRequest(@NonNull IHTTPSession session, @Nullable String req) throws Exception {
+    private Reply dispatchRequest(@Nullable String req, @Nullable String body) throws Exception {
+        Log.i(TAG, "Request: " + req);
+
         if (StringUtils.isEmpty(req)) { throw new IllegalArgumentException("Empty request"); }
 
         if (!req.startsWith("/")) { req = req.substring(1); }
 
         // Find and invoke the method on the RequestHandler.
-        Reply reply = dispatcher.run(req, getPostData(session), memory);
-        return Response.newFixedLengthResponse(Status.OK, reply.getContentType(), reply.getData());
+        return dispatcher.run(req, body, memory);
     }
 
     @Nullable

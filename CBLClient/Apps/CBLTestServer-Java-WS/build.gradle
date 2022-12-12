@@ -2,13 +2,23 @@ apply plugin: 'java'
 apply plugin: 'war'
 apply plugin: 'com.bmuschko.tomcat'
 
-sourceCompatibility = 1.8
 
 ext {
-    COUCHBASE_LITE_JAVA_VERSION = System.getProperty('version', "3.0.0-38")
+    COUCHBASE_LITE_JAVA_VERSION = System.getProperty('version', null)
 
     JAVA_COMMON_DIR = "${projectDir}/../JavaRequestHandlers"
     ASSET_DIR = "${JAVA_COMMON_DIR}/src/main/assets"
+
+    TOMCAT_VERSION = '9.0.1'
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.bmuschko:gradle-tomcat-plugin:2.5'
+    }
 }
 
 war {
@@ -19,11 +29,16 @@ war {
 }
 
 repositories {
-    jcenter()
-    mavenCentral()
-    maven {
+    if (null == COUCHBASE_LITE_JAVA_VERSION) {
+        mavenLocal()
+        COUCHBASE_LITE_JAVA_VERSION = "3.1.0-SNAPSHOT"
+    }
+    else {
         url "http://proget.build.couchbase.com/maven2/internalmaven/"
     }
+
+    google()
+    mavenCentral()
 }
 
 sourceSets {
@@ -37,17 +52,18 @@ sourceSets {
 }
 
 dependencies {
-    providedCompile "com.couchbase.lite:couchbase-lite-java-ee:${COUCHBASE_LITE_JAVA_VERSION}"
-    implementation 'com.google.code.gson:gson:2.8.5'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    providedCompile "javax.servlet:javax.servlet-api:4.0.1"
-}
+    compileOnly 'androidx.annotation:annotation:1.5.0'
 
-dependencies {
-    def tomcatVersion = '9.0.1'
-    tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
+    providedCompile "javax.servlet:javax.servlet-api:4.0.1"
+    providedCompile "com.couchbase.lite:couchbase-lite-java-ee-macos:${COUCHBASE_LITE_JAVA_VERSION}"
+
+    implementation 'com.google.code.gson:gson:2.8.5'
+
+    testImplementation 'junit:junit:4.13.2'
+
+    tomcat "org.apache.tomcat.embed:tomcat-embed-core:${TOMCAT_VERSION}",
             "org.apache.tomcat.embed:tomcat-embed-logging-juli:9.0.0.M6",
-            "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}",
+            "org.apache.tomcat.embed:tomcat-embed-jasper:${TOMCAT_VERSION}",
             "com.couchbase.lite:couchbase-lite-java-ee:${COUCHBASE_LITE_JAVA_VERSION}"
 }
 
@@ -57,12 +73,4 @@ tomcat {
     ajpProtocol  = 'org.apache.coyote.ajp.AjpNio2Protocol'
 }
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.bmuschko:gradle-tomcat-plugin:2.5'
-    }
-}
 

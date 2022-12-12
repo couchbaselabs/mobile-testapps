@@ -28,7 +28,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -41,7 +40,6 @@ import com.couchbase.lite.mobiletestkit.util.Log;
 
 
 public class AndroidTestKitApp extends TestKitApp {
-
     private final Context context;
 
     public AndroidTestKitApp(Context context) { this.context = context.getApplicationContext(); }
@@ -62,7 +60,7 @@ public class AndroidTestKitApp extends TestKitApp {
     public byte[] decodeBase64(String encodedBytes) { return Base64.decode(encodedBytes, Base64.NO_WRAP); }
 
     @Override
-    public String getLocalIpAddress() {
+    public String getAppId() {
         try {
             for (NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
                 String intf_name = intf.getName();
@@ -82,9 +80,6 @@ public class AndroidTestKitApp extends TestKitApp {
 
     @Override
     public TLSIdentity getCreateIdentity() throws CouchbaseLiteException {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.YEAR, 2);
-
         return TLSIdentity.createIdentity(
             true,
             getX509Attributes(),

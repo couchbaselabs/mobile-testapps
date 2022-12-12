@@ -28,7 +28,14 @@ import com.couchbase.lite.mobiletestkit.util.Log;
 public class JavaDesktopTestkitApp extends TestKitApp {
     private final File directory;
 
-    public JavaDesktopTestkitApp(File directory) { this.directory = directory; }
+    public JavaDesktopTestkitApp() {
+        directory = new File(System.getProperty("java.io.tmpdir"), "TestServerTemp");
+        if (!directory.exists()) {
+            if (!directory.mkdirs()) {
+                throw new IllegalStateException("Cannot create tmp directory: " + directory);
+            }
+        }
+    }
 
     @Override
     protected void initCBL() { CouchbaseLite.init(true); }
@@ -46,7 +53,7 @@ public class JavaDesktopTestkitApp extends TestKitApp {
     public byte[] decodeBase64(String encodedBytes) { return Base64.getDecoder().decode(encodedBytes); }
 
     @Override
-    public String getLocalIpAddress() {
+    public String getAppId() {
         try {
             Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
             for (NetworkInterface iface: Collections.list(nets)) {
