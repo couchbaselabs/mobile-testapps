@@ -20,34 +20,24 @@ import androidx.annotation.NonNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
-import com.couchbase.lite.KeyStoreUtils;
 import com.couchbase.lite.LogDomain;
 import com.couchbase.lite.LogLevel;
 import com.couchbase.lite.TLSIdentity;
-import com.couchbase.lite.mobiletestkit.util.Log;
 
 
 public abstract class TestKitApp {
-    private static final String TAG = "TESTKIT";
+    protected static final String TAG = "TESTKIT";
 
     private static final AtomicReference<TestKitApp> APP = new AtomicReference<>();
 
@@ -76,80 +66,42 @@ public abstract class TestKitApp {
 
     public abstract byte[] decodeBase64(String encodedBytes);
 
+    public abstract String getLocalIpAddress();
+
+    public abstract TLSIdentity getCreateIdentity() throws Exception;
+
+    public abstract TLSIdentity getSelfSignedIdentity() throws Exception;
+
+    public abstract TLSIdentity getClientCertsIdentity() throws Exception;
+
+    public InputStream getAsset(String name) { return TestKitApp.class.getResourceAsStream("/" + name); }
+
     public Dispatcher getDispatcher() { return dispatcher; }
 
-    public String getLocalIpAddress() {
-        try {
-            for (NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
-                String intf_name = intf.getName();
-                Log.d(TAG, "intf_name: " + intf_name);
-                for (InetAddress inetAddress: Collections.list(intf.getInetAddresses())) {
-                    if (!inetAddress.isLoopbackAddress()
-                        && (inetAddress instanceof Inet4Address)
-                        && (intf_name.equals("eth1") || intf_name.equals("wlan0"))) {
-                        return inetAddress.getHostAddress();
-                    }
-                }
-            }
-        }
-        catch (java.net.SocketException e) { Log.w(TAG, "Failed getting device IP address", e); }
-        return "unknown";
-    }
-
-    public InputStream getAsset(String name) { return getClass().getResourceAsStream("/" + name); }
-
-    public TLSIdentity getCreateIdentity() throws CouchbaseLiteException {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.YEAR, 2);
-
-        HashMap<String, String> X509Attributes = new HashMap<>();
-        X509Attributes.put(TLSIdentity.CERT_ATTRIBUTE_COMMON_NAME, "CBL Test");
-        X509Attributes.put(TLSIdentity.CERT_ATTRIBUTE_ORGANIZATION, "Couchbase");
-        X509Attributes.put(TLSIdentity.CERT_ATTRIBUTE_ORGANIZATION_UNIT, "Mobile");
-        X509Attributes.put(TLSIdentity.CERT_ATTRIBUTE_EMAIL_ADDRESS, "lite@couchbase.com");
-        return TLSIdentity.createIdentity(
-            true,
-            X509Attributes,
-            calendar.getTime(),
-            UUID.randomUUID().toString());
-    }
-
-    public TLSIdentity getSelfSignedIdentity()
-        throws UnrecoverableEntryException, CertificateException, KeyStoreException, NoSuchAlgorithmException,
-        IOException, CouchbaseLiteException {
-        InputStream serverCert = getAsset("certs.p12");
-        KeyStoreUtils.importEntry(
-            "PKCS12",
-            serverCert,
-            "123456".toCharArray(),
-            "testkit",
-            "123456".toCharArray(),
-            "Servercerts");
-        return TLSIdentity.getIdentity("Servercerts");
-    }
-
     public List<Certificate> getAuthenticatorCertsList() throws CertificateException, IOException {
-        List<Certificate> certsList = new ArrayList<>();
+        CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
 
-        try (InputStream serverCert = getAsset("client-ca.der")) {
-            certsList.add(CertificateFactory.getInstance("X.509").generateCertificate(serverCert));
+        List<Certificate> certsList = new ArrayList<>();
+        try (InputStream cert = getAsset("client-ca.der")) {
+            certsList.add(certFactory.generateCertificate(cert));
         }
 
         return certsList;
     }
 
-    public TLSIdentity getClientCertsIdentity()
-        throws IOException, UnrecoverableEntryException, CertificateException, KeyStoreException,
-        NoSuchAlgorithmException, CouchbaseLiteException {
-        try (InputStream clientCert = getAsset("client.p12")) {
-            KeyStoreUtils.importEntry("PKCS12",
-                clientCert,
-                "123456".toCharArray(),
-                "testkit",
-                "123456".toCharArray(), "ClientCertsSelfsigned");
+    protected final Date getExpirationTime() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR, 2);
+        return calendar.getTime();
+    }
 
-            return TLSIdentity.getIdentity("ClientCertsSelfsigned");
-        }
+    protected final HashMap<String, String> getX509Attributes() {
+        HashMap<String, String> attributes = new HashMap<>();
+        attributes.put(TLSIdentity.CERT_ATTRIBUTE_COMMON_NAME, "CBL Test");
+        attributes.put(TLSIdentity.CERT_ATTRIBUTE_ORGANIZATION, "Couchbase");
+        attributes.put(TLSIdentity.CERT_ATTRIBUTE_ORGANIZATION_UNIT, "Mobile");
+        attributes.put(TLSIdentity.CERT_ATTRIBUTE_EMAIL_ADDRESS, "lite@couchbase.com");
+        return attributes;
     }
 
     private void init() {

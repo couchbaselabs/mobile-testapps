@@ -8,12 +8,7 @@ import androidx.annotation.NonNull;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +16,6 @@ import java.util.List;
 import com.couchbase.lite.Authenticator;
 import com.couchbase.lite.ClientCertificateAuthenticator;
 import com.couchbase.lite.ConflictResolver;
-import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.ListenerAuthenticator;
 import com.couchbase.lite.ListenerCertificateAuthenticator;
@@ -56,9 +50,7 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
         Log.i(TAG, "Replication started .... ");
     }
 
-    public Replicator configure(Args args)
-        throws URISyntaxException, CertificateException, UnrecoverableEntryException, KeyStoreException,
-        NoSuchAlgorithmException, IOException, CouchbaseLiteException {
+    public Replicator configure(Args args) throws Exception {
         String ipaddress = args.getString("host");
         int port = args.getInt("port");
         Database sourceDb = args.get("database", Database.class);
@@ -241,9 +233,7 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
         }
     }
 
-    public URLEndpointListener serverStart(Args args)
-        throws CouchbaseLiteException, UnrecoverableEntryException, CertificateException, KeyStoreException,
-        NoSuchAlgorithmException, IOException {
+    public URLEndpointListener serverStart(Args args) throws Exception {
         int port = args.getInt("port");
         Database sourceDb = args.get("database", Database.class);
         URLEndpointListenerConfiguration config = new URLEndpointListenerConfiguration(sourceDb);

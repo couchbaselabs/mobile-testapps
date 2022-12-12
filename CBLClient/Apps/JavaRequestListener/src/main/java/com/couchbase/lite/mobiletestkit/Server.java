@@ -15,10 +15,6 @@ import org.nanohttpd.protocols.http.response.Response;
 import org.nanohttpd.protocols.http.response.Status;
 
 import com.couchbase.lite.internal.utils.StringUtils;
-import com.couchbase.lite.mobiletestkit.Dispatcher;
-import com.couchbase.lite.mobiletestkit.Memory;
-import com.couchbase.lite.mobiletestkit.Reply;
-import com.couchbase.lite.mobiletestkit.TestKitApp;
 import com.couchbase.lite.mobiletestkit.util.Log;
 
 

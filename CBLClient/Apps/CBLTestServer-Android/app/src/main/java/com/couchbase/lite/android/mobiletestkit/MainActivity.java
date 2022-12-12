@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         status = findViewById(R.id.status);
 
         final int port = server.myPort;
-        Log.i(TAG, "Starting server at " + ip + ":" + port);
+        Log.i(TAG, "Server launched at " + ip + ":" + port);
         status.setText(getString(R.string.running, ip, port));
         try { server.start(); }
         catch (IOException e) {
