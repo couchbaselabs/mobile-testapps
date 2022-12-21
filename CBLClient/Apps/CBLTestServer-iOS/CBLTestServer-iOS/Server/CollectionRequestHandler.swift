@@ -32,6 +32,14 @@ public class CollectionRequestHandler {
             }
             return names
             
+        case "collection_documentCount":
+            let collection: Collection = (args.get(name: "collection"))!
+            return collection.count
+            
+        case "collection_collectionScope":
+            let collection: Collection = args.get(name: "collection")!
+            return collection.scope
+            
         case "collection_collectionInstances":
             let scope: String = (args.get(name:"scopeName")) ?? "_default"
             let database: Database = (args.get(name:"database"))!
