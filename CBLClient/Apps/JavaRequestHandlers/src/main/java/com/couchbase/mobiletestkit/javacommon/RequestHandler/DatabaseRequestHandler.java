@@ -1,12 +1,13 @@
 package com.couchbase.mobiletestkit.javacommon.RequestHandler;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.couchbase.lite.Collection;
 import com.couchbase.lite.MaintenanceType;
 import com.couchbase.mobiletestkit.javacommon.Args;
 import com.couchbase.mobiletestkit.javacommon.Context;
@@ -33,6 +34,7 @@ import com.couchbase.lite.QueryBuilder;
 import com.couchbase.lite.Result;
 import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.SelectResult;
+import com.couchbase.lite.Scope;
 
 public class DatabaseRequestHandler {
     private static final String TAG = "DATABASE";
@@ -384,6 +386,75 @@ public class DatabaseRequestHandler {
         }
 
         return data;
+    }
+
+    public Scope defaultScope(Args args) throws CouchbaseLiteException {
+        Database db = args.get("database");
+        return db.getDefaultScope();
+    }
+
+    public Collection defaultCollection(Args args) throws CouchbaseLiteException {
+        Database db =args.get("database");
+        return db.getDefaultCollection();
+
+    }
+
+    public Collection createCollection(Args args) throws CouchbaseLiteException {
+        Database db = args.get("database");
+        String collectionName = args.get("collectionName");
+        String scopeName = args.get("scopeName");
+        if (scopeName == null) {
+            return db.createCollection(collectionName);
+        }
+        else {
+            return db.createCollection(collectionName, scopeName);
+        }
+    }
+
+    public void deleteCollection(Args args) throws CouchbaseLiteException {
+        Database db = args.get("database");
+        String collectionName = args.get("collectionName");
+        String scopeName = args.get("scopeName");
+        if (scopeName == null) {
+            db.deleteCollection(collectionName);
+            return;
+        }
+        else {
+            db.deleteCollection(collectionName, scopeName);
+            return;
+        }
+    }
+
+    public static Set<Collection> collectionsInScope(Database db, String scopeName) throws CouchbaseLiteException {
+        if (scopeName == null) {
+            return db.getCollections();
+        }
+        else {
+            return db.getCollections(scopeName);
+        }
+    }
+
+    public ArrayList<String> collectionNames (Args args) throws CouchbaseLiteException {
+        Database db = args.get("database");
+        String scopeName = args.get("scopeName");
+        ArrayList<String> collectionsNames = new ArrayList<>();
+        Set<Collection> collections = collectionsInScope(db, scopeName);
+        for (Collection collectionObject: collections) {
+            collectionsNames.add(collectionObject.getName());
+        }
+        return collectionsNames;
+    }
+
+    public Collection collectionObject(Args args) throws CouchbaseLiteException {
+        Database db = args.get("database");
+        String collectionName = args.get("collectionName");
+        String scopeName = args.get("scopeName");
+        if (scopeName == null) {
+            return db.getCollection(collectionName);
+        }
+        else {
+            return db.getCollection(collectionName, scopeName);
+        }
     }
 }
 
