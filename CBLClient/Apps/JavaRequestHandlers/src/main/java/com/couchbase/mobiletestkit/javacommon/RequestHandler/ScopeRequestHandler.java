@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.couchbase.lite.Collection;
 import com.couchbase.lite.CouchbaseLiteException;
+import com.couchbase.lite.Database;
 import com.couchbase.lite.Scope;
 import com.couchbase.mobiletestkit.javacommon.Args;
 import com.couchbase.lite.Array;
@@ -24,6 +25,11 @@ public class ScopeRequestHandler {
     public String scopeName(Args args) throws CouchbaseLiteException {
         Scope scope = args.get("scope");
         return scope.getName();
+    }
+
+    public Scope defaultScope(Args args) throws CouchbaseLiteException {
+        Database db = args.get("database");
+        return db.getDefaultScope();
     }
 
     public Collection collection(Args args) throws CouchbaseLiteException {

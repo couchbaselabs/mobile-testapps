@@ -30,11 +30,52 @@ public class CollectionRequestHandler {
         return object.getName();
     }
 
+    public Collection createCollection(Args args) throws CouchbaseLiteException {
+        Database db = args.get("database");
+        String collectionName = args.get("collectionName");
+        String scopeName = args.get("scopeName");
+        if (scopeName == null) {
+            return db.createCollection(collectionName);
+        }
+        else {
+            return db.createCollection(collectionName, scopeName);
+        }
+    }
+
+    public void deleteCollection(Args args) throws CouchbaseLiteException {
+        Database db = args.get("database");
+        String collectionName = args.get("collectionName");
+        String scopeName = args.get("scopeName");
+        if (scopeName == null) {
+            db.deleteCollection(collectionName);
+            return;
+        }
+        else {
+            db.deleteCollection(collectionName, scopeName);
+            return;
+        }
+    }
+
+    public Collection defaultCollection(Args args) throws CouchbaseLiteException {
+        Database db =args.get("database");
+        return db.getDefaultCollection();
+
+    }
+
+    public static Set<Collection> collectionsInScope(Database db, String scopeName) throws CouchbaseLiteException {
+        if (scopeName == null) {
+            return db.getCollections();
+        }
+        else {
+            return db.getCollections(scopeName);
+        }
+    }
+
     public ArrayList<String> collectionNames(Args args) throws CouchbaseLiteException {
         Database db = args.get("database");
         String scopeName = args.get("scopeName");
         ArrayList<String> collectionsNames = new ArrayList<String>();
-        Set<Collection> collectionObjects= com.couchbase.mobiletestkit.javacommon.RequestHandler.DatabaseRequestHandler.collectionsInScope(db, scopeName);
+        Set<Collection> collectionObjects = collectionsInScope(db, scopeName);
         for (Collection collectionObject: collectionObjects) {
             collectionsNames.add(collectionObject.getName());
         }
@@ -45,6 +86,18 @@ public class CollectionRequestHandler {
 //        Collection collectionObject = args.get("collection");
 //        return collectionObject.getCount();
 //    }
+
+    public Collection collection(Args args) throws CouchbaseLiteException {
+        Database db = args.get("database");
+        String collectionName = args.get("collectionName");
+        String scopeName = args.get("scopeName");
+        if (scopeName == null) {
+            return db.getCollection(collectionName);
+        }
+        else {
+            return db.getCollection(collectionName, scopeName);
+        }
+    }
 
     public void saveDocument(Args args) throws CouchbaseLiteException {
         Collection collection = args.get("collection");
