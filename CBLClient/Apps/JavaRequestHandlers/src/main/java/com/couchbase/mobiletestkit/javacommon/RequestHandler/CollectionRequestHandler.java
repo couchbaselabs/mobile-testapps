@@ -82,10 +82,10 @@ public class CollectionRequestHandler {
         return collectionsNames;
     }
 
-//    public long documentCount(Args args) throws CouchbaseLiteException {
-//        Collection collectionObject = args.get("collection");
-//        return collectionObject.getCount();
-//    }
+    public long documentCount(Args args) throws CouchbaseLiteException {
+        Collection collectionObject = args.get("collection");
+        return collectionObject.getCount();
+    }
 
     public Collection collection(Args args) throws CouchbaseLiteException {
         Database db = args.get("database");
