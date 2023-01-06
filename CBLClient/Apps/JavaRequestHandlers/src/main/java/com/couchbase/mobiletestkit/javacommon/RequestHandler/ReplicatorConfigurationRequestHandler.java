@@ -144,7 +144,10 @@ public class ReplicatorConfigurationRequestHandler {
         String replication_type = args.get("replication_type");
         Map<String, String> headers = args.get("headers");
         target_url = new URI((String) args.get("target_url"));
-        Database target_db = args.get("target_db");
+        Database target_db = null;
+        if (args.get("target_db") != null) {
+            target_db = args.get("target_db");
+        }
         String auto_purge = args.get("auto_purge");
         String pinnedservercert = args.get("pinnedservercert");
         List<com.couchbase.lite.Collection> collections = args.get("collections");
