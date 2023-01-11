@@ -7,23 +7,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
 import com.couchbase.lite.Collection;
-import com.couchbase.lite.CollectionChangeListener;
 import com.couchbase.lite.CollectionConfiguration;
 import com.couchbase.lite.Endpoint;
+import com.couchbase.lite.Replicator;
 import com.couchbase.mobiletestkit.javacommon.Args;
 import com.couchbase.mobiletestkit.javacommon.RequestHandlerDispatcher;
 import com.couchbase.mobiletestkit.javacommon.util.Log;
 import com.couchbase.lite.Authenticator;
 import com.couchbase.lite.Conflict;
 import com.couchbase.lite.ConflictResolver;
-import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseEndpoint;
 import com.couchbase.lite.Document;
@@ -134,7 +131,7 @@ public class ReplicatorConfigurationRequestHandler {
         }
         return config;
     }
-    public ReplicatorConfiguration configureCollection(Args args) throws Exception {
+    public Replicator configureCollection(Args args) throws Exception {
         Boolean continuous = args.get("continuous");
         URI target_url = null;
         String max_retries = args.get("max_retries");
@@ -230,7 +227,7 @@ public class ReplicatorConfigurationRequestHandler {
                 throw new Exception("\"Mismatch in number of collections and configurations\"");
             }
         }
-        return config;
+        return new Replicator(config);
     }
     public ReplicatorConfiguration builderCreate(Args args) throws URISyntaxException {
         Database sourceDb = args.get("sourceDb");
