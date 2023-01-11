@@ -18,6 +18,9 @@ using namespace nlohmann;
 using namespace std;
 
 #ifdef COUCHBASE_ENTERPRISE
+static void CBLReplicator_EntryDelete(void* ptr) {
+    CBLReplicator_Release(static_cast<CBLReplicator *>(ptr));
+}
 
 static FLSliceResult replicator_encrypt(void* context, FLString documentID, FLDict properties, FLString keyPath, 
     FLSlice input, FLStringResult* algorithm, FLStringResult* kid, CBLError* error) {
@@ -288,6 +291,7 @@ void replicatorCollectionConfiguration(json& body, mg_connection* conn) {
 void replicatorConfigurationCollection(json& body, mg_connection* conn) {
     auto config = static_cast<CBLReplicatorConfiguration *>(malloc(sizeof(CBLReplicatorConfiguration)));
     memset(config, 0, sizeof(CBLReplicatorConfiguration));
+    vector<CBLReplicationCollection> vec;
     if(body.contains("target_url")) {
         CBLError err;
         const auto url = body["target_url"].get<string>();
@@ -311,9 +315,9 @@ void replicatorConfigurationCollection(json& body, mg_connection* conn) {
         config->continuous = body["continuous"].get<bool>();
     }
     if(body.contains("configuration")) {
-        vector<CBLReplicationCollection> vec;
         for(const auto& c: body["configuration"]) {
             CBLReplicationCollection *rep_object = static_cast<CBLReplicationCollection*>(memory_map::get(c.get<string>()));
+            config->collections = rep_object;
             vec.push_back(*rep_object);
         }
         config->collections = vec.data();
@@ -386,7 +390,10 @@ void replicatorConfigurationCollection(json& body, mg_connection* conn) {
                 config->context = context;
             }
 #endif
-    write_serialized_body(conn, memory_map::store(config, CBLReplicatorConfigCollection_EntryDelete));
+    CBLError err;
+    CBLReplicator* repl;
+    TRY((repl = CBLReplicator_Create(config, &err)), err)
+    write_serialized_body(conn, memory_map::store(repl, CBLReplicator_EntryDelete));
 }
 
     void replicatorConfiguration_create(json& body, mg_connection* conn) {

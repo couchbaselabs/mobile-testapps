@@ -30,7 +30,6 @@ public class ReplicatorConfigurationRequestHandler {
             let channels: [String]? = args.get(name: "channels")
             let documentIDs: [String]? = args.get(name: "documentIDs")
             var config = CollectionConfiguration()
-            let filter1 = { (doc: Document, flags: DocumentFlags) in return false }
             config.conflictResolver = conflictResolver
             if (pull_filter != false) {
                 if filter_callback_func == "boolean" {
@@ -218,7 +217,7 @@ public class ReplicatorConfigurationRequestHandler {
                     config.addCollections(col)
                 }
             }
-            return config
+            return Replicator(config: config)
             
         case "replicatorConfiguration_configure":
             let source_db: Database? = args.get(name: "source_db")
