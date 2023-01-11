@@ -291,7 +291,6 @@ void replicatorCollectionConfiguration(json& body, mg_connection* conn) {
 void replicatorConfigurationCollection(json& body, mg_connection* conn) {
     auto config = static_cast<CBLReplicatorConfiguration *>(malloc(sizeof(CBLReplicatorConfiguration)));
     memset(config, 0, sizeof(CBLReplicatorConfiguration));
-    vector<CBLReplicationCollection> vec;
     if(body.contains("target_url")) {
         CBLError err;
         const auto url = body["target_url"].get<string>();
@@ -315,9 +314,9 @@ void replicatorConfigurationCollection(json& body, mg_connection* conn) {
         config->continuous = body["continuous"].get<bool>();
     }
     if(body.contains("configuration")) {
+        vector<CBLReplicationCollection> vec;
         for(const auto& c: body["configuration"]) {
             CBLReplicationCollection *rep_object = static_cast<CBLReplicationCollection*>(memory_map::get(c.get<string>()));
-            config->collections = rep_object;
             vec.push_back(*rep_object);
         }
         config->collections = vec.data();
