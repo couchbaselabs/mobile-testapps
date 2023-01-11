@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -131,6 +133,7 @@ public class ReplicatorConfigurationRequestHandler {
         }
         return config;
     }
+
     public Replicator configureCollection(Args args) throws Exception {
         Boolean continuous = args.get("continuous");
         URI target_url = null;
