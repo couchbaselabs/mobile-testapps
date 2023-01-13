@@ -25,7 +25,7 @@ public class ReplicatorRequestHandler {
             
         case "replicator_start":
             let replication_obj: Replicator = args.get(name: "replicator")!
-            try replication_obj.start()
+            replication_obj.start()
 
         case "replicator_stop":
             let replication_obj: Replicator = args.get(name: "replicator")!
