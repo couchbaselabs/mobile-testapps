@@ -41,5 +41,16 @@ namespace Couchbase.Lite.Testing
                 response.WriteBody(scope.Name);
             });
         }
+
+        public static void collection([NotNull] NameValueCollection args,
+                                             [NotNull] IReadOnlyDictionary<string, object> postBody,
+                                             [NotNull] HttpListenerResponse response)
+        {
+            With<Scope>(postBody, "scope", scope =>
+            {
+                string collectionName = postBody["collectionName"].ToString();
+                response.WriteBody(scope.GetCollection(collectionName));
+            });
+        }
     }
 }
