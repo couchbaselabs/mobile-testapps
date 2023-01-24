@@ -17,6 +17,7 @@ using Newtonsoft.Json.Linq;
 
 using static Couchbase.Lite.Testing.DatabaseMethods;
 using System.Threading;
+using Couchbase.Lite.Query;
 
 namespace Couchbase.Lite.Testing
 {
@@ -103,6 +104,26 @@ namespace Couchbase.Lite.Testing
                 string scopeName = postBody["scopeName"].ToString();
                 response.WriteBody(MemoryMap.Store(database.GetCollection(collectionName, scopeName)));
             });
+        }
+
+        public static void getDocIds([NotNull] NameValueCollection args,
+                                            [NotNull] IReadOnlyDictionary<string, object> postBody,
+                                            [NotNull] HttpListenerResponse response)
+        {
+            With<Collection>(postBody, "collection", collection =>
+            {
+                    IExpression limit = Expression.Int((int)postBody["limit"]);
+                    IExpression offset = Expression.Int((int)postBody["offset"]);
+                    using (IQuery query = Query.QueryBuilder
+                           .Select(SelectResult.Expression(Meta.ID))
+                           .From(DataSource.Collection(collection))
+                           .Limit(limit, offset))
+                    {
+                        var result = query.Execute();
+                        var ids = result.Select(x => x.GetString("id")).ToList();
+                        response.WriteBody(ids);
+                    }
+                });
         }
     }
 }

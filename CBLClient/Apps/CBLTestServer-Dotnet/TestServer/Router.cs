@@ -285,6 +285,7 @@ namespace Couchbase.Lite.Testing
                 ["collection_collectionNames"] = CollectionMethods.collectionNames,
                 ["collection_getCollectionName"] = CollectionMethods.collectionName,
                 ["collection_collection"] = CollectionMethods.collectionObject,
+                ["collection_getDocIds"] = CollectionMethods.getDocIds,
                 ["scope_defaultScope"] = ScopeMethods.defaultScope,
                 ["copy_files"] = CopyFiles,
                 ["release"] = ReleaseObject,
