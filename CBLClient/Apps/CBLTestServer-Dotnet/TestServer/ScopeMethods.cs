@@ -31,5 +31,15 @@ namespace Couchbase.Lite.Testing
                 response.WriteBody(MemoryMap.Store(database.GetDefaultScope()));
             });
         }
+
+        public static void scopeName([NotNull] NameValueCollection args,
+                                             [NotNull] IReadOnlyDictionary<string, object> postBody,
+                                             [NotNull] HttpListenerResponse response)
+        {
+            With<Scope>(postBody, "scope", scope =>
+            {
+                response.WriteBody(scope.Name);
+            });
+        }
     }
 }
