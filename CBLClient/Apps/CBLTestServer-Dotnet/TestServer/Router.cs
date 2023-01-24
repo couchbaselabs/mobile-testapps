@@ -284,6 +284,8 @@ namespace Couchbase.Lite.Testing
                 ["collection_deleteCollection"] = CollectionMethods.deleteCollection,
                 ["collection_collectionNames"] = CollectionMethods.collectionNames,
                 ["collection_getCollectionName"] = CollectionMethods.collectionName,
+                ["collection_collection"] = CollectionMethods.collectionObject,
+                ["scope_defaultScope"] = ScopeMethods.defaultScope,
                 ["copy_files"] = CopyFiles,
                 ["release"] = ReleaseObject,
                 ["flushMemory"] = flushMemory

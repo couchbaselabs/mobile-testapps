@@ -92,5 +92,17 @@ namespace Couchbase.Lite.Testing
                 response.WriteBody(collection.Name);
             });
         }
+
+        public static void collectionObject([NotNull] NameValueCollection args,
+                                            [NotNull] IReadOnlyDictionary<string, object> postBody,
+                                            [NotNull] HttpListenerResponse response)
+        {
+            With<Database>(postBody, "database", database =>
+            {
+                string collectionName = postBody["collectionName"].ToString();
+                string scopeName = postBody["scopeName"].ToString();
+                response.WriteBody(MemoryMap.Store(database.GetCollection(collectionName, scopeName)));
+            });
+        }
     }
 }
