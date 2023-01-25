@@ -71,9 +71,14 @@ namespace Couchbase.Lite.Testing
                                             [NotNull] IReadOnlyDictionary<string, object> postBody,
                                             [NotNull] HttpListenerResponse response)
         {
+            string scopeName = "_default";
+            if(postBody.ContainsKey("scopeName"))
+            {
+                scopeName = postBody["scopeName"].ToString();
+            }
             With<Database>(postBody, "database", database =>
             {
-                string scopeName = postBody["scopeName"].ToString();
+                
                 List<string> collectionNames = new List<string>();
                 IReadOnlyList<Collection> collectionObjects = database.GetCollections(scopeName);
                 foreach (Collection col in collectionObjects)
