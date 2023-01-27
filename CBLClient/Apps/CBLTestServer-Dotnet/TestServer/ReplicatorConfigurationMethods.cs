@@ -251,7 +251,7 @@ namespace Couchbase.Lite.Testing
             }
             if (collections.Count() > 0)
             {
-                if(configurations != null)
+                if(configurations.Count() != 0)
                 {
                     if(collections.Count() == configurations.Count() && collections.Count()>1)
                     {
