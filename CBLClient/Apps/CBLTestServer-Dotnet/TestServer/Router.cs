@@ -168,6 +168,8 @@ namespace Couchbase.Lite.Testing
                 ["replicatorConfiguration_setReplicatorType"] = ReplicatorConfigurationMethods.SetReplicatorType,
                 ["replicatorConfiguration_isContinuous"] = ReplicatorConfigurationMethods.IsContinuous,
                 ["replicatorConfiguration_setAutoPurge"] = ReplicatorConfigurationMethods.SetAutoPurge,
+                ["replicatorConfiguration_configureCollection"] = ReplicatorConfigurationMethods.configurationCollection,
+                ["replicatorConfiguration_collection"] = ReplicatorConfigurationMethods.collectionConfigure,
                 ["replicator_changeListenerChangesCount"] = ReplicationMethods.ChangeListenerChangesCount,
                 ["replicator_changeListenerGetChanges"] = ReplicationMethods.ChangeListenerChanges,
                 ["replicator_resetCheckpoint"] = ReplicationMethods.ResetCheckpoint,
