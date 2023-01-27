@@ -302,6 +302,7 @@ namespace Couchbase.Lite.Testing
                 ["collection_getDocumentExpiration"] = CollectionMethods.getMutableDocument,
                 ["scope_defaultScope"] = ScopeMethods.defaultScope,
                 ["scope_scopeName"] = ScopeMethods.scopeName,
+                ["peerToPeer_configureCollection"] = P2PMethods.configureCollection,
                 ["copy_files"] = CopyFiles,
                 ["release"] = ReleaseObject,
                 ["flushMemory"] = flushMemory
