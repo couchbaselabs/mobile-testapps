@@ -60,10 +60,9 @@ function Calculate-Version {
 
 
 Push-Location $PSScriptRoot
-$VSRegistryKey = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\SxS\VS7"
-$VSInstall = (Get-CimInstance MSFT_VSInstance).InstallLocation[0]
+$VSInstall = (Get-CimInstance MSFT_VSInstance -Filter "Name LIKE '%2022'").InstallLocation
 if(-Not $VSInstall) {
-    throw "Unable to locate VS2019 installation"
+    throw "Unable to locate VS2022 installation"
 }
 
 $MSBuild = "$VSInstall\MSBuild\Current\Bin\MSBuild.exe"
