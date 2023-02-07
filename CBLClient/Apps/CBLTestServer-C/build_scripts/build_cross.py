@@ -146,6 +146,7 @@ if __name__ == '__main__':
     os.chdir(DOWNLOAD_DIR)
 
     print(f"==== Downloading Couchbase Lite C [{args.os}] {args.version}-{args.bld_num} ====")
+    build_system = args.os
     os_x86_64_list = ["debian9-x86_64", "debian10-x86_64", "ubuntu20.04_x64", "raspbian9"]
     if args.os in os_x86_64_list:
         build_system = "linux-x86_64"
