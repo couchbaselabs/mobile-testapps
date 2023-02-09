@@ -47,10 +47,28 @@ namespace Couchbase.Lite.Testing
                                 [NotNull] HttpListenerResponse response)
         {
             ResetStatus();
+            URLEndpointListenerConfiguration urlEndpointListenerConfig = null;
+            List<Collection> collections = new List<Collection>();
+            if (postBody.ContainsKey("collections"))
+            {
+                var collections_list = (List<object>)postBody["collections"];
+                List<String> collections_string = collections_list.Cast<string>().ToList();
+                foreach (var col in collections_string)
+                {
+                    collections.Add(MemoryMap.Get<Collection>(col));
+                }
+            }
             
             Database db = MemoryMap.Get<Database>(postBody["database"].ToString());
             int port = (int)postBody["port"];
-            URLEndpointListenerConfiguration urlEndpointListenerConfig = new URLEndpointListenerConfiguration(db);
+            if (collections.Count() > 0)
+            {
+                urlEndpointListenerConfig = new URLEndpointListenerConfiguration(collections);
+            }
+            else
+            {
+                urlEndpointListenerConfig = new URLEndpointListenerConfiguration(db);
+            }
             string tlsAuthType = postBody["tls_auth_type"].ToString();
             Boolean disableTls = Convert.ToBoolean(postBody[V].ToString());
             Boolean tls_authenticator = Convert.ToBoolean(postBody["tls_authenticator"].ToString());
@@ -162,13 +180,13 @@ namespace Couchbase.Lite.Testing
             Boolean server_verification_mode = Convert.ToBoolean(postBody["server_verification_mode"].ToString());
 
             Uri host;
-            if (true)
+            if (tls_disable == true)
             {
                 host = new Uri("ws://" + targetIP + ":" + port);
             }
             else
             {
-                host = new Uri("wss://" + targetIP + ":" + port);
+                host = new Uri("wss://" + targetIP + ":" + port);  
             }
             var dbUrl = new Uri(host, remote_DBName);
             AddStatus("Connecting " + host + "...");
@@ -249,9 +267,7 @@ namespace Couchbase.Lite.Testing
                     configurations.Add(MemoryMap.Get<CollectionConfiguration>(conf));
                 }
             }
-            Console.Write(collections.Count());
-            Console.WriteLine("hi");
-            Console.Write(configurations.Count());
+            
             if (collections.Count() > 0)
             {
                 if (configurations.Count() != 0)
