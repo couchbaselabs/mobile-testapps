@@ -1,6 +1,5 @@
 param (
     [Parameter()][string]$Version,
-    [Parameter()][int]$BuildNum,
     [switch]$Community
 )
 
@@ -60,13 +59,12 @@ function Calculate-Version {
 }
 cd ..
 Push-Location $PSScriptRoot
-$VSRegistryKey = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\SxS\VS7"
-$VSInstall = (Get-ItemProperty -Path $VSRegistryKey -Name "15.0") | Select-Object -ExpandProperty "15.0"
+$VSInstall = (Get-CimInstance MSFT_VSInstance -Filter "Name LIKE '%2022'").InstallLocation
 if(-Not $VSInstall) {
-    throw "Unable to locate VS2017 installation"
+    throw "Unable to locate VS2022 installation"
 }
 
-$MSBuild = "$VSInstall\MSBuild\15.0\Bin\MSBuild.exe"
+$MSBuild = "$VSInstall\MSBuild\Current\Bin\MSBuild.exe"
 
 $fullVersion = Calculate-Version
 
@@ -75,7 +73,7 @@ try {
     Modify-Packages "$PSScriptRoot\..\TestServer\TestServer.csproj" $fullVersion $Community
 
     Push-Location ..\TestServer
-    dotnet restore
+    dotnet restore TestServer.csproj
     if($LASTEXITCODE -ne 0) {
         Write-Error "Restore failed for TestServer"
         exit 1
@@ -83,7 +81,7 @@ try {
 
     Pop-Location
 
-    & $MSBuild /t:Restore
+    & $MSBuild /t:Restore TestServer.Android.csproj
     if($LASTEXITCODE -ne 0) {
         Write-Error "Restore failed for TestServer.Android"
         exit 1
