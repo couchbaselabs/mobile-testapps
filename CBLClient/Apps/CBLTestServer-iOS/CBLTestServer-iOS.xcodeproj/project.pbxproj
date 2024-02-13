@@ -55,6 +55,8 @@
 		4DE0E3222501F24D00DEBA87 /* identity in Resources */ = {isa = PBXBuildFile; fileRef = 4DE0E3212501F24D00DEBA87 /* identity */; };
 		6917C7BA232C30EE00D99DA6 /* RawData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6917C7B9232C30EE00D99DA6 /* RawData.swift */; };
 		733E07A12B6D47D700AEC18F /* float32_model.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 733E07A02B6D47D700AEC18F /* float32_model.mlpackage */; };
+		737CB88E2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 737CB88D2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework */; };
+		737CB88F2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 737CB88D2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7494704E25C4DEB600355244 /* CouchbaseLiteSwift.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7494704A25C4DEAF00355244 /* CouchbaseLiteSwift.xcframework */; };
 		7494704F25C4DEB600355244 /* CouchbaseLiteSwift.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7494704A25C4DEAF00355244 /* CouchbaseLiteSwift.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A38237BB28E19AF3007F14ED /* CollectionRequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A38237BA28E19AF3007F14ED /* CollectionRequestHandler.swift */; };
@@ -98,6 +100,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				737CB88F2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework in Embed Frameworks */,
 				7494704F25C4DEB600355244 /* CouchbaseLiteSwift.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -185,6 +188,7 @@
 		4DE0E3212501F24D00DEBA87 /* identity */ = {isa = PBXFileReference; lastKnownFileType = folder; path = identity; sourceTree = "<group>"; };
 		6917C7B9232C30EE00D99DA6 /* RawData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawData.swift; sourceTree = "<group>"; };
 		733E07A02B6D47D700AEC18F /* float32_model.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; name = float32_model.mlpackage; path = "../../../../../gte-small/coreml/feature-extraction/float32_model.mlpackage"; sourceTree = "<group>"; };
+		737CB88D2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = "CouchbaseLiteVectorSearch 2.xcframework"; path = "../../../../../../Downloads/CouchbaseLiteVectorSearch 2.xcframework"; sourceTree = "<group>"; };
 		7494704A25C4DEAF00355244 /* CouchbaseLiteSwift.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = CouchbaseLiteSwift.xcframework; path = Frameworks/CouchbaseLiteSwift.xcframework; sourceTree = "<group>"; };
 		A38237BA28E19AF3007F14ED /* CollectionRequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionRequestHandler.swift; sourceTree = "<group>"; };
 		A38237BC28E19B22007F14ED /* ScopeRequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopeRequestHandler.swift; sourceTree = "<group>"; };
@@ -210,6 +214,7 @@
 			files = (
 				4D8175C625CB71CC0020B14B /* Zip in Frameworks */,
 				7494704E25C4DEB600355244 /* CouchbaseLiteSwift.xcframework in Frameworks */,
+				737CB88E2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -406,6 +411,7 @@
 		29F7869E1F9FC4850035178F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				737CB88D2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework */,
 				7494704A25C4DEAF00355244 /* CouchbaseLiteSwift.xcframework */,
 			);
 			name = Frameworks;
@@ -809,7 +815,7 @@
 				);
 				GCC_OPTIMIZATION_LEVEL = 1;
 				INFOPLIST_FILE = "CBLTestServer-iOS/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -839,7 +845,7 @@
 					"$(PROJECT_DIR)/Frameworks",
 				);
 				INFOPLIST_FILE = "CBLTestServer-iOS/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1034,7 +1040,7 @@
 				);
 				GCC_OPTIMIZATION_LEVEL = 1;
 				INFOPLIST_FILE = "CBLTestServer-iOS/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
