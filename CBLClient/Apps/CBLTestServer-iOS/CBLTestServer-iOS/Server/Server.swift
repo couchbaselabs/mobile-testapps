@@ -17,6 +17,7 @@ enum RequestHandlerError: Error {
     case MethodNotFound(String)
     case InvalidArgument(String)
     case IOException(String)
+    //case VersionError(String)
 }
 
 enum ValueSerializerError: Error {
@@ -52,6 +53,7 @@ public class Server {
     let listenerAuthenticatorRequestHandler: ListenerAuthenticatorRequestHandler!
     let predictiveQueryRequestHandler: PredictiveQueriesRequestHandler!
     let fileLoggingRequestHandler: FileLoggingRequestHandler!
+    let vectorSearchRequestHandler: VectorSearchRequestHandler!
     let memory = Memory()
     
     public init() {
@@ -81,6 +83,7 @@ public class Server {
         listenerAuthenticatorRequestHandler = ListenerAuthenticatorRequestHandler()
         predictiveQueryRequestHandler = PredictiveQueriesRequestHandler()
         fileLoggingRequestHandler = FileLoggingRequestHandler()
+        vectorSearchRequestHandler = VectorSearchRequestHandler()
         server = GCDWebServer()
         Database.log.console.level = LogLevel.verbose
         server.addDefaultHandler(forMethod: "POST", request: GCDWebServerDataRequest.self) {
@@ -181,6 +184,11 @@ public class Server {
                             result = try self.predictiveQueryRequestHandler.handleRequest(method: method, args: args)
                     } else if method.hasPrefix("logging") {
                         result = try self.fileLoggingRequestHandler.handleRequest(method: method, args: args)
+                    } else if method.hasPrefix("vectorSearch") {
+                        let constMethod = method
+                        result = Task {
+                            try await self.vectorSearchRequestHandler.handleRequest(method: constMethod, args: args)
+                        }
                     } else {
                         throw ServerError.MethodNotImplemented(method)
                     }
