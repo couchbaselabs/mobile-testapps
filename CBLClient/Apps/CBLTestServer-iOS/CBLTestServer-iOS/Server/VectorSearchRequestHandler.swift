@@ -100,12 +100,14 @@ public class vectorModel: PredictiveModel {
         nil
     }
     
-    func tokenizeInput(input: String) async throws -> [Int]? {
-        guard let tokenizerConfig = try readConfig(name: "tokenizer_config") else { return nil }
-        guard let tokenizerData = try readConfig(name: "tokenizer") else { return nil }
+    func tokenizeInput(input: String) async throws -> [Int] {
+        guard let tokenizerConfig = try readConfig(name: "tokenizer_config") else { throw RequestHandlerError.IOException("Could not read config") }
+        guard let tokenizerData = try readConfig(name: "tokenizer") else { throw RequestHandlerError.IOException("Could not read config") }
         let tokenizer = try! AutoTokenizer.from(tokenizerConfig: tokenizerConfig, tokenizerData: tokenizerData)
-        let inputIds = tokenizer(input)
-        return inputIds
+        let tokenized = tokenizer.tokenize(text: input)
+        let inputIds = tokenizer.convertTokensToIds(tokenized)
+        let output = inputIds.compactMap{ $0 }
+        return output
     
     }
     
