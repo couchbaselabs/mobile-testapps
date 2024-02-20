@@ -190,9 +190,7 @@
 		4DE0E3212501F24D00DEBA87 /* identity */ = {isa = PBXFileReference; lastKnownFileType = folder; path = identity; sourceTree = "<group>"; };
 		6917C7B9232C30EE00D99DA6 /* RawData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawData.swift; sourceTree = "<group>"; };
 		73015D9B2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = CouchbaseLiteVectorSearch.xcframework; path = ../../../../artifacts/CouchbaseLiteVectorSearch.xcframework; sourceTree = "<group>"; };
-		73015D9E2B84E94B0062E7F4 /* float32_model.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; name = float32_model.mlpackage; path = ../../../../artifacts/float32_model.mlpackage; sourceTree = "<group>"; };
 		73015D9F2B84E9830062E7F4 /* float32_model.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; name = float32_model.mlpackage; path = "../../../../../artifacts/gte-small/coreml/feature-extraction/float32_model.mlpackage"; sourceTree = "<group>"; };
-		737CB88D2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = "CouchbaseLiteVectorSearch 2.xcframework"; path = "../../../../../../Downloads/CouchbaseLiteVectorSearch 2.xcframework"; sourceTree = "<group>"; };
 		737CB8902B7BA26E00BF0A32 /* VectorSearchRequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VectorSearchRequestHandler.swift; sourceTree = "<group>"; };
 		7494704A25C4DEAF00355244 /* CouchbaseLiteSwift.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = CouchbaseLiteSwift.xcframework; path = Frameworks/CouchbaseLiteSwift.xcframework; sourceTree = "<group>"; };
 		A38237BA28E19AF3007F14ED /* CollectionRequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionRequestHandler.swift; sourceTree = "<group>"; };
@@ -418,9 +416,7 @@
 		29F7869E1F9FC4850035178F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				73015D9E2B84E94B0062E7F4 /* float32_model.mlpackage */,
 				73015D9B2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework */,
-				737CB88D2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework */,
 				7494704A25C4DEAF00355244 /* CouchbaseLiteSwift.xcframework */,
 			);
 			name = Frameworks;
