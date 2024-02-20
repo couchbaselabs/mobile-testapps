@@ -13,13 +13,12 @@ import Tokenizers
 import Hub
 
 public class VectorSearchRequestHandler {
-    public func handleRequest(method: String, args: Args) throws -> Any? {
+    public func handleRequest(method: String, args: Args) async throws -> Any? {
         switch method {
             
         case "vectorSearch_registerModel":
-            let model = vectorModel(name: "model")
-            let test = model.readConfig(name: "tokenizer")
-            return test
+            let model = vectorModel(name: "test")
+            return try await model.tokenizeInput(input: "test")
             
         case "vectorSearch_createIndex":
             guard let database: Database = args.get(name: "database") else { throw RequestHandlerError.InvalidArgument("Invalid database argument")}
@@ -92,47 +91,41 @@ public class VectorSearchRequestHandler {
 
 }
 
-// testing that coreml models can be loaded can only be done on
-// a device as we cannot access the directories on sim
-// for now work on other API endpoints and return to model later
-// could add native coreml embedding model to get vectors and test
-// gte-small in future
-
 @available(iOS 16.0, *)
 public class vectorModel: PredictiveModel {
     let name: String
-    //let model = try! float32_model()
+    let model = try! float32_model()
     
     public func predict(input: DictionaryObject) -> DictionaryObject? {
         nil
     }
     
-// not sure this is working properly
-    func readConfig(name: String) -> Config? {
-        if let path = Bundle.main.path(forResource: name, ofType: "json") {
-            do {
-                let data = try Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe)
-                let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
-                if let jsonDict = jsonResult as? [String: Any] {
-                    return Config(jsonDict)
-                }
-            } catch {
-                print("Error reading config JSON file:", error)
-            }
-        }
-        return nil
-    }
+    func tokenizeInput(input: String) async throws -> [Int]? {
+        guard let tokenizerConfig = try readConfig(name: "tokenizer_config") else { return nil }
+        guard let tokenizerData = try readConfig(name: "tokenizer") else { return nil }
+        let tokenizer = try! AutoTokenizer.from(tokenizerConfig: tokenizerConfig, tokenizerData: tokenizerData)
+        let inputIds = tokenizer(input)
+        return inputIds
     
-//    func tokenizeInput(input: String) async -> [Int]? {
-//        guard let tokenizerConfig = readConfig(name: "tokenizer_config") else { return nil }
-//        guard let tokenizerData = readConfig(name: "tokenizer") else { return nil }
-//        let tokenizer = try! AutoTokenizer.from(tokenizerConfig: tokenizerConfig, tokenizerData: tokenizerData)
-//        let inputIds = tokenizer(input)
-//        return inputIds
-//    
-//    }
+    }
     
     init(name: String) {
         self.name = name
     }
+}
+
+// Reads a config from Files/ directory
+func readConfig(name: String) throws -> Config? {
+    if let url = Bundle.main.url(forResource: "Files/\(name)", withExtension: "json") {
+        do {
+            let data = try Data(contentsOf: url, options: .mappedIfSafe)
+            let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
+            if let jsonDict = jsonResult as? [String: Any] {
+                return Config(jsonDict)
+            }
+        } catch {
+            throw RequestHandlerError.IOException("Error retrieving json config: \(error)")
+        }
+    }
+    return nil
 }

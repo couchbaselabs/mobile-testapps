@@ -48,7 +48,6 @@
 		29F7869B1F9FC4180035178F /* GCDWebServerErrorResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 29F7868C1F9FC4180035178F /* GCDWebServerErrorResponse.m */; };
 		29F7869C1F9FC4180035178F /* GCDWebServerFileResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 29F7868E1F9FC4180035178F /* GCDWebServerFileResponse.m */; };
 		29F7869D1F9FC4180035178F /* GCDWebServerStreamedResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 29F786901F9FC4180035178F /* GCDWebServerStreamedResponse.m */; };
-		2E8631EF229F2C8C00859424 /* Files in Resources */ = {isa = PBXBuildFile; fileRef = 2E8631EE229F2C8C00859424 /* Files */; };
 		4D7993E5250ED4B4004CDBA6 /* ListenerAuthenticatorRequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7993E4250ED4B4004CDBA6 /* ListenerAuthenticatorRequestHandler.swift */; };
 		4D8175C625CB71CC0020B14B /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = 4D8175C525CB71CC0020B14B /* Zip */; };
 		4D9BFA2625EEE6F6008CAB78 /* sg_cert.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4D9BFA2525EEE6F6008CAB78 /* sg_cert.cer */; };
@@ -57,6 +56,7 @@
 		73015D9C2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73015D9B2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework */; };
 		73015D9D2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 73015D9B2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		73015DA02B84E9830062E7F4 /* float32_model.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 73015D9F2B84E9830062E7F4 /* float32_model.mlpackage */; };
+		73015DA12B85193E0062E7F4 /* Files in Resources */ = {isa = PBXBuildFile; fileRef = 2E8631EE229F2C8C00859424 /* Files */; };
 		737CB8912B7BA26E00BF0A32 /* VectorSearchRequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737CB8902B7BA26E00BF0A32 /* VectorSearchRequestHandler.swift */; };
 		737CB8942B7F8A5200BF0A32 /* Transformers in Frameworks */ = {isa = PBXBuildFile; productRef = 737CB8932B7F8A5200BF0A32 /* Transformers */; };
 		7494704E25C4DEB600355244 /* CouchbaseLiteSwift.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7494704A25C4DEAF00355244 /* CouchbaseLiteSwift.xcframework */; };
@@ -546,12 +546,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				73015DA12B85193E0062E7F4 /* Files in Resources */,
 				29F77F311F9FC18D0035178F /* LaunchScreen.storyboard in Resources */,
 				29F77F2E1F9FC18D0035178F /* Assets.xcassets in Resources */,
 				4D9BFA2625EEE6F6008CAB78 /* sg_cert.cer in Resources */,
 				4DE0E3222501F24D00DEBA87 /* identity in Resources */,
 				29F77F2C1F9FC18D0035178F /* Main.storyboard in Resources */,
-				2E8631EF229F2C8C00859424 /* Files in Resources */,
 				FB5934E0219CB6220000C958 /* Databases in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
