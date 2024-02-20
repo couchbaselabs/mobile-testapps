@@ -64,7 +64,7 @@
     }
   ],
   "normalizer": {
-    "type": "BertNormalizer",
+    "type": "Bert",
     "clean_text": true,
     "handle_chinese_chars": true,
     "strip_accents": null,
