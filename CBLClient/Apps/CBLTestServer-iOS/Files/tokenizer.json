@@ -70,9 +70,6 @@
     "strip_accents": null,
     "lowercase": true
   },
-  "pre_tokenizer": {
-    "type": "BertPreTokenizer"
-  },
   "post_processor": {
     "type": "TemplateProcessing",
     "single": [
