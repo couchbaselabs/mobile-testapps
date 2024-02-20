@@ -42,9 +42,11 @@ public class VectorSearchRequestHandler {
             
             let scalarEncoding: ScalarQuantizerType? = args.get(name: "scalarEncoding")
             // UInt32/Int problem
+            // Note that subquantizers needs to be a factor of dimensions, runtime error if not
+            // and bits b needs 4 <= b <= 12, maybe worth adding input validation in future
             let subquantizers: Int? = args.get(name: "subquantizers")
             let bits: Int? = args.get(name: "bits")
-            let metric: DistanceMetric? = args.get(name: "metric")
+            let metric: String? = args.get(name: "metric")
             // UInt32/Int problem
             let minTrainingSize: Int? = args.get(name: "minTrainingSize")
             let maxTrainingSize: Int? = args.get(name: "maxTrainingSize")
@@ -65,7 +67,14 @@ public class VectorSearchRequestHandler {
                 config.encoding = VectorEncoding.productQuantizer(subquantizers: UInt32(subquantizers!), bits: UInt32(bits))
             }
             if let metric {
-                config.metric = metric
+                switch metric {
+                case "euclidean":
+                    config.metric = DistanceMetric.euclidean
+                case "cosine":
+                    config.metric = DistanceMetric.cosine
+                default:
+                    throw RequestHandlerError.InvalidArgument("Invalid distance metric")
+                }
             }
             if let minTrainingSize {
                 config.minTrainingSize = UInt32(minTrainingSize)
@@ -73,7 +82,7 @@ public class VectorSearchRequestHandler {
             if let maxTrainingSize {
                 config.maxTrainingSize = UInt32(maxTrainingSize)
             }
-            
+            // may change this to try catch, and return name of created index in future
             return try collection.createIndex(withName: indexName, config: config)
             
         default:
