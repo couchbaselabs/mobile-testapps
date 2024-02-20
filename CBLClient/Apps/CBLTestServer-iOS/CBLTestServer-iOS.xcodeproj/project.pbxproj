@@ -54,9 +54,9 @@
 		4D9BFA2625EEE6F6008CAB78 /* sg_cert.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4D9BFA2525EEE6F6008CAB78 /* sg_cert.cer */; };
 		4DE0E3222501F24D00DEBA87 /* identity in Resources */ = {isa = PBXBuildFile; fileRef = 4DE0E3212501F24D00DEBA87 /* identity */; };
 		6917C7BA232C30EE00D99DA6 /* RawData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6917C7B9232C30EE00D99DA6 /* RawData.swift */; };
-		733E07A12B6D47D700AEC18F /* float32_model.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 733E07A02B6D47D700AEC18F /* float32_model.mlpackage */; };
-		737CB88E2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 737CB88D2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework */; };
-		737CB88F2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 737CB88D2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		73015D9C2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73015D9B2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework */; };
+		73015D9D2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 73015D9B2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		73015DA02B84E9830062E7F4 /* float32_model.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 73015D9F2B84E9830062E7F4 /* float32_model.mlpackage */; };
 		737CB8912B7BA26E00BF0A32 /* VectorSearchRequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737CB8902B7BA26E00BF0A32 /* VectorSearchRequestHandler.swift */; };
 		737CB8942B7F8A5200BF0A32 /* Transformers in Frameworks */ = {isa = PBXBuildFile; productRef = 737CB8932B7F8A5200BF0A32 /* Transformers */; };
 		7494704E25C4DEB600355244 /* CouchbaseLiteSwift.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7494704A25C4DEAF00355244 /* CouchbaseLiteSwift.xcframework */; };
@@ -102,7 +102,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				737CB88F2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework in Embed Frameworks */,
+				73015D9D2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework in Embed Frameworks */,
 				7494704F25C4DEB600355244 /* CouchbaseLiteSwift.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -189,7 +189,9 @@
 		4D9BFA2525EEE6F6008CAB78 /* sg_cert.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = sg_cert.cer; sourceTree = "<group>"; };
 		4DE0E3212501F24D00DEBA87 /* identity */ = {isa = PBXFileReference; lastKnownFileType = folder; path = identity; sourceTree = "<group>"; };
 		6917C7B9232C30EE00D99DA6 /* RawData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawData.swift; sourceTree = "<group>"; };
-		733E07A02B6D47D700AEC18F /* float32_model.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; name = float32_model.mlpackage; path = "../../../../../gte-small/coreml/feature-extraction/float32_model.mlpackage"; sourceTree = "<group>"; };
+		73015D9B2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = CouchbaseLiteVectorSearch.xcframework; path = ../../../../artifacts/CouchbaseLiteVectorSearch.xcframework; sourceTree = "<group>"; };
+		73015D9E2B84E94B0062E7F4 /* float32_model.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; name = float32_model.mlpackage; path = ../../../../artifacts/float32_model.mlpackage; sourceTree = "<group>"; };
+		73015D9F2B84E9830062E7F4 /* float32_model.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; name = float32_model.mlpackage; path = "../../../../../artifacts/gte-small/coreml/feature-extraction/float32_model.mlpackage"; sourceTree = "<group>"; };
 		737CB88D2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = "CouchbaseLiteVectorSearch 2.xcframework"; path = "../../../../../../Downloads/CouchbaseLiteVectorSearch 2.xcframework"; sourceTree = "<group>"; };
 		737CB8902B7BA26E00BF0A32 /* VectorSearchRequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VectorSearchRequestHandler.swift; sourceTree = "<group>"; };
 		7494704A25C4DEAF00355244 /* CouchbaseLiteSwift.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = CouchbaseLiteSwift.xcframework; path = Frameworks/CouchbaseLiteSwift.xcframework; sourceTree = "<group>"; };
@@ -215,10 +217,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				73015D9C2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework in Frameworks */,
 				4D8175C625CB71CC0020B14B /* Zip in Frameworks */,
 				7494704E25C4DEB600355244 /* CouchbaseLiteSwift.xcframework in Frameworks */,
 				737CB8942B7F8A5200BF0A32 /* Transformers in Frameworks */,
-				737CB88E2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -314,7 +316,6 @@
 				2E8631EE229F2C8C00859424 /* Files */,
 				2909B0741F9FFA9B00B4E0E4 /* Server */,
 				29F77F261F9FC18D0035178F /* AppDelegate.swift */,
-				733E07A02B6D47D700AEC18F /* float32_model.mlpackage */,
 				29F77F281F9FC18D0035178F /* ViewController.swift */,
 				29F77F2D1F9FC18D0035178F /* Assets.xcassets */,
 				FB5934DF219CB6220000C958 /* Databases */,
@@ -323,6 +324,7 @@
 				4D9BFA2525EEE6F6008CAB78 /* sg_cert.cer */,
 				29F77F2F1F9FC18D0035178F /* LaunchScreen.storyboard */,
 				29F77F2A1F9FC18D0035178F /* Main.storyboard */,
+				73015D9F2B84E9830062E7F4 /* float32_model.mlpackage */,
 			);
 			path = "CBLTestServer-iOS";
 			sourceTree = "<group>";
@@ -416,6 +418,8 @@
 		29F7869E1F9FC4850035178F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				73015D9E2B84E94B0062E7F4 /* float32_model.mlpackage */,
+				73015D9B2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework */,
 				737CB88D2B7A715D00BF0A32 /* CouchbaseLiteVectorSearch 2.xcframework */,
 				7494704A25C4DEAF00355244 /* CouchbaseLiteSwift.xcframework */,
 			);
@@ -592,6 +596,7 @@
 				FB60EBD421069D5A005052B6 /* PeerToPeerRequestHandler.swift in Sources */,
 				294FB2081FEAF51F00DD0C23 /* QueryRequestHandler.swift in Sources */,
 				6917C7BA232C30EE00D99DA6 /* RawData.swift in Sources */,
+				73015DA02B84E9830062E7F4 /* float32_model.mlpackage in Sources */,
 				FB5A86762017E672008127FC /* DatabaseConfigurationRequestHandler.swift in Sources */,
 				2907D176200E860A00CE56EB /* BasicAuthenticatorRequestHandler.swift in Sources */,
 				29F77F271F9FC18D0035178F /* AppDelegate.swift in Sources */,
@@ -606,7 +611,6 @@
 				FB0C46F1221DE1F6002550CC /* PredictiveQueriesRequestHandler.swift in Sources */,
 				294FB20E1FEB0E1800DD0C23 /* DocumentRequestHandler.swift in Sources */,
 				FB6DD8C12232456300C84523 /* FileLoggingRequestHandler.swift in Sources */,
-				733E07A12B6D47D700AEC18F /* float32_model.mlpackage in Sources */,
 				29D15BA11FA7DCFA005DAAA3 /* ValueSerializer.swift in Sources */,
 				FB5A6A5521123A9A00937927 /* ReplicatorTcpConnection.swift in Sources */,
 				29F786921F9FC4180035178F /* GCDWebServerConnection.m in Sources */,
