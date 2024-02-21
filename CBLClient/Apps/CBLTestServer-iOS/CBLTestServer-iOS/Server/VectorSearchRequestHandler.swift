@@ -123,7 +123,7 @@ public class vectorModel: PredictiveModel {
         let embedding = Task {
             let tokens = try await tokenizeInput(input: input)
             let modelTokens = try MLMultiArray(tokens)
-            let attentionMask = try MLMultiArray(generateAttentionMask(tokenIdList: tokens))
+            let attentionMask = generateAttentionMask(tokenIdList: tokens)
             let modelInput = float32_modelInput(input_ids: modelTokens, attention_mask: attentionMask)
             return try model.prediction(input: modelInput)
         }
@@ -181,7 +181,7 @@ func padTokenizedInput(tokenIdList: [Int]) -> [Int] {
     return paddedTokenList
 }
 
-func generateAttentionMask(tokenIdList: [Int]) -> [Int] {
+func generateAttentionMask(tokenIdList: [Int]) -> MLMultiArray {
     var mask = [Int]()
     for i in tokenIdList {
         if i == 0 {
@@ -190,7 +190,11 @@ func generateAttentionMask(tokenIdList: [Int]) -> [Int] {
             mask.append(1)
         }
     }
-    return mask
+    let attentionMaskMultiArray = try? MLMultiArray(shape: [1, NSNumber(value: tokenIdList.count)], dataType: .int32)
+    for i in 0..<tokenIdList.count {
+        attentionMaskMultiArray?[i] = NSNumber(value: mask[i])
+    }
+    return attentionMaskMultiArray!
 }
 
 // https://stackoverflow.com/a/77300959
