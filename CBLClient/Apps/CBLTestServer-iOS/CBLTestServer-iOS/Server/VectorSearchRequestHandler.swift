@@ -89,7 +89,12 @@ public class VectorSearchRequestHandler {
             let testDic = MutableDictionaryObject()
             testDic.setValue("test", forKey: "test")
             let prediction = model.predict(input: testDic)
-            return prediction?.array(forKey: "vector")
+            let value = prediction?.array(forKey: "vector")
+            if let value {
+                return value.toArray()
+            } else {
+                return "not working"
+            }
             
         default:
             throw RequestHandlerError.MethodNotFound(method)
