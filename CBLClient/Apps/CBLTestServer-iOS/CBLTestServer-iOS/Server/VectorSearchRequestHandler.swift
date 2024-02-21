@@ -84,10 +84,11 @@ public class VectorSearchRequestHandler {
             // may change this to try catch, and return name of created index in future
             return try collection.createIndex(withName: indexName, config: config)
             
-        case "vectorSearch_predict":
+        case "vectorSearch_testPredict":
             let model = vectorModel(key: "test")
             let testDic = MutableDictionaryObject()
-            testDic.setValue("test", forKey: "test")
+            guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input for prediction")}
+            testDic.setValue(input, forKey: "test")
             let prediction = model.predict(input: testDic)
             let value = prediction?.array(forKey: "vector")
             if let value {
@@ -95,6 +96,14 @@ public class VectorSearchRequestHandler {
             } else {
                 return "not working"
             }
+        
+        case "vectorSearch_registerModel":
+            guard let key: String = args.get(name: "key") else { throw RequestHandlerError.InvalidArgument("Invalid key")}
+            guard let name: String = args.get(name: "name") else { throw RequestHandlerError.InvalidArgument("Invalid name")}
+            let model = vectorModel(key: key)
+            Database.prediction.registerModel(model, withName: name)
+            return "Registered model with name \(name)"
+            
             
         default:
             throw RequestHandlerError.MethodNotFound(method)
@@ -105,6 +114,8 @@ public class VectorSearchRequestHandler {
 
 @available(iOS 16.0, *)
 public class vectorModel: PredictiveModel {
+    // key is the field name in the doc
+    // to create embeddings on
     let key: String
     let model = try! float32_model()
 
@@ -161,6 +172,8 @@ func readConfig(name: String) throws -> Config? {
     return nil
 }
 
+// might need validation on input size, gte-small model only
+// takes up to 128 tokens, so need to truncate otherwise
 func tokenizeInput(input: String) async throws -> [Int] {
     guard let tokenizerConfig = try readConfig(name: "tokenizer_config") else { throw RequestHandlerError.IOException("Could not read config") }
     guard let tokenizerData = try readConfig(name: "tokenizer") else { throw RequestHandlerError.IOException("Could not read config") }
