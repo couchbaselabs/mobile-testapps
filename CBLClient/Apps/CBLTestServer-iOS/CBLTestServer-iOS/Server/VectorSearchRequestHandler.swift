@@ -104,11 +104,8 @@ public class vectorModel: PredictiveModel {
         guard let tokenizerConfig = try readConfig(name: "tokenizer_config") else { throw RequestHandlerError.IOException("Could not read config") }
         guard let tokenizerData = try readConfig(name: "tokenizer") else { throw RequestHandlerError.IOException("Could not read config") }
         let tokenizer = try! AutoTokenizer.from(tokenizerConfig: tokenizerConfig, tokenizerData: tokenizerData)
-        let tokenized = tokenizer.tokenize(text: input)
-        let inputIds = tokenizer.convertTokensToIds(tokenized)
-        let output = inputIds.compactMap{ $0 }
-        return output
-    
+        let tokenized = tokenizer.encode(text: input)
+        return tokenized
     }
     
     init(name: String) {
