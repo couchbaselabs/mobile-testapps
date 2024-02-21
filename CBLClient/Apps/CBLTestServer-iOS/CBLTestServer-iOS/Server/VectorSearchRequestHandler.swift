@@ -138,7 +138,11 @@ func padTokenizedInput(tokenIdList: [Int]) -> [Int] {
     
     paddedTokenList += tokenIdList
     if inputNumTokens < modelInputLength {
-        paddedTokenList.append(padTokenId)
+        var numTokensToAdd = modelInputLength - inputNumTokens
+        while numTokensToAdd > 0 {
+            paddedTokenList.append(padTokenId)
+            numTokensToAdd -= 1
+        }
     }
     return paddedTokenList
 }
