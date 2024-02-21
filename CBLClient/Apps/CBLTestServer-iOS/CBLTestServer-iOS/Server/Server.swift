@@ -17,7 +17,7 @@ enum RequestHandlerError: Error {
     case MethodNotFound(String)
     case InvalidArgument(String)
     case IOException(String)
-    //case VersionError(String)
+    case VectorPredicionError(String)
 }
 
 enum ValueSerializerError: Error {
@@ -219,6 +219,8 @@ public class Server {
                     reason = r
                 case .MethodNotFound(let r):
                     reason = r
+                default:
+                    break
                 }
                 let response = GCDWebServerDataResponse(text: reason)!
                 response.statusCode = 432

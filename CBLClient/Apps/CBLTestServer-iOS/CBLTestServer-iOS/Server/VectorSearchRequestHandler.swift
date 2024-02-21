@@ -16,9 +16,9 @@ public class VectorSearchRequestHandler {
     public func handleRequest(method: String, args: Args) async throws -> Any? {
         switch method {
             
-        case "vectorSearch_registerModel":
-            let model = vectorModel(name: "test")
-            return try await model.tokenizeInput(input: "test")
+        case "vectorSearch_testTokenizer":
+            guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input")}
+            return try await tokenizeInput(input: input)
             
         case "vectorSearch_createIndex":
             guard let database: Database = args.get(name: "database") else { throw RequestHandlerError.InvalidArgument("Invalid database argument")}
@@ -84,6 +84,13 @@ public class VectorSearchRequestHandler {
             // may change this to try catch, and return name of created index in future
             return try collection.createIndex(withName: indexName, config: config)
             
+        case "vectorSearch_predict":
+            let model = vectorModel(key: "test")
+            let testDic = MutableDictionaryObject()
+            testDic.setValue("test", forKey: "test")
+            let prediction = model.predict(input: testDic)
+            return prediction?.array(forKey: "vector")
+            
         default:
             throw RequestHandlerError.MethodNotFound(method)
         }
@@ -93,23 +100,42 @@ public class VectorSearchRequestHandler {
 
 @available(iOS 16.0, *)
 public class vectorModel: PredictiveModel {
-    let name: String
+    let key: String
     let model = try! float32_model()
-    
+
     public func predict(input: DictionaryObject) -> DictionaryObject? {
-        nil
+        guard let text = input.string(forKey: self.key) else { return nil }
+        let result = MutableDictionaryObject()
+        Task.synchronous {
+            let embedding = await self.predict(input: text)
+            if let embedding {
+                let vectorArray = castToDoubleArray(embedding.pooler_output)
+                result.setValue(vectorArray, forKey: "vector")
+            } else {
+                throw RequestHandlerError.VectorPredicionError("Could not generate prediction")
+            }
+        }
+        return result
     }
     
-    func tokenizeInput(input: String) async throws -> [Int] {
-        guard let tokenizerConfig = try readConfig(name: "tokenizer_config") else { throw RequestHandlerError.IOException("Could not read config") }
-        guard let tokenizerData = try readConfig(name: "tokenizer") else { throw RequestHandlerError.IOException("Could not read config") }
-        let tokenizer = try! AutoTokenizer.from(tokenizerConfig: tokenizerConfig, tokenizerData: tokenizerData)
-        let tokenized = tokenizer.encode(text: input)
-        return padTokenizedInput(tokenIdList: tokenized)
+    // internal async predict function
+    private func predict(input: String) async -> float32_modelOutput? {
+        let embedding = Task {
+            let tokens = try await tokenizeInput(input: input)
+            let modelTokens = try MLMultiArray(tokens)
+            let attentionMask = try MLMultiArray(generateAttentionMask(tokenIdList: tokens))
+            let modelInput = float32_modelInput(input_ids: modelTokens, attention_mask: attentionMask)
+            return try model.prediction(input: modelInput)
+        }
+        do {
+            return try await embedding.value
+        } catch {
+            return nil
+        }
     }
     
-    init(name: String) {
-        self.name = name
+    init(key: String) {
+        self.key = key
     }
 }
 
@@ -129,6 +155,14 @@ func readConfig(name: String) throws -> Config? {
     return nil
 }
 
+func tokenizeInput(input: String) async throws -> [Int] {
+    guard let tokenizerConfig = try readConfig(name: "tokenizer_config") else { throw RequestHandlerError.IOException("Could not read config") }
+    guard let tokenizerData = try readConfig(name: "tokenizer") else { throw RequestHandlerError.IOException("Could not read config") }
+    let tokenizer = try! AutoTokenizer.from(tokenizerConfig: tokenizerConfig, tokenizerData: tokenizerData)
+    let tokenized = tokenizer.encode(text: input)
+    return padTokenizedInput(tokenIdList: tokenized)
+}
+
 func padTokenizedInput(tokenIdList: [Int]) -> [Int] {
     // gte-small constants
     let modelInputLength = 128
@@ -145,4 +179,43 @@ func padTokenizedInput(tokenIdList: [Int]) -> [Int] {
         }
     }
     return paddedTokenList
+}
+
+func generateAttentionMask(tokenIdList: [Int]) -> [Int] {
+    var mask = [Int]()
+    for i in tokenIdList {
+        if i == 0 {
+            mask.append(0)
+        } else {
+            mask.append(1)
+        }
+    }
+    return mask
+}
+
+// https://stackoverflow.com/a/77300959
+// pretty hacky but workaround for now
+extension Task where Failure == Error {
+    /// Performs an async task in a sync context.
+    ///
+    /// - Note: This function blocks the thread until the given operation is finished. The caller is responsible for managing multithreading.
+    static func synchronous(priority: TaskPriority? = nil, operation: @escaping @Sendable () async throws -> Success) {
+        let semaphore = DispatchSemaphore(value: 0)
+
+        Task(priority: priority) {
+            defer { semaphore.signal() }
+            return try await operation()
+        }
+
+        semaphore.wait()
+    }
+}
+
+// https://stackoverflow.com/q/62887013
+func castToDoubleArray(_ o: MLMultiArray) -> [Double] {
+    var result: [Double] = Array(repeating: 0.0, count: o.count)
+    for i in 0 ..< o.count {
+        result[i] = o[i].doubleValue
+    }
+    return result
 }
