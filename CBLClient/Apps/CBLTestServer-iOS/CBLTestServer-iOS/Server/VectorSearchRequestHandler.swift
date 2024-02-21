@@ -19,6 +19,12 @@ public class VectorSearchRequestHandler {
         case "vectorSearch_testTokenizer":
             guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input")}
             return try await tokenizeInput(input: input)
+        
+        case "vectorSearch_testDecode":
+            guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input")}
+            let tokens = try await tokenizeInput(input: input)
+            let decoded = try await decodeTokenIds(encoded: tokens)
+            return ["tokens": tokens, "decoded": decoded]
             
         case "vectorSearch_createIndex":
             guard let database: Database = args.get(name: "database") else { throw RequestHandlerError.InvalidArgument("Invalid database argument")}
@@ -180,6 +186,15 @@ func tokenizeInput(input: String) async throws -> [Int] {
     let tokenizer = try! AutoTokenizer.from(tokenizerConfig: tokenizerConfig, tokenizerData: tokenizerData)
     let tokenized = tokenizer.encode(text: input)
     return padTokenizedInput(tokenIdList: tokenized)
+}
+
+// refactor tokenizer stuff
+func decodeTokenIds(encoded: [Int]) async throws -> String {
+    guard let tokenizerConfig = try readConfig(name: "tokenizer_config") else { throw RequestHandlerError.IOException("Could not read config") }
+    guard let tokenizerData = try readConfig(name: "tokenizer") else { throw RequestHandlerError.IOException("Could not read config") }
+    let tokenizer = try! AutoTokenizer.from(tokenizerConfig: tokenizerConfig, tokenizerData: tokenizerData)
+    let decoded = tokenizer.decode(tokens: encoded)
+    return decoded
 }
 
 func padTokenizedInput(tokenIdList: [Int]) -> [Int] {
