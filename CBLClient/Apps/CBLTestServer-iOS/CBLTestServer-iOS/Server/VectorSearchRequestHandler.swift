@@ -122,9 +122,10 @@ public class vectorModel: PredictiveModel {
     private func predict(input: String) async -> float32_modelOutput? {
         let embedding = Task {
             let tokens = try await tokenizeInput(input: input)
-            let modelTokens = try MLMultiArray(tokens)
+            let modelTokens = convertModelInputs(feature: tokens)
             let attentionMask = generateAttentionMask(tokenIdList: tokens)
-            let modelInput = float32_modelInput(input_ids: modelTokens, attention_mask: attentionMask)
+            let modelMask = convertModelInputs(feature: attentionMask)
+            let modelInput = float32_modelInput(input_ids: modelTokens, attention_mask: modelMask)
             return try model.prediction(input: modelInput)
         }
         do {
@@ -181,7 +182,7 @@ func padTokenizedInput(tokenIdList: [Int]) -> [Int] {
     return paddedTokenList
 }
 
-func generateAttentionMask(tokenIdList: [Int]) -> MLMultiArray {
+func generateAttentionMask(tokenIdList: [Int]) -> [Int] {
     var mask = [Int]()
     for i in tokenIdList {
         if i == 0 {
@@ -190,9 +191,14 @@ func generateAttentionMask(tokenIdList: [Int]) -> MLMultiArray {
             mask.append(1)
         }
     }
-    let attentionMaskMultiArray = try? MLMultiArray(shape: [1, NSNumber(value: tokenIdList.count)], dataType: .int32)
-    for i in 0..<tokenIdList.count {
-        attentionMaskMultiArray?[i] = NSNumber(value: mask[i])
+    return mask
+}
+
+// convert input tokens and attention mask to the correct shape
+func convertModelInputs(feature: [Int]) -> MLMultiArray {
+    let attentionMaskMultiArray = try? MLMultiArray(shape: [1, NSNumber(value: feature.count)], dataType: .int32)
+    for i in 0..<feature.count {
+        attentionMaskMultiArray?[i] = NSNumber(value: feature[i])
     }
     return attentionMaskMultiArray!
 }
