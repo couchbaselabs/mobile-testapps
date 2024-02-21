@@ -105,7 +105,7 @@ public class vectorModel: PredictiveModel {
         guard let tokenizerData = try readConfig(name: "tokenizer") else { throw RequestHandlerError.IOException("Could not read config") }
         let tokenizer = try! AutoTokenizer.from(tokenizerConfig: tokenizerConfig, tokenizerData: tokenizerData)
         let tokenized = tokenizer.encode(text: input)
-        return tokenized
+        return padTokenizedInput(tokenIdList: tokenized)
     }
     
     init(name: String) {
@@ -127,4 +127,18 @@ func readConfig(name: String) throws -> Config? {
         }
     }
     return nil
+}
+
+func padTokenizedInput(tokenIdList: [Int]) -> [Int] {
+    // gte-small constants
+    let modelInputLength = 128
+    let padTokenId = 0
+    let inputNumTokens = tokenIdList.count
+    var paddedTokenList = [Int]()
+    
+    paddedTokenList += tokenIdList
+    if inputNumTokens < modelInputLength {
+        paddedTokenList.append(padTokenId)
+    }
+    return paddedTokenList
 }
