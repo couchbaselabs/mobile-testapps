@@ -16,16 +16,19 @@ public class VectorSearchRequestHandler {
     public func handleRequest(method: String, args: Args) async throws -> Any? {
         switch method {
             
+        // get tokenized input
         case "vectorSearch_testTokenizer":
             guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input")}
             return try await tokenizeInput(input: input)
         
+        // tokenize input then decode back to string, including padding
         case "vectorSearch_testDecode":
             guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input")}
             let tokens = try await tokenizeInput(input: input)
             let decoded = try await decodeTokenIds(encoded: tokens)
             return ["tokens": tokens, "decoded": decoded]
             
+        // create index on collection
         case "vectorSearch_createIndex":
             guard let database: Database = args.get(name: "database") else { throw RequestHandlerError.InvalidArgument("Invalid database argument")}
             
@@ -89,7 +92,8 @@ public class VectorSearchRequestHandler {
             }
             // may change this to try catch, and return name of created index in future
             return try collection.createIndex(withName: indexName, config: config)
-            
+          
+        // returns the embedding for input
         case "vectorSearch_testPredict":
             let model = vectorModel(key: "test")
             let testDic = MutableDictionaryObject()
@@ -103,12 +107,98 @@ public class VectorSearchRequestHandler {
                 return "not working"
             }
         
+        // register model that creates embeddings on the field referred to by key
         case "vectorSearch_registerModel":
             guard let key: String = args.get(name: "key") else { throw RequestHandlerError.InvalidArgument("Invalid key")}
             guard let name: String = args.get(name: "name") else { throw RequestHandlerError.InvalidArgument("Invalid name")}
             let model = vectorModel(key: key)
             Database.prediction.registerModel(model, withName: name)
             return "Registered model with name \(name)"
+            
+        // this is a very bare bones sql++ query handler which expects the
+        // user to pass the query as a string in the request body
+        // and simply tries to create a query from that string
+        // will fail for invalid query input
+        // assumes that you already have created an index
+        case "vectorSearch_query":
+            // term is the search query that will be embedded and
+            // queried against
+            guard let term: String = args.get(name: "term") else { throw RequestHandlerError.InvalidArgument("Invalid search term")}
+            
+            // internal call to handler to get vector embedding for search term
+            let embeddingArgs = Args()
+            embeddingArgs.set(value: term, forName: "input")
+            let embeddedTerm = try await self.handleRequest(method: "vectorSearch_testPredict", args: embeddingArgs)
+            
+            // the sql query, paramaterised by $vector which will be
+            // the embedded term
+            guard let sql: String = args.get(name: "sql") else { throw RequestHandlerError.InvalidArgument("Invalid sql string")}
+            
+            // database to execute query against
+            // may change to handle collections
+            guard let db: Database = args.get(name: "database") else { throw RequestHandlerError.InvalidArgument("Invalid database")}
+            
+            let params = Parameters()
+            params.setValue(embeddedTerm, forName: "vector")
+            let query = try db.createQuery(sql)
+            query.parameters = params
+            guard let queryResults = try? query.execute() else { throw RequestHandlerError.VectorPredictionError("Error executing SQL++ query")}
+            
+            var results: [[String:Any]] = []
+            for result in queryResults {
+                results.append(result.toDictionary())
+            }
+            
+            return results
+            
+        // load pre generated words dataset with vector embeddings stored in doc body
+        case "vectorSearch_loadWords":
+            let dbHandler = DatabaseRequestHandler()
+            let preBuiltArgs = Args()
+            preBuiltArgs.set(value: "Databases/words.cblite2", forName: "dbPath")
+            let wordsPath = try dbHandler.handleRequest(method: "database_getPreBuiltDb", args: preBuiltArgs)
+            let copyArgs = Args()
+            copyArgs.set(value: wordsPath!, forName: "dbPath")
+            copyArgs.set(value: "words", forName: "dbName")
+            _ = try dbHandler.handleRequest(method: "database_copy", args: copyArgs)
+            let words: Database = try Database(name: "words")
+            return words
+        
+        // for manual test, regenerate the embeddings in the word database to be from gte-small
+        case "vectorSearch_regenerateWordsEmbeddings":
+            let wordsDb = try Database(name: "words")
+            let wordsCollection = try wordsDb.collection(name: "words")
+            let collectionHandler = CollectionRequestHandler()
+            
+            let model = vectorModel(key: "word")
+            
+            let innerArgs = Args()
+            let numDocs: Int = Int(wordsCollection!.count)
+            innerArgs.set(value: wordsCollection!, forName: "collection")
+            innerArgs.set(value: numDocs, forName: "limit")
+            innerArgs.set(value: 0, forName: "offset")
+            let docIds: [String] = try collectionHandler.handleRequest(method: "collection_getDocIds", args: innerArgs) as! [String]
+            
+            for id in docIds {
+                innerArgs.set(value: id, forName: "docId")
+                let doc = try collectionHandler.handleRequest(method: "collection_getDocument", args: innerArgs) as! Document
+                
+                var docData = doc.toDictionary()
+                let mutableDict = MutableDictionaryObject(data: docData)
+                let prediction = model.predict(input: mutableDict)
+                let embedding = prediction?.array(forKey: "vector")
+                if let embedding {
+                    docData.updateValue(embedding.toArray(), forKey: "vector")
+                } else {
+                    continue
+                }
+                
+                innerArgs.set(value: docData, forName: "data")
+                innerArgs.set(value: id, forName: "id")
+                _ = try collectionHandler.handleRequest(method: "collection_updateDocument", args: innerArgs)
+            }
+            
+            return "Updated document embeddings"
             
             
         default:
@@ -134,7 +224,7 @@ public class vectorModel: PredictiveModel {
                 let vectorArray = castToDoubleArray(embedding.pooler_output)
                 result.setValue(vectorArray, forKey: "vector")
             } else {
-                throw RequestHandlerError.VectorPredicionError("Could not generate prediction")
+                throw RequestHandlerError.VectorPredictionError("Could not generate prediction")
             }
         }
         return result

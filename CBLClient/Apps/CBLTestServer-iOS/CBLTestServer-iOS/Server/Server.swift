@@ -17,7 +17,7 @@ enum RequestHandlerError: Error {
     case MethodNotFound(String)
     case InvalidArgument(String)
     case IOException(String)
-    case VectorPredicionError(String)
+    case VectorPredictionError(String)
 }
 
 enum ValueSerializerError: Error {
