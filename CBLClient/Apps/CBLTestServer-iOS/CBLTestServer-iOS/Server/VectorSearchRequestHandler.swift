@@ -218,30 +218,16 @@ public class vectorModel: PredictiveModel {
     public func predict(input: DictionaryObject) -> DictionaryObject? {
         guard let text = input.string(forKey: self.key) else { return nil }
         let result = MutableDictionaryObject()
-        Task.synchronous {
-            let embedding = await self.predict(input: text)
-            if let embedding {
-                let vectorArray = castToDoubleArray(embedding.pooler_output)
-                result.setValue(vectorArray, forKey: "vector")
-            } else {
-                throw RequestHandlerError.VectorPredictionError("Could not generate prediction")
-            }
-        }
-        return result
-    }
-    
-    // internal async predict function
-    private func predict(input: String) async -> float32_modelOutput? {
-        let embedding = Task {
-            let tokens = try await tokenizeInput(input: input)
+        do {
+            let tokens = try tokenizeInput(input: text)
             let modelTokens = convertModelInputs(feature: tokens)
             let attentionMask = generateAttentionMask(tokenIdList: tokens)
             let modelMask = convertModelInputs(feature: attentionMask)
             let modelInput = float32_modelInput(input_ids: modelTokens, attention_mask: modelMask)
-            return try model.prediction(input: modelInput)
-        }
-        do {
-            return try await embedding.value
+            let embedding = try model.prediction(input: modelInput)
+            let vectorArray = castToDoubleArray(embedding.pooler_output)
+            result.setValue(vectorArray, forKey: "vector")
+            return result
         } catch {
             return nil
         }
@@ -270,7 +256,7 @@ func readConfig(name: String) throws -> Config? {
 
 // might need validation on input size, gte-small model only
 // takes up to 128 tokens, so need to truncate otherwise
-func tokenizeInput(input: String) async throws -> [Int] {
+func tokenizeInput(input: String) throws -> [Int] {
     guard let tokenizerConfig = try readConfig(name: "tokenizer_config") else { throw RequestHandlerError.IOException("Could not read config") }
     guard let tokenizerData = try readConfig(name: "tokenizer") else { throw RequestHandlerError.IOException("Could not read config") }
     let tokenizer = try! AutoTokenizer.from(tokenizerConfig: tokenizerConfig, tokenizerData: tokenizerData)
@@ -279,7 +265,7 @@ func tokenizeInput(input: String) async throws -> [Int] {
 }
 
 // refactor tokenizer stuff
-func decodeTokenIds(encoded: [Int]) async throws -> String {
+func decodeTokenIds(encoded: [Int]) throws -> String {
     guard let tokenizerConfig = try readConfig(name: "tokenizer_config") else { throw RequestHandlerError.IOException("Could not read config") }
     guard let tokenizerData = try readConfig(name: "tokenizer") else { throw RequestHandlerError.IOException("Could not read config") }
     let tokenizer = try! AutoTokenizer.from(tokenizerConfig: tokenizerConfig, tokenizerData: tokenizerData)
@@ -324,24 +310,6 @@ func convertModelInputs(feature: [Int]) -> MLMultiArray {
         attentionMaskMultiArray?[i] = NSNumber(value: feature[i])
     }
     return attentionMaskMultiArray!
-}
-
-// https://stackoverflow.com/a/77300959
-// pretty hacky but workaround for now
-extension Task where Failure == Error {
-    /// Performs an async task in a sync context.
-    ///
-    /// - Note: This function blocks the thread until the given operation is finished. The caller is responsible for managing multithreading.
-    static func synchronous(priority: TaskPriority? = nil, operation: @escaping @Sendable () async throws -> Success) {
-        let semaphore = DispatchSemaphore(value: 0)
-
-        Task(priority: priority) {
-            defer { semaphore.signal() }
-            return try await operation()
-        }
-
-        semaphore.wait()
-    }
 }
 
 // https://stackoverflow.com/q/62887013
