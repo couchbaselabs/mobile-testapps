@@ -19,13 +19,13 @@ public class VectorSearchRequestHandler {
         // get tokenized input
         case "vectorSearch_testTokenizer":
             guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input")}
-            return try await tokenizeInput(input: input)
+            return try tokenizeInput(input: input)
         
         // tokenize input then decode back to string, including padding
         case "vectorSearch_testDecode":
             guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input")}
-            let tokens = try await tokenizeInput(input: input)
-            let decoded = try await decodeTokenIds(encoded: tokens)
+            let tokens = try tokenizeInput(input: input)
+            let decoded = try decodeTokenIds(encoded: tokens)
             return ["tokens": tokens, "decoded": decoded]
             
         // create index on collection
