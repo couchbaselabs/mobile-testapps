@@ -88,7 +88,7 @@ android {
         implementation 'com.android.support:appcompat-v7:28.0.0'
 
         implementation 'com.google.code.gson:gson:2.8.5'
-        implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-x86_64:1.0.0-22'
+        implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-x86_64:1.0.0-60000'
 
         // Using snapshot code to validate our product is incredibly dubious...
         implementation 'org.nanohttpd:nanohttpd:2.3.2-SNAPSHOT'
