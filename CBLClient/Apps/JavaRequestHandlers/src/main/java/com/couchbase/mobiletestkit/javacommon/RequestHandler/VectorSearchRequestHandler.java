@@ -33,8 +33,8 @@ public class VectorSearchRequestHandler {
             case "vectorSearch_createIndex":
                 Database database = args.get("database");
 
-                String scopeName = args.getOrDefault("scopeName", "_default");
-                String collectionName = args.getOrDefault("collectionName", "_default");
+                String scopeName = args.get("scopeName") != null ? args.get("scopeName") : "_default";
+                String collectionName = args.get("collectionName") != null ? args.get("collectionName") : "_default";
 
                 Collection collection = database.getCollection(collectionName, scopeName);
                 if (collection == null) {
@@ -114,26 +114,12 @@ public class VectorSearchRequestHandler {
 
     public List<Integer> tokenizeInput(String input) throws Exception {
         // Implement tokenizeInput method
+        return null;
     }
 
     public String decodeTokenIds(List<Integer> encoded) throws Exception {
         // Implement decodeTokenIds method
-    }
-
-    // Define other methods
-}
-
-public class VectorModel {
-    private String key;
-    private Model model;
-
-    public VectorModel(String key) {
-        this.key = key;
-        this.model = new Model(); // not sure here...
-    }
-
-    public Map<String, Object> predict(DictionaryObject input) {
-        // Implement predict method
+        return null;
     }
 
     // Define other methods
