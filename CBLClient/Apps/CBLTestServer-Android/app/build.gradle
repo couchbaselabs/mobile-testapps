@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 ext {
-    DEF_VERSION = System.getenv("MAVEN_UPLOAD_VERSION")
+    DEF_VERSION = System.getenv('MAVEN_UPLOAD_VERSION')
     // When manually build in Android studio, replace System.getenv("MAVEN_UPLOAD_VERSION") with build version you want to build
     // ex: DEF_VERSION = "3.1.0-353"
     COUCHBASE_LITE_VERSION = System.getProperty('version', DEF_VERSION)
@@ -15,16 +15,16 @@ ext {
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "29.0.3"
-    ndkVersion "25.1.8937393"
+    buildToolsVersion '29.0.3'
+    ndkVersion '25.1.8937393'
 
     defaultConfig {
-        applicationId "com.couchbase.TestServerApp"
+        applicationId 'com.couchbase.TestServerApp'
         minSdkVersion 22
         targetSdkVersion 30
         versionCode 1
         versionName DEF_VERSION
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
         multiDexEnabled true
     }
 
@@ -45,19 +45,17 @@ android {
     sourceSets {
         main {
             java.srcDirs = [
-                    "src/main/java/",                                   // android specific codes
+                    'src/main/java/',                                   // android specific codes
                     "${JAVA_COMMON_DIR}/src/main/java",
                     "${JAVA_SERVER_DIR}/src/main/java"
 
             ]
             resources.srcDirs = [
-                    "src/main/res/",                                    // android resource files
+                    'src/main/res/',                                    // android resource files
                     ASSET_DIR
             ]
-
         }
     }
-
 
     buildTypes {
         debug {
@@ -71,6 +69,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
+            packagingOptions {
+                jniLibs {
+                    useLegacyPackaging = true
+                }
         }
     }
 }
@@ -78,8 +80,9 @@ android {
 repositories {
     // for build version < 3.0.0-160, use below maven url
     // maven { url "http://proget.build.couchbase.com/maven2/internalmaven" }
-    maven { url "http://mobile.nuget.couchbase.com/maven2/internalmaven/"}
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    maven { url 'http://mobile.nuget.couchbase.com/maven2/internalmaven/' }
+    maven { url 'https://proget.sc.couchbase.com/maven2/internalmaven' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     google()
     jcenter()
 }
@@ -90,6 +93,7 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:28.0.0'
 
     implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-arm64:1.0.0-60000'
 
     // Using snapshot code to validate our product is incredibly dubious...
     implementation 'org.nanohttpd:nanohttpd:2.3.2-SNAPSHOT'
@@ -102,5 +106,5 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.2"
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
