@@ -61,6 +61,7 @@ android {
         debug {
             debuggable true
             packagingOptions.jniLibs.useLegacyPackaging = true
+            packagingOptions.jniLibs.useLegacyPackaging = true
         }
         customDebuggableBuildType {
             debuggable true
@@ -70,6 +71,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
+            packagingOptions.jniLibs.useLegacyPackaging = true
             packagingOptions.jniLibs.useLegacyPackaging = true
         }
     }
@@ -94,17 +96,22 @@ android {
         // Using snapshot code to validate our product is incredibly dubious...
         implementation 'org.nanohttpd:nanohttpd:2.3.2-SNAPSHOT'
 
-        implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-x86_64:1.0.0-60000'
+        // implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-x86_64:1.0.0-60000'
 
-        // for build version < 3.0.0-160, use below package name
         // implementation "com.couchbase.lite:couchbase-lite-android-ee:${COUCHBASE_LITE_VERSION}"
-        // for build version > 3.0.0-160 but < 3.0.0-177, use below package name
-        implementation "com.couchbase.lite:couchbase-lite-kt-android-ee:${COUCHBASE_LITE_VERSION}"
-        // implementation "com.couchbase.lite:couchbase-lite-android-ee-ktx:${COUCHBASE_LITE_VERSION}"
         // implementation 'com.couchbase.lite:couchbase-lite-android-ee:3.2.0-69'
-        testImplementation 'junit:junit:4.12'
 
-        androidTestImplementation 'com.android.support.test:runner:1.0.2'
-        androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+        // Couchbase Lite:
+        implementation 'com.couchbase.lite:couchbase-lite-android-ee:3.2.0-69'
+        implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-arm64:1.0.0-60000'
+
+        // Android SDK:
+        implementation 'androidx.appcompat:appcompat:1.6.1'
+        implementation 'com.google.android.material:material:1.9.0'
+        implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+        testImplementation 'junit:junit:4.13.2'
+        androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+        androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     }
 }
