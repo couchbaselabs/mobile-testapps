@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 import com.couchbase.mobiletestkit.javacommon.*;
-import com.couchbase.lite;
+import com.couchbase.lite.*;
 
 public class VectorSearchRequestHandler {
     public Object handleRequest(String method, Args args) throws Exception {
