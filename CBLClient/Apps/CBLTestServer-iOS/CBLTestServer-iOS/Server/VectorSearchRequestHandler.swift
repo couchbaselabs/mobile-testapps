@@ -165,6 +165,8 @@ public class VectorSearchRequestHandler {
             return words
         
         // for manual test, regenerate the embeddings in the word database to be from gte-small
+        //manual testing note: database words is closed at the end of this, so need to reopen for subsequent
+        //operations
         case "vectorSearch_regenerateWordsEmbeddings":
             let wordsDb = try Database(name: "words")
             let wordsCollection = try wordsDb.collection(name: "words")
@@ -199,6 +201,97 @@ public class VectorSearchRequestHandler {
             }
             
             return "Updated document embeddings"
+            
+        // for manual generation of the functional test database
+        case "vectorSearch_generateTestDatabase":
+            let innerVectorSearchHandler = VectorSearchRequestHandler()
+            let innerArgs = Args()
+            var wordsDatabase = try await innerVectorSearchHandler.handleRequest(method: "vectorSearch_loadWords", args: innerArgs)
+            _ = try await innerVectorSearchHandler.handleRequest(method: "vectorSearch_regenerateWordsEmbeddings", args: innerArgs)
+            
+            // reopen words db
+            let databaseHandler = DatabaseRequestHandler()
+            innerArgs.set(value: "words", forName: "name")
+            wordsDatabase = try databaseHandler.handleRequest(method: "database_create", args: innerArgs)
+            
+            // remove collections
+            let collectionHandler = CollectionRequestHandler()
+            innerArgs.set(value: wordsDatabase!, forName: "database")
+            innerArgs.set(value: "extwords", forName: "collectionName")
+            _ = try collectionHandler.handleRequest(method: "collection_deleteCollection", args: innerArgs)
+            innerArgs.set(value: "categories", forName: "collectionName")
+            _ = try collectionHandler.handleRequest(method: "collection_deleteCollection", args: innerArgs)
+            
+            // add collections
+            innerArgs.set(value: "docBodyVectors", forName: "collectionName")
+            let docBodyVectors = try collectionHandler.handleRequest(method: "collection_createCollection", args: innerArgs) as! Collection
+            innerArgs.set(value: "indexVectors", forName: "collectionName")
+            let indexVectors = try collectionHandler.handleRequest(method: "collection_createCollection", args: innerArgs) as! Collection
+            innerArgs.set(value: "auxiliaryWords", forName: "collectionName")
+            let auxiliaryWords = try collectionHandler.handleRequest(method: "collection_createCollection", args: innerArgs) as! Collection
+            innerArgs.set(value: "searchTerms", forName: "collectionName")
+            let searchTerms = try collectionHandler.handleRequest(method: "collection_createCollection", args: innerArgs) as! Collection
+            
+            // get doc ids for words
+            innerArgs.set(value: "words", forName: "collectionName")
+            let wordsCollection = try collectionHandler.handleRequest(method: "collection_collection", args: innerArgs) as! Collection
+            innerArgs.set(value: wordsCollection, forName: "collection")
+            // arbitrary high number to ensure all docs retrieved
+            innerArgs.set(value: 10000, forName: "limit")
+            innerArgs.set(value: 0, forName: "offset")
+            let docIds = try collectionHandler.handleRequest(method: "collection_getDocIds", args: innerArgs) as! [String]
+            
+            // copy docs
+            try self.copyWordDocument(copyFrom: wordsCollection, copyTo: docBodyVectors, docIds: docIds)
+            try self.copyWordDocument(copyFrom: wordsCollection, copyTo: indexVectors, docIds: docIds)
+            
+            // remove word from first 5 cat3 docs in indexVectors
+            // 101 is the beginning of cat3
+            let cat3Offset = 100
+            for i in 1...5 {
+                let docId = "word\(cat3Offset+i)"
+                let doc = try indexVectors.document(id: docId)?.toMutable()
+                doc?.removeValue(forKey: "word")
+                try indexVectors.save(document: doc!)
+            }
+            
+            // remove embedding from first 10 docs in cat1 and 2 of docBodyVectors
+            let cat2Offset = 50
+            for i in 1...10 {
+                let docIdCat1 = "word\(i)"
+                let docIdCat2 = "word\(cat2Offset+i)"
+                
+                let doc1 = try docBodyVectors.document(id: docIdCat1)?.toMutable()
+                let doc2 = try docBodyVectors.document(id: docIdCat2)?.toMutable()
+                
+                doc1?.removeValue(forKey: "vector")
+                doc2?.removeValue(forKey: "vector")
+                try docBodyVectors.save(document: doc1!)
+                try docBodyVectors.save(document: doc2!)
+            }
+            
+            // add 10 new words with cat3 to auxiliaryWords
+            let newWordsOffset = 300 // 300 words initially in words._default.words
+            let newWords = ["pan", "pot", "fry", "burn", "stir", "spoon", "chop", "knife", "slice", "simmer"]
+            for i in 0...9 {
+                let docId = "word\(newWordsOffset+1+i)"
+                let doc = MutableDocument(id: docId)
+                doc.setString(newWords[i], forKey: "word")
+                doc.setString("cat3", forKey: "catid")
+                
+                try auxiliaryWords.save(document: doc)
+            }
+            
+            // add dinner search term to searchTerms
+            let dinner = "dinner"
+            innerArgs.set(value: dinner, forName: "input")
+            let dinnerVector: [Double] = try await innerVectorSearchHandler.handleRequest(method: "vectorSearch_testPredict", args: innerArgs) as! [Double]
+            let dinnerDoc = MutableDocument(id: "dinner")
+            dinnerDoc.setArray(MutableArrayObject(data: dinnerVector), forKey: "vector")
+            dinnerDoc.setString(dinner, forKey: "word")
+            try searchTerms.save(document: dinnerDoc)
+            
+            return "Generated test database"
             
             
         default:
@@ -319,4 +412,22 @@ func castToDoubleArray(_ o: MLMultiArray) -> [Double] {
         result[i] = o[i].doubleValue
     }
     return result
+}
+
+private extension VectorSearchRequestHandler {
+    // internal function for copying documents to the test database
+    func copyWordDocument(copyFrom: Collection, copyTo: Collection, docIds: [String]) throws {
+        let copyToCollectionName = copyTo.name
+        for docId in docIds {
+            guard let doc = try copyFrom.document(id: docId) else { throw RequestHandlerError.IOException("Could not get document \(docId)")}
+            var docData = doc.toDictionary()
+            
+            if copyToCollectionName == "indexVectors" {
+                docData.removeValue(forKey: "vector")
+            }
+            
+            let newDoc = MutableDocument(id: docId, data: docData)
+            try copyTo.save(document: newDoc)
+        }
+    }
 }
