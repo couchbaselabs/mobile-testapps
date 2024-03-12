@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = 'CBLTestServer-Android'
+rootProject.name = 'CBLTestServer'
 include ':app'
