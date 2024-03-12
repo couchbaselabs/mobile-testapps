@@ -42,7 +42,7 @@ public class VectorSearchRequestHandler {
                 int dimensions = args.get("dimensions");
                 int centroids = args.get("centroids");
 
-                ScalarQuantizerType scalarEncoding = args.get("scalarEncoding");
+                VectorEncoding.ScalarQuantizerType scalarEncoding = args.get("scalarEncoding");
 
                 Integer subquantizers = args.get("subquantizers");
                 Integer bits = args.get("bits");
@@ -71,10 +71,10 @@ public class VectorSearchRequestHandler {
                 if (metric != null) {
                     switch (metric) {
                         case "euclidean":
-                            config.setMetric(DistanceMetric.euclidean);
+                            config.setMetric(VectorIndexConfiguration.DistanceMetric.EUCLIDIAN);
                             break;
                         case "cosine":
-                            config.setMetric(DistanceMetric.cosine);
+                            config.setMetric(VectorIndexConfiguration.DistanceMetric.COSINE);
                             break;
                         default:
                             throw new Error("Invalid distance metric");
@@ -89,7 +89,9 @@ public class VectorSearchRequestHandler {
                     config.setMaxTrainingSize(maxTrainingSize);
                 }
 
-                return collection.createIndex(indexName, config);
+                collection.createIndex(indexName, config);
+
+                return "???";
 
             case "vectorSearch_testPredict":
                 // Implement testPredict method
