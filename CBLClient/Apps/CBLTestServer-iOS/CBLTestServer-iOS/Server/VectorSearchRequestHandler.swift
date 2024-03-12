@@ -291,6 +291,10 @@ public class VectorSearchRequestHandler {
             dinnerDoc.setString(dinner, forKey: "word")
             try searchTerms.save(document: dinnerDoc)
             
+            // remove original words collection
+            innerArgs.set(value: "words", forName: "collectionName")
+            _ = try collectionHandler.handleRequest(method: "collection_deleteCollection", args: innerArgs)
+            
             return "Generated test database"
             
             
