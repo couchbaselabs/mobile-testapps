@@ -16,18 +16,6 @@ public class VectorSearchRequestHandler {
     public func handleRequest(method: String, args: Args) async throws -> Any? {
         switch method {
             
-        // get tokenized input
-        case "vectorSearch_testTokenizer":
-            guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input")}
-            return try tokenizeInput(input: input)
-        
-        // tokenize input then decode back to string, including padding
-        case "vectorSearch_testDecode":
-            guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input")}
-            let tokens = try tokenizeInput(input: input)
-            let decoded = try decodeTokenIds(encoded: tokens)
-            return ["tokens": tokens, "decoded": decoded]
-            
         // create index on collection
         case "vectorSearch_createIndex":
             guard let database: Database = args.get(name: "database") else { throw RequestHandlerError.InvalidArgument("Invalid database argument")}
@@ -90,11 +78,15 @@ public class VectorSearchRequestHandler {
             if let maxTrainingSize {
                 config.maxTrainingSize = UInt32(maxTrainingSize)
             }
-            // may change this to try catch, and return name of created index in future
-            return try collection.createIndex(withName: indexName, config: config)
+            do {
+                try collection.createIndex(withName: indexName, config: config)
+                return "Created index with name \(indexName) on collection \(collectionName)"
+            } catch {
+                return "Could not create index: \(error)"
+            }
           
-        // returns the embedding for input
-        case "vectorSearch_testPredict":
+        // returns the embedding for input string
+        case "vectorSearch_getEmbedding":
             let model = vectorModel(key: "test")
             let testDic = MutableDictionaryObject()
             guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input for prediction")}
@@ -104,7 +96,7 @@ public class VectorSearchRequestHandler {
             if let value {
                 return value.toArray()
             } else {
-                return "not working"
+                return "Could not generate embedding"
             }
         
         // register model that creates embeddings on the field referred to by key
@@ -151,151 +143,32 @@ public class VectorSearchRequestHandler {
             
             return results
             
-        // load pre generated words dataset with vector embeddings stored in doc body
-        case "vectorSearch_loadWords":
+        // load pre generated vsTestDatabase
+        case "vectorSearch_loadDatabase":
             let dbHandler = DatabaseRequestHandler()
             let preBuiltArgs = Args()
-            preBuiltArgs.set(value: "Databases/words.cblite2", forName: "dbPath")
-            let wordsPath = try dbHandler.handleRequest(method: "database_getPreBuiltDb", args: preBuiltArgs)
-            let copyArgs = Args()
-            copyArgs.set(value: wordsPath!, forName: "dbPath")
-            copyArgs.set(value: "words", forName: "dbName")
-            _ = try dbHandler.handleRequest(method: "database_copy", args: copyArgs)
-            let words: Database = try Database(name: "words")
-            return words
-        
-        // for manual test, regenerate the embeddings in the word database to be from gte-small
-        //manual testing note: database words is closed at the end of this, so need to reopen for subsequent
-        //operations
-        case "vectorSearch_regenerateWordsEmbeddings":
-            let wordsDb = try Database(name: "words")
-            let wordsCollection = try wordsDb.collection(name: "words")
-            let collectionHandler = CollectionRequestHandler()
+            preBuiltArgs.set(value: "Databases/vsTestDatabase.cblite2", forName: "dbPath")
+            let dbPath = try dbHandler.handleRequest(method: "database_getPreBuiltDb", args: preBuiltArgs)
+            preBuiltArgs.set(value: dbPath!, forName: "dbPath")
+            preBuiltArgs.set(value: "vsTestDatabase", forName: "dbName")
+            _ = try dbHandler.handleRequest(method: "database_copy", args: preBuiltArgs)
+            let db: Database = try Database(name: "vsTestDatabase")
+            return db
             
-            let model = vectorModel(key: "word")
+            // the handlers below are for manual testing purposes and do not
+            // need to be replicated in the other test servers
             
-            let innerArgs = Args()
-            let numDocs: Int = Int(wordsCollection!.count)
-            innerArgs.set(value: wordsCollection!, forName: "collection")
-            innerArgs.set(value: numDocs, forName: "limit")
-            innerArgs.set(value: 0, forName: "offset")
-            let docIds: [String] = try collectionHandler.handleRequest(method: "collection_getDocIds", args: innerArgs) as! [String]
+            // get tokenized input
+            case "vectorSearch_testTokenizer":
+                guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input")}
+                return try tokenizeInput(input: input)
             
-            for id in docIds {
-                innerArgs.set(value: id, forName: "docId")
-                let doc = try collectionHandler.handleRequest(method: "collection_getDocument", args: innerArgs) as! Document
-                
-                var docData = doc.toDictionary()
-                let mutableDict = MutableDictionaryObject(data: docData)
-                let prediction = model.predict(input: mutableDict)
-                let embedding = prediction?.array(forKey: "vector")
-                if let embedding {
-                    docData.updateValue(embedding.toArray(), forKey: "vector")
-                } else {
-                    continue
-                }
-                
-                innerArgs.set(value: docData, forName: "data")
-                innerArgs.set(value: id, forName: "id")
-                _ = try collectionHandler.handleRequest(method: "collection_updateDocument", args: innerArgs)
-            }
-            
-            return "Updated document embeddings"
-            
-        // for manual generation of the functional test database
-        case "vectorSearch_generateTestDatabase":
-            let innerVectorSearchHandler = VectorSearchRequestHandler()
-            let innerArgs = Args()
-            var wordsDatabase = try await innerVectorSearchHandler.handleRequest(method: "vectorSearch_loadWords", args: innerArgs)
-            _ = try await innerVectorSearchHandler.handleRequest(method: "vectorSearch_regenerateWordsEmbeddings", args: innerArgs)
-            
-            // reopen words db
-            let databaseHandler = DatabaseRequestHandler()
-            innerArgs.set(value: "words", forName: "name")
-            wordsDatabase = try databaseHandler.handleRequest(method: "database_create", args: innerArgs)
-            
-            // remove collections
-            let collectionHandler = CollectionRequestHandler()
-            innerArgs.set(value: wordsDatabase!, forName: "database")
-            innerArgs.set(value: "extwords", forName: "collectionName")
-            _ = try collectionHandler.handleRequest(method: "collection_deleteCollection", args: innerArgs)
-            innerArgs.set(value: "categories", forName: "collectionName")
-            _ = try collectionHandler.handleRequest(method: "collection_deleteCollection", args: innerArgs)
-            
-            // add collections
-            innerArgs.set(value: "docBodyVectors", forName: "collectionName")
-            let docBodyVectors = try collectionHandler.handleRequest(method: "collection_createCollection", args: innerArgs) as! Collection
-            innerArgs.set(value: "indexVectors", forName: "collectionName")
-            let indexVectors = try collectionHandler.handleRequest(method: "collection_createCollection", args: innerArgs) as! Collection
-            innerArgs.set(value: "auxiliaryWords", forName: "collectionName")
-            let auxiliaryWords = try collectionHandler.handleRequest(method: "collection_createCollection", args: innerArgs) as! Collection
-            innerArgs.set(value: "searchTerms", forName: "collectionName")
-            let searchTerms = try collectionHandler.handleRequest(method: "collection_createCollection", args: innerArgs) as! Collection
-            
-            // get doc ids for words
-            innerArgs.set(value: "words", forName: "collectionName")
-            let wordsCollection = try collectionHandler.handleRequest(method: "collection_collection", args: innerArgs) as! Collection
-            innerArgs.set(value: wordsCollection, forName: "collection")
-            // arbitrary high number to ensure all docs retrieved
-            innerArgs.set(value: 10000, forName: "limit")
-            innerArgs.set(value: 0, forName: "offset")
-            let docIds = try collectionHandler.handleRequest(method: "collection_getDocIds", args: innerArgs) as! [String]
-            
-            // copy docs
-            try self.copyWordDocument(copyFrom: wordsCollection, copyTo: docBodyVectors, docIds: docIds)
-            try self.copyWordDocument(copyFrom: wordsCollection, copyTo: indexVectors, docIds: docIds)
-            
-            // remove word from first 5 cat3 docs in indexVectors
-            // 101 is the beginning of cat3
-            let cat3Offset = 100
-            for i in 1...5 {
-                let docId = "word\(cat3Offset+i)"
-                let doc = try indexVectors.document(id: docId)?.toMutable()
-                doc?.removeValue(forKey: "word")
-                try indexVectors.save(document: doc!)
-            }
-            
-            // remove embedding from first 10 docs in cat1 and 2 of docBodyVectors
-            let cat2Offset = 50
-            for i in 1...10 {
-                let docIdCat1 = "word\(i)"
-                let docIdCat2 = "word\(cat2Offset+i)"
-                
-                let doc1 = try docBodyVectors.document(id: docIdCat1)?.toMutable()
-                let doc2 = try docBodyVectors.document(id: docIdCat2)?.toMutable()
-                
-                doc1?.removeValue(forKey: "vector")
-                doc2?.removeValue(forKey: "vector")
-                try docBodyVectors.save(document: doc1!)
-                try docBodyVectors.save(document: doc2!)
-            }
-            
-            // add 10 new words with cat3 to auxiliaryWords
-            let newWordsOffset = 300 // 300 words initially in words._default.words
-            let newWords = ["pan", "pot", "fry", "burn", "stir", "spoon", "chop", "knife", "slice", "simmer"]
-            for i in 0...9 {
-                let docId = "word\(newWordsOffset+1+i)"
-                let doc = MutableDocument(id: docId)
-                doc.setString(newWords[i], forKey: "word")
-                doc.setString("cat3", forKey: "catid")
-                
-                try auxiliaryWords.save(document: doc)
-            }
-            
-            // add dinner search term to searchTerms
-            let dinner = "dinner"
-            innerArgs.set(value: dinner, forName: "input")
-            let dinnerVector: [Double] = try await innerVectorSearchHandler.handleRequest(method: "vectorSearch_testPredict", args: innerArgs) as! [Double]
-            let dinnerDoc = MutableDocument(id: "dinner")
-            dinnerDoc.setArray(MutableArrayObject(data: dinnerVector), forKey: "vector")
-            dinnerDoc.setString(dinner, forKey: "word")
-            try searchTerms.save(document: dinnerDoc)
-            
-            // remove original words collection
-            innerArgs.set(value: "words", forName: "collectionName")
-            _ = try collectionHandler.handleRequest(method: "collection_deleteCollection", args: innerArgs)
-            
-            return "Generated test database"
+            // tokenize input then decode back to string, including padding
+            case "vectorSearch_testDecode":
+                guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input")}
+                let tokens = try tokenizeInput(input: input)
+                let decoded = try decodeTokenIds(encoded: tokens)
+                return ["tokens": tokens, "decoded": decoded]
             
             
         default:
