@@ -13,9 +13,12 @@ ext {
     JAVA_SERVER_DIR = "${ROOT_DIR}/JavaRequestListener"
 }
 
+println "BUILDING TEST SERVER WITH CBL VERSION ${COUCHBASE_LITE_VERSION}"
+
 android {
-    compileSdkVersion 30
-    buildToolsVersion '29.0.3'
+    namespace 'com.couchbase.CouchbaseLiteServ'
+
+    compileSdkVersion 33
     ndkVersion '25.1.8937393'
 
     defaultConfig {
@@ -77,10 +80,13 @@ android {
     }
 
     repositories {
-        // for build version < 3.0.0-160, use below maven url
+        // legacy maven for build version < 3.0.0-160
         // maven { url "http://proget.build.couchbase.com/maven2/internalmaven" }
-        maven { url 'http://mobile.nuget.couchbase.com/maven2/internalmaven/' }
+        // external maven
+        // maven { url 'https://mobile.maven.couchbase.com/maven2/dev/' }
+        // internal maven
         maven { url 'https://proget.sc.couchbase.com/maven2/internalmaven' }
+        // where nanohttpd lives
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
         google()
         jcenter()
@@ -96,14 +102,10 @@ android {
         // Using snapshot code to validate our product is incredibly dubious...
         implementation 'org.nanohttpd:nanohttpd:2.3.2-SNAPSHOT'
 
-        // implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-x86_64:1.0.0-60000'
-
-        // implementation "com.couchbase.lite:couchbase-lite-android-ee:${COUCHBASE_LITE_VERSION}"
-        // implementation 'com.couchbase.lite:couchbase-lite-android-ee:3.2.0-69'
-
         // Couchbase Lite:
         implementation 'com.couchbase.lite:couchbase-lite-android-ee:3.2.0-69'
         implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-arm64:1.0.0-60000'
+        // implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-x86_64:1.0.0-60000'
 
         // Android SDK:
         implementation 'androidx.appcompat:appcompat:1.6.1'
