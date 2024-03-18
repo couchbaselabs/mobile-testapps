@@ -161,7 +161,7 @@ public class VectorSearchRequestHandler {
             ResultSet rs = query.execute();
             List<Object> resultArray = new ArrayList<>();
             for (Object row : rs) {
-                resultArray.add(((ResultSet) row).toMap);
+                resultArray.add(((ResultSet) row));
             }
             return resultArray;
         }
