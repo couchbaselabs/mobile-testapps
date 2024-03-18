@@ -124,7 +124,7 @@ public class VectorSearchRequestHandler {
                 } catch (Exception e) {
                     // TODO: handle exception
                 }
-                Database db1 = Database("vsTestDatabase");
+                Database db1 = new Database("vsTestDatabase");
                 return db1;
 
             case "vectorSearch_getEmbedding":
@@ -151,15 +151,16 @@ public class VectorSearchRequestHandler {
 
         List<Object> getWordVector(String word, String collection, Database db) {
             String sql = String.format("select vector from %s where word = '%s'", collection, word);
-            Query query = this.db.createQuery(sql);
+            Query query = db.createQuery(sql);
             ResultSet rs = query.execute();
-            List<Object> resultArray = new ArrayList<>();
-            for (Result row : resultArray) {
+            List<Result> resultArray = new ArrayList<>();
+            for (Result row : rs) {
                 resultArray.add(row.toMap());
             }
             return resultArray;
         }
 
+        @Override
         public Dictionary predict(Dictionary input, Database db) {
             String inputWord = input.getString("word");
 
