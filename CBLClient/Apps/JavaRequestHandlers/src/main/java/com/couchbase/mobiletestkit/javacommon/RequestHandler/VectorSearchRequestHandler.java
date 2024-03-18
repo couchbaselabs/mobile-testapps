@@ -135,7 +135,7 @@ public class VectorSearchRequestHandler {
                 testDic.setValue(input, "test");
                 Dictionary value = model1.predict(testDic);
 
-                return value.toArray();
+                return value;
 
             default:
                 throw new Exception(method);
