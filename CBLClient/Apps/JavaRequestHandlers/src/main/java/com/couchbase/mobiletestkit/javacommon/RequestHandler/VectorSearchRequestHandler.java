@@ -3,7 +3,6 @@ package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
 
 import com.couchbase.mobiletestkit.javacommon.*;
 import com.couchbase.lite.*;
@@ -11,18 +10,6 @@ import com.couchbase.lite.*;
 public class VectorSearchRequestHandler {
     public Object handleRequest(String method, Args args) throws Exception {
         switch (method) {
-            case "vectorSearch_testTokenizer":
-                String input = args.get("input");
-                return tokenizeInput(input);
-
-            case "vectorSearch_testDecode":
-                String decodeInput = args.get("input");
-                List<Integer> tokens = tokenizeInput(decodeInput);
-                String decoded = decodeTokenIds(tokens);
-                Map<String, Object> result = new HashMap<>();
-                result.put("tokens", tokens);
-                result.put("decoded", decoded);
-                return result;
 
             case "vectorSearch_createIndex":
                 Database database = args.get("database");
@@ -93,31 +80,73 @@ public class VectorSearchRequestHandler {
 
                 return "???";
 
-            case "vectorSearch_testPredict":
-                // Implement testPredict method
             case "vectorSearch_registerModel":
-                // Implement registerModel method
+                String key = args.get("key");
+                String name = args.get("name");
+                vectorModel model = new vectorModel(key);
+                Database.prediction.registerModel(model, name);
+                return "Registered model with name " + name;
+
+
             case "vectorSearch_query":
-                // Implement query method
-            case "vectorSearch_loadWords":
-                // Implement loadWords method
-            case "vectorSearch_regenerateWordsEmbeddings":
-                // Implement regenerateWordsEmbeddings method
+
+
+            case "vectorSearch_loadDatabase":
+                // loads the given database vsTestDatabase
+                DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
+                Args newArgs = args;
+                newArgs.put("dbPath","Databases/vsTestDatabase.cblite2")
+                try {
+                    String dbPath = dbHandler.getPreBuiltDb(newArgs);
+                    newArgs.put("dbPath", dbPath);
+                    newArgs.put("dbName", "vsTestDatabase");
+                    dbHandler.copy(newArgs);
+                } catch (Exception e) {
+                    // TODO: handle exception
+                }
+                Database db = Database("vsTestDatabase");
+                return db;
+                
+
+            case "vectorSearch_getEmbedding":
+
+
             default:
                 throw new Exception(method);
         }
     }
 
-    public List<Integer> tokenizeInput(String input) throws Exception {
-        // Implement tokenizeInput method
-        return null;
-    }
+    private class vectorModel implements PredictiveModel {
+        String key;
+        Database db;
 
-    public String decodeTokenIds(List<Integer> encoded) throws Exception {
-        // Implement decodeTokenIds method
-        return null;
-    }
+        vectorModel(String key, Database db) {
+            this.key = key;
+            this.db = db;
+        }
 
+        List<Object> getWordVector(String word, String collection) {
+            String sql = String.format("select vector from %s where word = '%s'", collection, word);
+            Query query = this.db.createQuery(sql);
+            ResultSet rs = query.execute();
+            List<Object> resultArray = new ArrayList<>();
+            for (Result row : rows) {
+                resultArray.add(row.toMap());
+            }
+            return resultArray;
+        }
+
+        public Dictionary predict(Dictionary input) {
+            String inputWord = input.getString("word");
+
+            List<Object> result = getWordVector(inputWord, "words");
+
+            MutableDictionary output = new MutableDictionary();
+            output.setValue(result, "vector");
+            return output;
+        }
+
+    }
     // Define other methods
 }
 
