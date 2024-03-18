@@ -161,13 +161,13 @@ public class VectorSearchRequestHandler {
             Query query = this.db.createQuery(sql);
             try {
                 ResultSet rs = query.execute();
+                List<Object> resultArray = new ArrayList<>();
+                for (Object row : rs) {
+                    resultArray.add(((ResultSet) row));
+                }
             }
             catch (CouchbaseLiteException e) {
                 throw e;
-            }
-            List<Object> resultArray = new ArrayList<>();
-            for (Object row : rs) {
-                resultArray.add(((ResultSet) row));
             }
             return resultArray;
         }
