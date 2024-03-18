@@ -128,12 +128,12 @@ public class VectorSearchRequestHandler {
                 return db1;
 
             case "vectorSearch_getEmbedding":
-                Database db3 = this.handleRequest("vectorSearch_loadDatabase", newArgs);
-                vectorModel model1 = new vectorModel("test");
+                Database db3 = this.handleRequest("vectorSearch_loadDatabase", args);
+                vectorModel model1 = new vectorModel("test", db3);
                 MutableDictionary testDic = new MutableDictionary();
                 String input = args.get("input");
                 testDic.setValue(input, "test");
-                Dictionary value = model1.predict(testDic, db3);
+                Dictionary value = model1.predict(testDic);
 
                 return value.toArray();
 
@@ -144,27 +144,33 @@ public class VectorSearchRequestHandler {
 
     private class vectorModel implements PredictiveModel {
         String key;
+        Database db;
+
+        vectorModel(String key, Database db) {
+            this.key = key;
+            this.db = db;
+        }
 
         vectorModel(String key) {
             this.key = key;
         }
 
-        List<Object> getWordVector(String word, String collection, Database db) {
+        List<Object> getWordVector(String word, String collection) {
             String sql = String.format("select vector from %s where word = '%s'", collection, word);
-            Query query = db.createQuery(sql);
+            Query query = this.db.createQuery(sql);
             ResultSet rs = query.execute();
-            List<Result> resultArray = new ArrayList<>();
-            for (Result row : rs) {
+            List<Object> resultArray = new ArrayList<>();
+            for (Object row : rs) {
                 resultArray.add(row.toMap());
             }
             return resultArray;
         }
 
         @Override
-        public Dictionary predict(Dictionary input, Database db) {
+        public Dictionary predict(Dictionary input) {
             String inputWord = input.getString("word");
 
-            List<Object> result = getWordVector(inputWord, "words", db);
+            List<Object> result = getWordVector(inputWord, "words");
 
             MutableDictionary output = new MutableDictionary();
             output.setValue("vector", result);
