@@ -84,14 +84,14 @@ public class VectorSearchRequestHandler {
                 String key = args.get("key");
                 String name = args.get("name");
                 vectorModel model = new vectorModel(key);
-                Database.prediction.registerModel(model, name);
+                Database.prediction.registerModel(name, model);
                 return "Registered model with name " + name;
 
             case "vectorSearch_query":
                 String term = args.get("term");
 
                 Args embeddingArgs = new Args();
-                embeddingArgs.set(term, "input");
+                embeddingArgs.put(term, "input");
                 Object embeddedTerm = this.handleRequest("vectorSearch_getEmbedding", embeddingArgs);
 
                 String sql = args.get("sql");
@@ -99,9 +99,9 @@ public class VectorSearchRequestHandler {
                 Database db = args.get("database");
 
                 Parameters params = new Parameters();
-                params.setValue(embeddedTerm, "vector");
+                params.setValue("vector", embeddedTerm);
                 Query query = db.createQuery(sql);
-                query.parameters = params;
+                query.getParameters() = params;
 
                 List<Object> resultArray = new ArrayList<>();
                 ResultSet queryResults = query.execute();
@@ -124,22 +124,18 @@ public class VectorSearchRequestHandler {
                 } catch (Exception e) {
                     // TODO: handle exception
                 }
-                Database db = Database("vsTestDatabase");
-                return db;
+                Database db1 = Database("vsTestDatabase");
+                return db1;
 
             case "vectorSearch_getEmbedding":
-                Database db = this.handleRequest(method, newArgs);
-                vectorModel model = new vectorModel("test", db);
+                Database db3 = this.handleRequest("vectorSearch_loadDatabase", newArgs);
+                vectorModel model1 = new vectorModel("test");
                 MutableDictionary testDic = new MutableDictionary();
                 String input = args.get("input");
                 testDic.setValue(input, "test");
-                Prediction prediction = model.predict(testDic);
-                Dictionary value = prediction.array("vector");
-                if (value) {
-                    return value.toArray();
-                } else {
-                    return "Could not generate embedding";
-                }
+                Dictionary value = model1.predict(testDic, db3);
+
+                return value.toArray();
 
             default:
                 throw new Exception(method);
@@ -148,31 +144,29 @@ public class VectorSearchRequestHandler {
 
     private class vectorModel implements PredictiveModel {
         String key;
-        Database db;
 
-        vectorModel(String key, Database db) {
+        vectorModel(String key) {
             this.key = key;
-            this.db = db;
         }
 
-        List<Object> getWordVector(String word, String collection) {
+        List<Object> getWordVector(String word, String collection, Database db) {
             String sql = String.format("select vector from %s where word = '%s'", collection, word);
             Query query = this.db.createQuery(sql);
             ResultSet rs = query.execute();
             List<Object> resultArray = new ArrayList<>();
-            for (Result row : rows) {
+            for (Result row : resultArray) {
                 resultArray.add(row.toMap());
             }
             return resultArray;
         }
 
-        public Dictionary predict(Dictionary input) {
+        public Dictionary predict(Dictionary input, Database db) {
             String inputWord = input.getString("word");
 
-            List<Object> result = getWordVector(inputWord, "words");
+            List<Object> result = getWordVector(inputWord, "words", db);
 
             MutableDictionary output = new MutableDictionary();
-            output.setValue(result, "vector");
+            output.setValue("vector", result);
             return output;
         }
 
