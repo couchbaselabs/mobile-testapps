@@ -2,6 +2,7 @@ package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import com.couchbase.mobiletestkit.javacommon.*;
@@ -158,7 +159,12 @@ public class VectorSearchRequestHandler {
         List<Object> getWordVector(String word, String collection) {
             String sql = String.format("select vector from %s where word = '%s'", collection, word);
             Query query = this.db.createQuery(sql);
-            ResultSet rs = query.execute();
+            try {
+                ResultSet rs = query.execute();
+            }
+            catch (CouchbaseLiteException e) {
+                throw e;
+            }
             List<Object> resultArray = new ArrayList<>();
             for (Object row : rs) {
                 resultArray.add(((ResultSet) row));
