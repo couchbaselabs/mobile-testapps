@@ -2,6 +2,7 @@ package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import com.couchbase.mobiletestkit.javacommon.*;
@@ -101,7 +102,7 @@ public class VectorSearchRequestHandler {
                 Parameters params = new Parameters();
                 params.setValue("vector", embeddedTerm);
                 Query query = db.createQuery(sql);
-                query.getParameters() = params;
+                query.setParameters(params);
 
                 List<Object> resultArray = new ArrayList<>();
                 ResultSet queryResults = query.execute();
