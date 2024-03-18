@@ -89,6 +89,28 @@ public class VectorSearchRequestHandler {
 
 
             case "vectorSearch_query":
+                String term = args.get("term");
+
+                Args embeddingArgs = new Args();
+                embeddingArgs.set(term, "input");
+                Object embeddedTerm = this.handleRequest("vectorSearch_getEmbedding", embeddingArgs);
+
+                String sql = args.get("sql");
+
+                Database db = args.get("database");
+
+                Parameters params = new Parameters();
+                params.setValue(embeddedTerm, "vector");
+                Query query = db.createQuery(sql);
+                query.parameters = params;
+
+                List<Object> resultArray = new ArrayList<>();
+                ResultSet queryResults = query.execute();
+                for (Result row : queryResults) {
+                    resultArray.add(row.toMap());
+                }
+
+                return resultArray;
 
 
             case "vectorSearch_loadDatabase":
@@ -109,6 +131,18 @@ public class VectorSearchRequestHandler {
                 
 
             case "vectorSearch_getEmbedding":
+                Database db = this.handleRequest(method, newArgs);
+                vectorModel model = new vectorModel("test", db);
+                MutableDictionary testDic = new MutableDictionary();
+                String input = args.get("input");
+                testDic.setValue(input, "test");
+                Prediction prediction = model.predict(testDic);
+                Dictionary value = prediction.array("vector");
+                if (value) {
+                    return value.toArray();
+                } else {
+                    return "Could not generate embedding";
+                }
 
 
             default:
