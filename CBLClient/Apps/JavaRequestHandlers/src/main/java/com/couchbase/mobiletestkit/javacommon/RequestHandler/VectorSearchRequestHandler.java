@@ -87,7 +87,6 @@ public class VectorSearchRequestHandler {
                 Database.prediction.registerModel(model, name);
                 return "Registered model with name " + name;
 
-
             case "vectorSearch_query":
                 String term = args.get("term");
 
@@ -112,12 +111,11 @@ public class VectorSearchRequestHandler {
 
                 return resultArray;
 
-
             case "vectorSearch_loadDatabase":
                 // loads the given database vsTestDatabase
                 DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
                 Args newArgs = args;
-                newArgs.put("dbPath","Databases/vsTestDatabase.cblite2")
+                newArgs.put("dbPath", "Databases/vsTestDatabase.cblite2");
                 try {
                     String dbPath = dbHandler.getPreBuiltDb(newArgs);
                     newArgs.put("dbPath", dbPath);
@@ -128,7 +126,6 @@ public class VectorSearchRequestHandler {
                 }
                 Database db = Database("vsTestDatabase");
                 return db;
-                
 
             case "vectorSearch_getEmbedding":
                 Database db = this.handleRequest(method, newArgs);
@@ -143,7 +140,6 @@ public class VectorSearchRequestHandler {
                 } else {
                     return "Could not generate embedding";
                 }
-
 
             default:
                 throw new Exception(method);
