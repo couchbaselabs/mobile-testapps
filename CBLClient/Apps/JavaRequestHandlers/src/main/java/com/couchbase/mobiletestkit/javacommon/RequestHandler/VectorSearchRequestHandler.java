@@ -2,7 +2,6 @@ package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 
 import java.util.List;
 import java.util.ArrayList;
-import com.couchbase.lite.Collection;
 import java.util.Map;
 
 import com.couchbase.mobiletestkit.javacommon.*;
@@ -129,7 +128,7 @@ public class VectorSearchRequestHandler {
                 return db1;
 
             case "vectorSearch_getEmbedding":
-                Database db3 = this.handleRequest("vectorSearch_loadDatabase", args);
+                Database db3 = (Database) handleRequest("vectorSearch_loadDatabase", args);
                 vectorModel model1 = new vectorModel("test", db3);
                 MutableDictionary testDic = new MutableDictionary();
                 String input = args.get("input");
@@ -162,7 +161,7 @@ public class VectorSearchRequestHandler {
             ResultSet rs = query.execute();
             List<Object> resultArray = new ArrayList<>();
             for (Object row : rs) {
-                resultArray.add(row.toMap());
+                resultArray.add(((ResultSet) row).toMap());
             }
             return resultArray;
         }
