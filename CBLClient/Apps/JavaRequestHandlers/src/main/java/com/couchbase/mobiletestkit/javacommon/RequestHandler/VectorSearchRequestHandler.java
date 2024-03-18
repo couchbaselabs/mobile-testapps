@@ -170,7 +170,13 @@ public class VectorSearchRequestHandler {
         public Dictionary predict(Dictionary input) {
             String inputWord = input.getString("word");
 
-            List<Object> result = getWordVector(inputWord, "words");
+            List<Object> result =  new ArrayList<>();
+            try {
+                result = getWordVector(inputWord, "words");
+            }
+            catch (CouchbaseLiteException e) {
+                // TODO: handle exception
+            }
 
             MutableDictionary output = new MutableDictionary();
             output.setValue("vector", result);
