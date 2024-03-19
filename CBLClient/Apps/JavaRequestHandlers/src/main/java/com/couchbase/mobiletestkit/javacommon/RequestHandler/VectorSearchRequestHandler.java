@@ -3,6 +3,7 @@ package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 import java.util.List;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import com.couchbase.mobiletestkit.javacommon.*;
@@ -233,7 +234,9 @@ public class VectorSearchRequestHandler {
 
     public Database loadDatabase(Args args) throws CouchbaseLiteException, IOException  {
         // loads the given database vsTestDatabase
+        DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
         DatabaseConfiguration dbConfig = new DatabaseConfiguration();
+        dbConfig = configHandler.configure(args);
         DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
         Args newArgs = args;
         newArgs.put("dbPath", "vstestDatabase.cblite2.zip");
