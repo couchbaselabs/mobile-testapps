@@ -257,7 +257,7 @@ public class VectorSearchRequestHandler {
             this.key = key;
         }
 
-        List<Object> getWordVector(String word, String collection) throws CouchbaseLiteException, IOException {
+        List<Object> getWordVector(String word, String collection) throws CouchbaseLiteException {
             String sql = String.format("select vector from %s where word = '%s'", collection, word);
             Query query = this.db.createQuery(sql);
             ResultSet rs = query.execute();
