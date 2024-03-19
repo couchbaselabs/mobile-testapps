@@ -120,7 +120,7 @@ public class VectorSearchRequestHandler {
             // internal call to handler to get vector embedding for search term
             let embeddingArgs = Args()
             embeddingArgs.set(value: term, forName: "input")
-            let embeddedTerm = try await self.handleRequest(method: "vectorSearch_testPredict", args: embeddingArgs)
+            let embeddedTerm = try await self.handleRequest(method: "vectorSearch_getEmbedding", args: embeddingArgs)
             
             // the sql query, paramaterised by $vector which will be
             // the embedded term
@@ -154,21 +154,20 @@ public class VectorSearchRequestHandler {
             _ = try dbHandler.handleRequest(method: "database_copy", args: preBuiltArgs)
             let db: Database = try Database(name: "vsTestDatabase")
             return db
-            
-            // the handlers below are for manual testing purposes and do not
-            // need to be replicated in the other test servers
-            
-            // get tokenized input
-            case "vectorSearch_testTokenizer":
-                guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input")}
-                return try tokenizeInput(input: input)
-            
-            // tokenize input then decode back to string, including padding
-            case "vectorSearch_testDecode":
-                guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input")}
-                let tokens = try tokenizeInput(input: input)
-                let decoded = try decodeTokenIds(encoded: tokens)
-                return ["tokens": tokens, "decoded": decoded]
+        // the handlers below are for manual testing purposes and do not
+        // need to be replicated in the other test servers
+        
+        // get tokenized input
+        case "vectorSearch_testTokenizer":
+            guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input")}
+            return try tokenizeInput(input: input)
+        
+        // tokenize input then decode back to string, including padding
+        case "vectorSearch_testDecode":
+            guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input")}
+            let tokens = try tokenizeInput(input: input)
+            let decoded = try decodeTokenIds(encoded: tokens)
+            return ["tokens": tokens, "decoded": decoded]
             
             
         default:
