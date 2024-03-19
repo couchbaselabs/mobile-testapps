@@ -4,6 +4,7 @@ import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import com.couchbase.mobiletestkit.javacommon.*;
@@ -214,9 +215,10 @@ public class VectorSearchRequestHandler {
         query.setParameters(params);
 
         List<Object> resultArray = new ArrayList<>();
-        ResultSet queryResults = query.execute();
-        for (Result row : queryResults) {
-            resultArray.add(row.toMap());
+        try (ResultSet rs = query.execute()) {
+            for (Result row : rs) {
+                resultArray.add(row.toMap());
+            }
         }
 
         return resultArray;

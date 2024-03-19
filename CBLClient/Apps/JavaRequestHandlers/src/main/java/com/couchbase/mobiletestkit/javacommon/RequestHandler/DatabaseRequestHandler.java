@@ -352,7 +352,7 @@ public class DatabaseRequestHandler {
         ZipUtils zipper = new ZipUtils();
         //zipper.unzip(context.getAsset(dbPath), context.getFilesDir());
         zipper.unzip(context.getAsset("vstestDatabase.cblite2.zip"), context.getFilesDir());
-        return context.getFilesDir().getAbsolutePath() + "/" + dbFileName;
+        return (context.getFilesDir().getAbsolutePath() + "/" + dbFileName).replace("/data", "");
     }
 
     private Map<String, Object> setDataBlob(Map<String, Object> data) {
