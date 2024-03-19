@@ -194,7 +194,7 @@ public class VectorSearchRequestHandler {
             return "???";
         }
     
-    public List<Object> query(Args args) {
+    public List<Object> query(Args args) throws CouchbaseLiteException {
         String term = args.get("term");
 
         Args embeddingArgs = new Args();
@@ -220,7 +220,7 @@ public class VectorSearchRequestHandler {
     }
 
 
-    public Dictionary getEmbedding(Args args) throws CouchbaseLiteException{
+    public Dictionary getEmbedding(Args args) throws CouchbaseLiteException {
         Database db3 = this.loadDatabase(args);
         vectorModel model1 = new vectorModel("test", db3);
         MutableDictionary testDic = new MutableDictionary();
