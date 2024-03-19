@@ -124,7 +124,7 @@ public class VectorSearchRequestHandler {
                 throw new Exception(method);
         }
     }*/
-    public String createIndex(Args args) {
+    public String createIndex(Args args) throws  CouchbaseLiteException, Exception{
         Database database = args.get("database");
 
         String scopeName = args.get("scopeName") != null ? args.get("scopeName") : "_default";
