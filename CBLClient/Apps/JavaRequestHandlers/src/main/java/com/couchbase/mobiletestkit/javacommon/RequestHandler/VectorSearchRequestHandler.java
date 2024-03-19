@@ -10,8 +10,7 @@ import com.couchbase.lite.*;
 public class VectorSearchRequestHandler {
     public Object handleRequest(String method, Args args) throws Exception {
         switch (method) {
-
-            case "vectorSearch_createIndex":
+            case "createIndex":
                 Database database = args.get("database");
 
                 String scopeName = args.get("scopeName") != null ? args.get("scopeName") : "_default";
@@ -80,14 +79,14 @@ public class VectorSearchRequestHandler {
 
                 return "???";
 
-            case "vectorSearch_registerModel":
+            case "registerModel":
                 String key = args.get("key");
                 String name = args.get("name");
                 vectorModel model = new vectorModel(key);
                 Database.prediction.registerModel(name, model);
                 return "Registered model with name " + name;
 
-            case "vectorSearch_query":
+            case "query":
                 String term = args.get("term");
 
                 Args embeddingArgs = new Args();
@@ -111,7 +110,7 @@ public class VectorSearchRequestHandler {
 
                 return resultArray;
 
-            case "vectorSearch_loadDatabase":
+            case "loadDatabase":
                 // loads the given database vsTestDatabase
                 DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
                 Args newArgs = args;
@@ -127,7 +126,7 @@ public class VectorSearchRequestHandler {
                 Database db1 = new Database("vsTestDatabase");
                 return db1;
 
-            case "vectorSearch_getEmbedding":
+            case "getEmbedding":
                 Database db3 = (Database) handleRequest("vectorSearch_loadDatabase", args);
                 vectorModel model1 = new vectorModel("test", db3);
                 MutableDictionary testDic = new MutableDictionary();
