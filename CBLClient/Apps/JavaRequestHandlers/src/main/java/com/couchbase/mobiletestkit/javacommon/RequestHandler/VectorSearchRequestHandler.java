@@ -221,7 +221,7 @@ public class VectorSearchRequestHandler {
     }
 
 
-    public Dictionary getEmbedding(Args args) throws CouchbaseLiteException {
+    public Dictionary getEmbedding(Args args) throws CouchbaseLiteException, IOException {
         Database db3 = this.loadDatabase(args);
         vectorModel model1 = new vectorModel("test", db3);
         MutableDictionary testDic = new MutableDictionary();
