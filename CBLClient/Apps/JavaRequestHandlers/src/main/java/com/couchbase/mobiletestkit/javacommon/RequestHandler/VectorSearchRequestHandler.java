@@ -243,11 +243,11 @@ public class VectorSearchRequestHandler {
         DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
         DatabaseConfiguration dbConfig = new DatabaseConfiguration().setDirectory(new File(dbPath).getParent());
         dbConfig = configHandler.configure(args);
-        newArgs.put("dbPath", dbPath);
+        newArgs.put("dbPath", new File (dbPath).getParent() + "/vsTestDatabase.cblite2" );
         newArgs.put("dbName", "vsTestDatabase");
         newArgs.put("dbConfig", dbConfig);
         dbHandler.copy(newArgs);
-        Database db1 = new Database("vstestDatabase.cblite2");
+        Database db1 = new Database("vsTestDatabase");
 
         return db1;
     }
