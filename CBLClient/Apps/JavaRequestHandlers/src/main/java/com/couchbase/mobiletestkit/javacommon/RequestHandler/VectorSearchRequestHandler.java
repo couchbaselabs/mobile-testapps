@@ -239,6 +239,7 @@ public class VectorSearchRequestHandler {
         String dbPath = dbHandler.getPreBuiltDb(newArgs);
         newArgs.put("dbPath", dbPath);
         newArgs.put("dbName", "vsTestDatabase");
+        newArgs.put("dbConfig", "");
         dbHandler.copy(newArgs);
         Database db1 = new Database("vsTestDatabase");
         return db1;
