@@ -1,12 +1,15 @@
 package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 
 import java.util.List;
+import java.io.File;
 import java.io.IOException;
+import java.rmi.ServerError;
 import java.util.ArrayList;
 import java.util.Map;
 
 import com.couchbase.mobiletestkit.javacommon.*;
 import com.couchbase.lite.*;
+import com.couchbase.lite.internal.utils.FileUtils;
 
 public class VectorSearchRequestHandler {
    /*  public Object handleRequest(String method, Args args) throws Exception {
@@ -233,19 +236,20 @@ public class VectorSearchRequestHandler {
 
     public Database loadDatabase(Args args) throws CouchbaseLiteException, IOException  {
         // loads the given database vsTestDatabase
-        DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
-        DatabaseConfiguration dbConfig = new DatabaseConfiguration();
-        dbConfig = configHandler.configure(args);
         DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
         Args newArgs = args;
         newArgs.put("dbPath", "vstestDatabase.cblite2.zip");
         String dbPath = dbHandler.getPreBuiltDb(newArgs);
+        Database.exists("vstestDatabase.cblite2", new File(dbPath));
+        DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
+        DatabaseConfiguration dbConfig = new DatabaseConfiguration().setDirectory(new File(dbPath).getPath());
+        dbConfig = configHandler.configure(args);
         newArgs.put("dbPath", dbPath);
         newArgs.put("dbName", "vsTestDatabase");
         newArgs.put("dbConfig", dbConfig);
         dbHandler.copy(newArgs);
         Database db1 = new Database("vstestDatabase.cblite2");
-        
+
         return db1;
     }
 
