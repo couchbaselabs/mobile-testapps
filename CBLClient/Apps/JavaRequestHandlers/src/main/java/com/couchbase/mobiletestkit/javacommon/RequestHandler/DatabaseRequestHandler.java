@@ -349,9 +349,9 @@ public class DatabaseRequestHandler {
         String dbFileName = new File(dbPath).getName();
         dbFileName = dbFileName.substring(0, dbFileName.lastIndexOf("."));
         Context context = RequestHandlerDispatcher.context;
-
         ZipUtils zipper = new ZipUtils();
-        zipper.unzip(context.getAsset(dbPath), context.getFilesDir());
+        //zipper.unzip(context.getAsset(dbPath), context.getFilesDir());
+        zipper.unzip(context.getAsset("vstestDatabase.cblite.zip"), context.getFilesDir());
         return context.getFilesDir().getAbsolutePath() + "/" + dbFileName;
     }
 
