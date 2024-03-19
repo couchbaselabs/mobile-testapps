@@ -235,7 +235,7 @@ public class VectorSearchRequestHandler {
         // loads the given database vsTestDatabase
         DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
         Args newArgs = args;
-        newArgs.put("dbPath", "assets/vsTestDatabase");
+        newArgs.put("dbPath", "assets/vsTestDatabase.cblite2");
         String dbPath = dbHandler.getPreBuiltDb(newArgs);
         newArgs.put("dbPath", dbPath);
         newArgs.put("dbName", "vsTestDatabase");
