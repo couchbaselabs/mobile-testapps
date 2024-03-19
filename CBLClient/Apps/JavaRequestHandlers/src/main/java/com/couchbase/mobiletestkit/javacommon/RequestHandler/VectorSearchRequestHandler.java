@@ -8,7 +8,7 @@ import com.couchbase.mobiletestkit.javacommon.*;
 import com.couchbase.lite.*;
 
 public class VectorSearchRequestHandler {
-    public Object handleRequest(String method, Args args) throws Exception {
+   /*  public Object handleRequest(String method, Args args) throws Exception {
         switch (method) {
             case "createIndex":
                 Database database = args.get("database");
@@ -110,22 +110,6 @@ public class VectorSearchRequestHandler {
 
                 return resultArray;
 
-            case "loadDatabase":
-                // loads the given database vsTestDatabase
-                DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
-                Args newArgs = args;
-                newArgs.put("dbPath", "Databases/vsTestDatabase.cblite2");
-                try {
-                    String dbPath = dbHandler.getPreBuiltDb(newArgs);
-                    newArgs.put("dbPath", dbPath);
-                    newArgs.put("dbName", "vsTestDatabase");
-                    dbHandler.copy(newArgs);
-                } catch (Exception e) {
-                    // TODO: handle exception
-                }
-                Database db1 = new Database("vsTestDatabase");
-                return db1;
-
             case "getEmbedding":
                 Database db3 = (Database) handleRequest("vectorSearch_loadDatabase", args);
                 vectorModel model1 = new vectorModel("test", db3);
@@ -139,6 +123,32 @@ public class VectorSearchRequestHandler {
             default:
                 throw new Exception(method);
         }
+    }*/
+    public Dictionary getEmbedding(Args args) throws CouchbaseLiteException{
+        Database db3 = this.loadDatabase(args);
+        vectorModel model1 = new vectorModel("test", db3);
+        MutableDictionary testDic = new MutableDictionary();
+        String input = args.get("input");
+        testDic.setValue(input, "test");
+        Dictionary value = model1.predict(testDic);
+        return value;
+    }
+
+    public Database loadDatabase(Args args) throws CouchbaseLiteException  {
+        // loads the given database vsTestDatabase
+        DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
+        Args newArgs = args;
+        newArgs.put("dbPath", "Databases/vsTestDatabase.cblite2");
+        try {
+            String dbPath = dbHandler.getPreBuiltDb(newArgs);
+            newArgs.put("dbPath", dbPath);
+            newArgs.put("dbName", "vsTestDatabase");
+            dbHandler.copy(newArgs);
+        } catch (Exception e) {
+            // TODO: handle exception
+         }
+        Database db1 = new Database("vsTestDatabase");
+        return db1;
     }
 
     private class vectorModel implements PredictiveModel {
