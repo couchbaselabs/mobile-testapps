@@ -195,7 +195,7 @@ public class VectorSearchRequestHandler {
             return "???";
         }
     
-    public List<Object> query(Args args) throws CouchbaseLiteException {
+    public List<Object> query(Args args) throws CouchbaseLiteException, IOException {
         String term = args.get("term");
 
         Args embeddingArgs = new Args();
