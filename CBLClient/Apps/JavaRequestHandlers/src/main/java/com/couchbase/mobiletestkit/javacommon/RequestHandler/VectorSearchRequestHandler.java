@@ -3,7 +3,6 @@ package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 import java.util.List;
 import java.io.File;
 import java.io.IOException;
-import java.rmi.ServerError;
 import java.util.ArrayList;
 import java.util.Map;
 
