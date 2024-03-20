@@ -357,13 +357,15 @@ public class DatabaseRequestHandler {
         //zipper.unzip(context.getAsset(dbPath), context.getFilesDir());
         //zipper.unzip(context.getAsset("vstestDatabase.cblite2.zip"), context.getFilesDir());
         String filesFolder =  context.getFilesDir().getAbsolutePath() + "/vsTestDatabase.cblite2";
-        InputStream preBuiltDbFile = context.getAsset("vsTestDatabase.cblite2/db.sqlite3");
+        InputStream dbsqlite = context.getAsset("vsTestDatabase.cblite2/db.sqlite3");
+        InputStream dbsqliteshm = context.getAsset("vsTestDatabase.cblite2/db.sqlite3-shm");
+        InputStream dbsqlwal = context.getAsset("vsTestDatabase.cblite2/db.sqlite3-wal");
         new File(filesFolder).mkdirs();
-        copyDbFile(preBuiltDbFile,  new FileOutputStream(new File(filesFolder + "/db.sqlite3")));
-        copyDbFile(preBuiltDbFile,  new FileOutputStream(new File(filesFolder + "/db.sqlite3-shm")));
-        copyDbFile(preBuiltDbFile,  new FileOutputStream(new File(filesFolder + "/db.sqlite3-wal")));
+        copyDbFile(dbsqlite,  new FileOutputStream(new File(filesFolder + "/db.sqlite3")));
+        copyDbFile(dbsqliteshm,  new FileOutputStream(new File(filesFolder + "/db.sqlite3-shm")));
+        copyDbFile(dbsqlwal,  new FileOutputStream(new File(filesFolder + "/db.sqlite3-wal")));
         //Memory.copyFolder(preBuiltDbFolder, destFolder);
-        return filesFolder + "/vsTestDatabase.cblite2";
+        return filesFolder;
     }
 
     private void copyDbFile(InputStream source, OutputStream target) throws IOException {

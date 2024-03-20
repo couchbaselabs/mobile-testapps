@@ -4,6 +4,7 @@ import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import com.couchbase.mobiletestkit.javacommon.*;
@@ -11,7 +12,8 @@ import com.couchbase.lite.*;
 import com.couchbase.lite.internal.utils.FileUtils;
 
 public class VectorSearchRequestHandler {
-   /*  public Object handleRequest(String method, Args args) throws Exception {
+    private static final String TAG = "GILAD";
+    /*  public Object handleRequest(String method, Args args) throws Exception {
         switch (method) {
             case "createIndex":
                 Database database = args.get("database");
@@ -240,11 +242,12 @@ public class VectorSearchRequestHandler {
         Args newArgs = args;
         newArgs.put("dbPath", "vstestDatabase.cblite2.zip");
         String dbPath = dbHandler.getPreBuiltDb(newArgs);
-        Database.exists("vstestDatabase.cblite2", new File(dbPath));
+        Log.d(TAG, "dbPath=" + dbPath);
+        //Database.exists("vstestDatabase.cblite2", new File(dbPath));
         DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
         DatabaseConfiguration dbConfig = new DatabaseConfiguration().setDirectory(new File(dbPath).getParent());
         dbConfig = configHandler.configure(args);
-        newArgs.put("dbPath", new File (dbPath).getParent() + "/vsTestDatabase.cblite2" );
+        newArgs.put("dbPath", new File (dbPath));
         newArgs.put("dbName", "vsTestDatabase");
         newArgs.put("dbConfig", dbConfig);
         dbHandler.copy(newArgs);
