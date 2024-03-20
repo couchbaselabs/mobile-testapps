@@ -261,6 +261,9 @@ public class VectorSearchRequestHandler {
                 let docIdCat1 = "word\(i)"
                 let docIdCat2 = "word\(cat2Offset+i)"
                 
+                // copy the documents to aux words for android app
+                try self.copyWordDocument(copyFrom: docBodyVectors, copyTo: auxiliaryWords, docIds: [docIdCat1, docIdCat2])
+                
                 let doc1 = try docBodyVectors.document(id: docIdCat1)?.toMutable()
                 let doc2 = try docBodyVectors.document(id: docIdCat2)?.toMutable()
                 
@@ -280,6 +283,49 @@ public class VectorSearchRequestHandler {
                 doc.setString("cat3", forKey: "catid")
                 
                 try auxiliaryWords.save(document: doc)
+            }
+            
+            // add 15 words with cat1 to aux, 5 with, 5 without and 5 with wrong embeddings
+            let correct = ["unhealthy", "toast", "kosher", "halal", "coffee"]
+            let without = ["junk", "oily", "porridge", "waste", "dairy"]
+            let wrong = ["carbohydrate", "breakfast", "eggs", "treat", "sugary"]
+            
+            let auxOffset = 311
+            for i in 0...4 {
+                let innerOffset = auxOffset + i
+                let correctId = "word\(innerOffset)"
+                let withoutId = "word\(innerOffset+5)"
+                let wrongId = "word\(innerOffset+10)"
+                
+                let correctDoc = MutableDocument(id: correctId)
+                let withoutDoc = MutableDocument(id: withoutId)
+                let wrongDoc = MutableDocument(id: wrongId)
+                
+                let correctWord = correct[i]
+                let withoutWord = without[i]
+                let wrongWord = wrong[i]
+                
+                innerArgs.set(value: correctWord, forName: "input")
+                let correctEmbedding: [Double] = try await innerVectorSearchHandler.handleRequest(method: "vectorSearch_testPredict", args: innerArgs) as! [Double]
+                
+                innerArgs.set(value: wrongWord, forName: "input")
+                var wrongEmbedding: [Double] = try await innerVectorSearchHandler.handleRequest(method: "vectorSearch_testPredict", args: innerArgs) as! [Double]
+                wrongEmbedding.removeLast(10)
+                
+                correctDoc.setString(correctWord, forKey: "word")
+                correctDoc.setString("cat1", forKey: "catid")
+                correctDoc.setArray(MutableArrayObject(data: correctEmbedding), forKey: "vector")
+                
+                withoutDoc.setString(withoutWord, forKey: "word")
+                withoutDoc.setString("cat1", forKey: "catid")
+                
+                wrongDoc.setString(wrongWord, forKey: "word")
+                wrongDoc.setString("cat1", forKey: "catid")
+                correctDoc.setArray(MutableArrayObject(data: wrongEmbedding), forKey: "vector")
+                
+                try auxiliaryWords.save(document: correctDoc)
+                try auxiliaryWords.save(document: withoutDoc)
+                try auxiliaryWords.save(document: wrongDoc)
             }
             
             // add dinner search term to searchTerms
