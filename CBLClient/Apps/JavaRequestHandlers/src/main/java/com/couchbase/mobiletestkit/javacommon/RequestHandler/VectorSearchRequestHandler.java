@@ -121,6 +121,16 @@ public class VectorSearchRequestHandler {
 
     public Database loadDatabase(Args args) throws CouchbaseLiteException, IOException {
         // loads the given database vsTestDatabase
+        DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
+        Args newArgs = args;
+        DatabaseConfiguration dbConfig = new DatabaseConfiguration();
+
+        newArgs.put("dbPath", "assets");
+        newArgs.put("dbName", "vsTestDatabase");
+        newArgs.put("dbConfig", dbConfig);
+
+        dbHandler.copy(newArgs);
+
         Database db = new Database("vsTestDatabase");
         return db;
     }
