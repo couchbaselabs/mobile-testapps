@@ -35,6 +35,7 @@ import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.net.URL;
+import java.net.URISyntaxException;
 
 
 import android.util.Base64;
@@ -51,7 +52,7 @@ public class TestServerContext implements Context {
 
     @Override
     public File getAssetAsFile(String name) {
-        URL resource  = getClass.class.getResource("/" + name);
+        URL resource  = getClass().getResource("/" + name);
         try {
             return new File(resource.toURI());
         }

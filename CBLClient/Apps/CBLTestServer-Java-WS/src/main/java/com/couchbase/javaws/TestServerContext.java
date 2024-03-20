@@ -8,6 +8,7 @@ import java.security.UnrecoverableEntryException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Base64;
+import java.net.URL;
 
 import com.couchbase.lite.TLSIdentity;
 
