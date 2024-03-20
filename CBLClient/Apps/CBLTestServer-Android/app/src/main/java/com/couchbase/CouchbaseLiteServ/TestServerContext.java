@@ -49,6 +49,18 @@ public class TestServerContext implements Context {
     }
 
     @Override
+    public File getAssetAsFile(String name) {
+        URL resource  = getClass.class.getResource("/" + name);
+        try {
+            return new File(resource.toURI());
+        }
+        catch (URISyntaxException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
     public String getPlatform() {
         return "android";
     }
