@@ -247,7 +247,7 @@ public class VectorSearchRequestHandler {
         DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
         DatabaseConfiguration dbConfig = new DatabaseConfiguration().setDirectory(new File(dbPath).getParent());
         dbConfig = configHandler.configure(args);
-        newArgs.put("dbPath", new File (dbPath));
+        newArgs.put("dbPath", dbPath);
         newArgs.put("dbName", "vsTestDatabase");
         newArgs.put("dbConfig", dbConfig);
         dbHandler.copy(newArgs);
