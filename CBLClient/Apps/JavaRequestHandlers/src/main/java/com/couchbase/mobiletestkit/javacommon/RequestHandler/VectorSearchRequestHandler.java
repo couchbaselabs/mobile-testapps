@@ -3,7 +3,6 @@ package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
 
 import com.couchbase.mobiletestkit.javacommon.*;
 import com.couchbase.lite.*;
@@ -11,18 +10,6 @@ import com.couchbase.lite.*;
 public class VectorSearchRequestHandler {
     public Object handleRequest(String method, Args args) throws Exception {
         switch (method) {
-            case "vectorSearch_testTokenizer":
-                String input = args.get("input");
-                return tokenizeInput(input);
-
-            case "vectorSearch_testDecode":
-                String decodeInput = args.get("input");
-                List<Integer> tokens = tokenizeInput(decodeInput);
-                String decoded = decodeTokenIds(tokens);
-                Map<String, Object> result = new HashMap<>();
-                result.put("tokens", tokens);
-                result.put("decoded", decoded);
-                return result;
 
             case "vectorSearch_createIndex":
                 Database database = args.get("database");
@@ -42,7 +29,7 @@ public class VectorSearchRequestHandler {
                 int dimensions = args.get("dimensions");
                 int centroids = args.get("centroids");
 
-                ScalarQuantizerType scalarEncoding = args.get("scalarEncoding");
+                VectorEncoding.ScalarQuantizerType scalarEncoding = args.get("scalarEncoding");
 
                 Integer subquantizers = args.get("subquantizers");
                 Integer bits = args.get("bits");
@@ -71,10 +58,10 @@ public class VectorSearchRequestHandler {
                 if (metric != null) {
                     switch (metric) {
                         case "euclidean":
-                            config.setMetric(DistanceMetric.euclidean);
+                            config.setMetric(VectorIndexConfiguration.DistanceMetric.EUCLIDIAN);
                             break;
                         case "cosine":
-                            config.setMetric(DistanceMetric.cosine);
+                            config.setMetric(VectorIndexConfiguration.DistanceMetric.COSINE);
                             break;
                         default:
                             throw new Error("Invalid distance metric");
@@ -89,33 +76,108 @@ public class VectorSearchRequestHandler {
                     config.setMaxTrainingSize(maxTrainingSize);
                 }
 
-                return collection.createIndex(indexName, config);
+                collection.createIndex(indexName, config);
 
-            case "vectorSearch_testPredict":
-                // Implement testPredict method
+                return "???";
+
             case "vectorSearch_registerModel":
-                // Implement registerModel method
+                String key = args.get("key");
+                String name = args.get("name");
+                vectorModel model = new vectorModel(key);
+                Database.prediction.registerModel(name, model);
+                return "Registered model with name " + name;
+
             case "vectorSearch_query":
-                // Implement query method
-            case "vectorSearch_loadWords":
-                // Implement loadWords method
-            case "vectorSearch_regenerateWordsEmbeddings":
-                // Implement regenerateWordsEmbeddings method
+                String term = args.get("term");
+
+                Args embeddingArgs = new Args();
+                embeddingArgs.put(term, "input");
+                Object embeddedTerm = this.handleRequest("vectorSearch_getEmbedding", embeddingArgs);
+
+                String sql = args.get("sql");
+
+                Database db = args.get("database");
+
+                Parameters params = new Parameters();
+                params.setValue("vector", embeddedTerm);
+                Query query = db.createQuery(sql);
+                query.getParameters() = params;
+
+                List<Object> resultArray = new ArrayList<>();
+                ResultSet queryResults = query.execute();
+                for (Result row : queryResults) {
+                    resultArray.add(row.toMap());
+                }
+
+                return resultArray;
+
+            case "vectorSearch_loadDatabase":
+                // loads the given database vsTestDatabase
+                DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
+                Args newArgs = args;
+                newArgs.put("dbPath", "Databases/vsTestDatabase.cblite2");
+                try {
+                    String dbPath = dbHandler.getPreBuiltDb(newArgs);
+                    newArgs.put("dbPath", dbPath);
+                    newArgs.put("dbName", "vsTestDatabase");
+                    dbHandler.copy(newArgs);
+                } catch (Exception e) {
+                    // TODO: handle exception
+                }
+                Database db1 = new Database("vsTestDatabase");
+                return db1;
+
+            case "vectorSearch_getEmbedding":
+                Database db3 = this.handleRequest("vectorSearch_loadDatabase", args);
+                vectorModel model1 = new vectorModel("test", db3);
+                MutableDictionary testDic = new MutableDictionary();
+                String input = args.get("input");
+                testDic.setValue(input, "test");
+                Dictionary value = model1.predict(testDic);
+
+                return value.toArray();
+
             default:
                 throw new Exception(method);
         }
     }
 
-    public List<Integer> tokenizeInput(String input) throws Exception {
-        // Implement tokenizeInput method
-        return null;
-    }
+    private class vectorModel implements PredictiveModel {
+        String key;
+        Database db;
 
-    public String decodeTokenIds(List<Integer> encoded) throws Exception {
-        // Implement decodeTokenIds method
-        return null;
-    }
+        vectorModel(String key, Database db) {
+            this.key = key;
+            this.db = db;
+        }
 
+        vectorModel(String key) {
+            this.key = key;
+        }
+
+        List<Object> getWordVector(String word, String collection) {
+            String sql = String.format("select vector from %s where word = '%s'", collection, word);
+            Query query = this.db.createQuery(sql);
+            ResultSet rs = query.execute();
+            List<Object> resultArray = new ArrayList<>();
+            for (Object row : rs) {
+                resultArray.add(row.toMap());
+            }
+            return resultArray;
+        }
+
+        @Override
+        public Dictionary predict(Dictionary input) {
+            String inputWord = input.getString("word");
+
+            List<Object> result = getWordVector(inputWord, "words");
+
+            MutableDictionary output = new MutableDictionary();
+            output.setValue("vector", result);
+            return output;
+        }
+
+    }
     // Define other methods
 }
 
