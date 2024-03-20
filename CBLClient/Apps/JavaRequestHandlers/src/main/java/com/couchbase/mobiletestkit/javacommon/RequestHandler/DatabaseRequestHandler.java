@@ -1,6 +1,9 @@
 package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -353,11 +356,22 @@ public class DatabaseRequestHandler {
         //ZipUtils zipper = new ZipUtils();
         //zipper.unzip(context.getAsset(dbPath), context.getFilesDir());
         //zipper.unzip(context.getAsset("vstestDatabase.cblite2.zip"), context.getFilesDir());
-        File preBuiltDbFolder = context.getAssetAsFile("vsTestDatabase.cblite2/db.sqlite3");
-        File destFolder = context.getFilesDir();
-        Memory.copyFolder(preBuiltDbFolder, destFolder);
+        InputStream preBuiltDbFile = context.getAsset("vsTestDatabase.cblite2/db.sqlite3");
+        String filesFolder =  context.getFilesDir().getAbsolutePath() + "/vsTestDatabase";
+        new File(filesFolder).mkdirs();
+        copyDbFile(preBuiltDbFile,  new FileOutputStream(new File(filesFolder + "/db.sqlite3")));
+        //Memory.copyFolder(preBuiltDbFolder, destFolder);
         return context.getFilesDir().getAbsolutePath() + "/" + dbFileName;
     }
+
+    private void copyDbFile(InputStream source, OutputStream target) throws IOException {
+        byte[] buf = new byte[8192];
+        int length;
+        while ((length = source.read(buf)) != -1) {
+            target.write(buf, 0, length);
+        }
+    }
+
 
     private Map<String, Object> setDataBlob(Map<String, Object> data) {
         if (!data.containsKey("_attachments")) {
