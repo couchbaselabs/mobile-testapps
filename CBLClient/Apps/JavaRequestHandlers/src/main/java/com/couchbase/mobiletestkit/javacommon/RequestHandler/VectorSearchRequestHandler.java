@@ -134,7 +134,7 @@ public class VectorSearchRequestHandler {
 
         dbHandler.copy(newArgs);
 
-        Database db = Database("vsTestDatabase");
+        Database db = new Database("vsTestDatabase");
         return db;
     }
 
