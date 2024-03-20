@@ -35,7 +35,8 @@ import com.couchbase.lite.Result;
 import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.SelectResult;
 import com.couchbase.lite.Scope;
-
+import com.couchbase.lite.internal.utils.FileUtils;
+import com.couchbase.mobiletestkit.javacommon.Memory;
 public class DatabaseRequestHandler {
     private static final String TAG = "DATABASE";
     /* ------------ */
@@ -344,14 +345,16 @@ public class DatabaseRequestHandler {
         Database.copy(oldDbPath, dbName, dbConfig);
     }
 
-    public String getPreBuiltDb(Args args) throws IOException {
+    public String  getPreBuiltDb(Args args) throws IOException {
         String dbPath = args.get("dbPath");
         String dbFileName = new File(dbPath).getName();
         dbFileName = dbFileName.substring(0, dbFileName.lastIndexOf("."));
         Context context = RequestHandlerDispatcher.context;
         ZipUtils zipper = new ZipUtils();
         //zipper.unzip(context.getAsset(dbPath), context.getFilesDir());
-        zipper.unzip(context.getAsset("vstestDatabase.cblite2.zip"), context.getFilesDir());
+        File preBuiltDbFolder = context.getAssetAsFile("vstestDatabase.cblite2"));
+        File destFolder = context.getFilesDir();
+        copyFolder(preBuiltDbFolder, destFolder);
         return context.getFilesDir().getAbsolutePath() + "/" + dbFileName;
     }
 
