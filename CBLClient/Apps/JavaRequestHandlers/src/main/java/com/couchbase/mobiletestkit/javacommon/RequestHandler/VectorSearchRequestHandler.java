@@ -124,12 +124,10 @@ public class VectorSearchRequestHandler {
         DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
         Args newArgs = args;
         newArgs.put("dbPath", "assets/vsTestDatabase.cblite2");
-
-        String dbPath = dbHandler.getPreBuiltDb(newArgs);
         DatabaseConfiguration dbConfig = new DatabaseConfiguration();
 
-        newArgs.put("dbPath", dbPath);
-        newArgs.put("dbName", "vsTestDatabase");
+        newArgs.put("dbPath", "assets/vsTestDatabase");
+        newArgs.put("dbName", "db");
         newArgs.put("dbConfig", dbConfig);
 
         dbHandler.copy(newArgs);

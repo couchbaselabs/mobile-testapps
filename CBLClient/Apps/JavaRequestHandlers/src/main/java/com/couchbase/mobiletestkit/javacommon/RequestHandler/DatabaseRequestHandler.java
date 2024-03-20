@@ -1,7 +1,9 @@
 package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -344,17 +346,6 @@ public class DatabaseRequestHandler {
         DatabaseConfiguration dbConfig = args.get("dbConfig");
         File oldDbPath = new File(dbPath);
         Database.copy(oldDbPath, dbName, dbConfig);
-    }
-
-    public String getPreBuiltDb(Args args) throws IOException {
-        String dbPath = args.get("dbPath");
-        String dbFileName = new File(dbPath).getName();
-        dbFileName = dbFileName.substring(0, dbFileName.lastIndexOf("."));
-        Context context = RequestHandlerDispatcher.context;
-
-        ZipUtils zipper = new ZipUtils();
-        zipper.unzip(context.getAsset(dbPath), context.getFilesDir());
-        return context.getFilesDir().getAbsolutePath() + "/" + dbFileName;
     }
 
     private Map<String, Object> setDataBlob(Map<String, Object> data) {
