@@ -356,7 +356,7 @@ public class DatabaseRequestHandler {
         //ZipUtils zipper = new ZipUtils();
         //zipper.unzip(context.getAsset(dbPath), context.getFilesDir());
         //zipper.unzip(context.getAsset("vstestDatabase.cblite2.zip"), context.getFilesDir());
-        String filesFolder =  context.getFilesDir().getAbsolutePath() + "/vsTestDatabase";
+        String filesFolder =  context.getFilesDir().getAbsolutePath() + "/vsTestDatabase.cblite2";
         InputStream dbsqlite = context.getAsset("vsTestDatabase.cblite2/db.sqlite3");
         InputStream dbsqliteshm = context.getAsset("vsTestDatabase.cblite2/db.sqlite3-shm");
         InputStream dbsqlwal = context.getAsset("vsTestDatabase.cblite2/db.sqlite3-wal");
