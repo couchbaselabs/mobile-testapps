@@ -353,7 +353,7 @@ public class DatabaseRequestHandler {
         //ZipUtils zipper = new ZipUtils();
         //zipper.unzip(context.getAsset(dbPath), context.getFilesDir());
         //zipper.unzip(context.getAsset("vstestDatabase.cblite2.zip"), context.getFilesDir());
-        File preBuiltDbFolder = context.getAssetAsFile("vstestDatabase.cblite2");
+        File preBuiltDbFolder = context.getAssetAsFile("vsTestDatabase.cblite2");
         File destFolder = context.getFilesDir();
         Memory.copyFolder(preBuiltDbFolder, destFolder);
         return context.getFilesDir().getAbsolutePath() + "/" + dbFileName;
