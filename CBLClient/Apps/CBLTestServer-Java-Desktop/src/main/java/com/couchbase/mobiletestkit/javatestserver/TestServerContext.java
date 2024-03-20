@@ -54,6 +54,7 @@ public class TestServerContext implements Context {
         return TestServerMain.class.getResourceAsStream("/" + name);
     }
 
+    @Override
     public File getAssetAsFile(String name) {
         URL resource  = TestServerMain.class.getResource("/" + name);
         try {
