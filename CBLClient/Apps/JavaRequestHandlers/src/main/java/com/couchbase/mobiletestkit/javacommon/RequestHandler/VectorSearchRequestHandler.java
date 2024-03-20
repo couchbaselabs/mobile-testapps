@@ -4,12 +4,12 @@ import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 
 import com.couchbase.mobiletestkit.javacommon.*;
 import com.couchbase.lite.*;
 import com.couchbase.lite.internal.utils.FileUtils;
+import com.couchbase.mobiletestkit.javacommon.util.Log;
 
 public class VectorSearchRequestHandler {
     private static final String TAG = "GILAD";
