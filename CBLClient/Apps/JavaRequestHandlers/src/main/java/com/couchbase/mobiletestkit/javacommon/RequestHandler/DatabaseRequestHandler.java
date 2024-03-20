@@ -356,12 +356,14 @@ public class DatabaseRequestHandler {
         //ZipUtils zipper = new ZipUtils();
         //zipper.unzip(context.getAsset(dbPath), context.getFilesDir());
         //zipper.unzip(context.getAsset("vstestDatabase.cblite2.zip"), context.getFilesDir());
+        String filesFolder =  context.getFilesDir().getAbsolutePath() + "/vsTestDatabase.cblite2";
         InputStream preBuiltDbFile = context.getAsset("vsTestDatabase.cblite2/db.sqlite3");
-        String filesFolder =  context.getFilesDir().getAbsolutePath() + "/vsTestDatabase";
         new File(filesFolder).mkdirs();
         copyDbFile(preBuiltDbFile,  new FileOutputStream(new File(filesFolder + "/db.sqlite3")));
+        copyDbFile(preBuiltDbFile,  new FileOutputStream(new File(filesFolder + "/db.sqlite3-shm")));
+        copyDbFile(preBuiltDbFile,  new FileOutputStream(new File(filesFolder + "/db.sqlite3-wal")));
         //Memory.copyFolder(preBuiltDbFolder, destFolder);
-        return context.getFilesDir().getAbsolutePath() + "/" + dbFileName;
+        return filesFolder + "/vsTestDatabase.cblite2";
     }
 
     private void copyDbFile(InputStream source, OutputStream target) throws IOException {
