@@ -4,6 +4,7 @@ import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import com.couchbase.mobiletestkit.javacommon.*;
@@ -294,12 +295,25 @@ public class VectorSearchRequestHandler {
         public Dictionary predict(Dictionary input) {
             String inputWord = input.getString("word");
 
-            List<Object> result =  new ArrayList<>();
+            List<Object> result = new ArrayList<>();
+
             try {
-                result = getWordVector(inputWord, "words");
-            }
-            catch (CouchbaseLiteException e) {
-                // TODO: handle exception
+                result = getWordVector(inputWord, "docBodyVectors");
+                if (result == null) {
+                    result = getWordVector(inputWord, "indexVectors");
+                }
+                if (result == null) {
+                    result = getWordVector(inputWord, "auxiliaryWords");
+                }
+                if (result == null) {
+                    result = getWordVector(inputWord, "searchTerms");
+                }
+                if (result == null) {
+                    return null;
+                }
+            } catch (CouchbaseLiteException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
 
             MutableDictionary output = new MutableDictionary();
