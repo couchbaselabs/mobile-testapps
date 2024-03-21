@@ -297,6 +297,8 @@ public class VectorSearchRequestHandler {
             try {
                 List<Result> rl = rs.allResults();
                 Map<String, Object> res = rl.get(0).toMap();
+                Log.d("getWordVector", "vector=" + res);
+                Log.d("getWordVector", "vector=" + res.get("vector"));
                 return res.get("vector");
             } catch (Exception e) {
                 System.err.println(e + "retrieving vector could not be done - getWordVector query returned no results");
