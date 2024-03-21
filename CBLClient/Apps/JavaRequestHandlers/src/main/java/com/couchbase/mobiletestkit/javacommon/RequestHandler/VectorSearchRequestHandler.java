@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 
 import com.couchbase.mobiletestkit.javacommon.*;
 import com.couchbase.lite.*;
@@ -129,7 +130,7 @@ public class VectorSearchRequestHandler {
                 throw new Exception(method);
         }
     }*/
-    public String createIndex(Args args) throws  CouchbaseLiteException, Exception{
+    public String createIndex(Args args) throws  CouchbaseLiteException, Exception {
         Database database = args.get("database");
 
         String scopeName = args.get("scopeName") != null ? args.get("scopeName") : "_default";
@@ -183,21 +184,27 @@ public class VectorSearchRequestHandler {
                     break;
                 default:
                     throw new Error("Invalid distance metric");
-                }
             }
-
-            if (minTrainingSize != null) {
-                config.setMinTrainingSize(minTrainingSize);
-            }
-
-            if (maxTrainingSize != null) {
-                config.setMaxTrainingSize(maxTrainingSize);
-            }
-
-            collection.createIndex(indexName, config);
-
-            return "???";
         }
+
+        if (minTrainingSize != null) {
+            config.setMinTrainingSize(minTrainingSize);
+        }
+
+        if (maxTrainingSize != null) {
+            config.setMaxTrainingSize(maxTrainingSize);
+        }
+
+        collection.createIndex(indexName, config);
+
+        return "???";
+    }
+
+    public Set<Collection> collectionInstances(Args args) throws CouchbaseLiteException {
+        String scopeName = (args.get("scopeName") != null) ? args.get("scopeName") : "_default";
+        Database db = new Database(args.get("database"));
+        return db.getCollections(scopeName);
+    }
     
     public String registerModel(Args args) {
         String key = args.get("key");
@@ -236,8 +243,9 @@ public class VectorSearchRequestHandler {
 
 
     public Dictionary getEmbedding(Args args) throws CouchbaseLiteException, IOException {
-        Database db3 = this.loadDatabase(args);
-        vectorModel model1 = new vectorModel("test", db3);
+       // Database db3 = this.loadDatabase(args);
+        Database db = new Database("giladDB");
+        vectorModel model1 = new vectorModel("test", db);
         MutableDictionary testDic = new MutableDictionary();
         String input = args.get("input");
         testDic.setValue(input, "test");
