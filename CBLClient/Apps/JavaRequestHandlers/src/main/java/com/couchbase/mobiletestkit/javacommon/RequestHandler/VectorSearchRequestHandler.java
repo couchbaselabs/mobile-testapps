@@ -143,7 +143,6 @@ public class VectorSearchRequestHandler {
      */
     public String createIndex(Args args) throws CouchbaseLiteException, Exception {
         Database database = args.get("database");
-        Log.d(TAG, "*******CHECKING THAT RUNNING THE LATEST BUILD*********");
         String scopeName = args.get("scopeName") != null ? args.get("scopeName") : "_default";
         String collectionName = args.get("collectionName") != null ? args.get("collectionName") : "_default";
 
@@ -222,7 +221,7 @@ public class VectorSearchRequestHandler {
         return "Registered model with name " + name;
     }
 
-    public List<Object> query(Args args) throws CouchbaseLiteException, IOException {
+    public List<Object> query(Args args) throws CouchbaseLiteException, IOException, Exception {
         String term = args.get("term");
 
         Args embeddingArgs = new Args();
@@ -248,13 +247,19 @@ public class VectorSearchRequestHandler {
         return resultArray;
     }
 
-    public Object getEmbedding(Args args) throws CouchbaseLiteException, IOException {
+    public Object getEmbedding(Args args) throws CouchbaseLiteException, IOException, Exception {
         Database db = new Database("giladDB");
         vectorModel model1 = new vectorModel("giladDB");
         MutableDictionary testDic = new MutableDictionary();
         String input = args.get("input");
         testDic.setValue("word", input);
         Dictionary value = model1.predict(testDic);
+        if (value == null) {
+            throw new Exception("The  prediction model was null");
+        }
+        else {
+            Log.d(TAG , "value is: " + value.toString());
+        }
         return value.getValue("vector");
     }
 
