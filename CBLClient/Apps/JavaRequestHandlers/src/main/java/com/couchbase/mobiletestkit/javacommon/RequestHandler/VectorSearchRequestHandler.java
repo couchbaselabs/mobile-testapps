@@ -312,6 +312,7 @@ public class VectorSearchRequestHandler {
 
         @Override
         public Dictionary predict(Dictionary input) {
+            Log.d(TAG, "+++++++++++++++++++++++++++++++INSIDE PREDICT");
             String inputWord = input.getString("word");
             Object result = new ArrayList<>();
 
