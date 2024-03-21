@@ -219,7 +219,7 @@ public class VectorSearchRequestHandler {
         String term = args.get("term");
 
         Args embeddingArgs = new Args();
-        embeddingArgs.put(term, "input");
+        embeddingArgs.put("input", term);
         Object embeddedTerm = this.getEmbedding(embeddingArgs);
 
         String sql = args.get("sql");
@@ -248,7 +248,7 @@ public class VectorSearchRequestHandler {
         vectorModel model1 = new vectorModel("test", db);
         MutableDictionary testDic = new MutableDictionary();
         String input = args.get("input");
-        testDic.setValue(input, "test");
+        testDic.setValue("word", input);
         Dictionary value = model1.predict(testDic);
         return value;
     }
