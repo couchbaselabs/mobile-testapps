@@ -250,7 +250,7 @@ public class VectorSearchRequestHandler {
 
     public Object getEmbedding(Args args) throws CouchbaseLiteException, IOException {
         Database db = new Database("giladDB");
-        vectorModel model1 = new vectorModel("test", db);
+        vectorModel model1 = new vectorModel("giladDB");
         MutableDictionary testDic = new MutableDictionary();
         String input = args.get("input");
         testDic.setValue("word", input);
@@ -279,20 +279,17 @@ public class VectorSearchRequestHandler {
         return db1;
     }
 
-    private class vectorModel implements PredictiveModel {
+    private class vectorModel implements PredictiveModel throws CouchbaseLiteException
+    {
         String key;
         Database db;
 
-        vectorModel(String key, Database db) {
-            this.key = key;
-            this.db = db;
-        }
-
         vectorModel(String key) {
             this.key = key;
+            this.db = new Database(key);
         }
 
-        Object getWordVector(String word, String collection) throws CouchbaseLiteException {
+        Object getWordVector(String word, String collection) {
             String sql = String.format("select vector from %s where word = '%s'", collection, word);
             Query query = this.db.createQuery(sql);
             ResultSet rs = query.execute();
