@@ -45,7 +45,7 @@ public class CollectionRequestHandler {
         String scopeName = (args.get("scopeName") != null) ? args.get("scopeName") : "_default";
         Database db = args.get("database");
         Set<Collection> setCollections = db.getCollections(scopeName);
-        List<java.util.Collection<E>> returnCollections = new ArrayList<Collection>();
+        List<Collection> returnCollections = new ArrayList<Collection>();
         returnCollections.addAll(setCollections);
         return returnCollections;
     }
