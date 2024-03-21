@@ -212,8 +212,6 @@ public class VectorSearchRequestHandler {
         } catch (Exception e) {
             return "Could not create index: " + e;
         }
-
-        return "???";
     }
 
     public String registerModel(Args args) {
