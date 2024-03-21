@@ -143,7 +143,7 @@ public class VectorSearchRequestHandler {
      */
     public String createIndex(Args args) throws CouchbaseLiteException, Exception {
         Database database = args.get("database");
-
+        Log.d(TAG, "*******CHECKING THAT RUNNING THE LATEST BUILD*********");
         String scopeName = args.get("scopeName") != null ? args.get("scopeName") : "_default";
         String collectionName = args.get("collectionName") != null ? args.get("collectionName") : "_default";
 
