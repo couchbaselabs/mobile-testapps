@@ -245,15 +245,14 @@ public class VectorSearchRequestHandler {
         return resultArray;
     }
 
-    public Dictionary getEmbedding(Args args) throws CouchbaseLiteException, IOException {
-        // Database db3 = this.loadDatabase(args);
+    public Object getEmbedding(Args args) throws CouchbaseLiteException, IOException {
         Database db = new Database("giladDB");
         vectorModel model1 = new vectorModel("test", db);
         MutableDictionary testDic = new MutableDictionary();
         String input = args.get("input");
         testDic.setValue("word", input);
         Dictionary value = model1.predict(testDic);
-        return value;
+        return value.getValue("vector");
     }
 
     public Database loadDatabase(Args args) throws CouchbaseLiteException, IOException {
