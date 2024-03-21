@@ -208,7 +208,6 @@ public class VectorSearchRequestHandler {
         Log.d(TAG, "BEFORE CREATING INDEX");
         Args embeddingArgs = new Args();
         embeddingArgs.put("input", "dinner");
-        this.getEmbedding(embeddingArgs);
         try {
             collection.createIndex(indexName, config);
             return String.format("Created index with name %s on collection %s", indexName, collectionName);
@@ -258,12 +257,6 @@ public class VectorSearchRequestHandler {
         String input = args.get("input");
         testDic.setValue("word", input);
         Dictionary value = model1.predict(testDic);
-        if (value == null) {
-            throw new Exception("The  prediction model was null");
-        }
-        else {
-            Log.d(TAG , "value is: " + value.toString());
-        }
         return value.getValue("vector");
     }
 
@@ -320,7 +313,6 @@ public class VectorSearchRequestHandler {
         @Override
         public Dictionary predict(Dictionary input) {
             String inputWord = input.getString("word");
-
             Object result = new ArrayList<>();
 
             try {
@@ -344,6 +336,7 @@ public class VectorSearchRequestHandler {
 
             MutableDictionary output = new MutableDictionary();
             output.setValue("vector", result);
+            Log.d(TAG, "=========================output=" + output.toString());
             return output;
         }
 
