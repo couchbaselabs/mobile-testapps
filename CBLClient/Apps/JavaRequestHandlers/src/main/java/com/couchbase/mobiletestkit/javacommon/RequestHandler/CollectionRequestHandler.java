@@ -40,6 +40,12 @@ public class CollectionRequestHandler {
         return object.getName();
     }
 
+    public Set<Collection> collectionInstances(Args args) throws CouchbaseLiteException {
+        String scopeName = (args.get("scopeName") != null) ? args.get("scopeName") : "_default";
+        Database db = new Database(args.get("database"));
+        return db.getCollections(scopeName);
+    }
+
     public Collection createCollection(Args args) throws CouchbaseLiteException {
         Database db = args.get("database");
         String collectionName = args.get("collectionName");

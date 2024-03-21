@@ -211,12 +211,6 @@ public class VectorSearchRequestHandler {
         return "???";
     }
 
-    public Set<Collection> collectionInstances(Args args) throws CouchbaseLiteException {
-        String scopeName = (args.get("scopeName") != null) ? args.get("scopeName") : "_default";
-        Database db = new Database(args.get("database"));
-        return db.getCollections(scopeName);
-    }
-
     public String registerModel(Args args) {
         String key = args.get("key");
         String name = args.get("name");
