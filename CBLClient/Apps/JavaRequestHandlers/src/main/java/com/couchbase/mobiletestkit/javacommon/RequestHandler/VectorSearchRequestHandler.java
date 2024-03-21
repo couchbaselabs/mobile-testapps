@@ -304,7 +304,8 @@ public class VectorSearchRequestHandler {
             for (Object row : rs) {
                 resultArray.add(((ResultSet) row));
             }
-            return resultArray.get(0);
+            Object res = (resultArray.get(0) != null) ? resultArray.get(0) : null;
+            return res;
         }
 
         @Override
