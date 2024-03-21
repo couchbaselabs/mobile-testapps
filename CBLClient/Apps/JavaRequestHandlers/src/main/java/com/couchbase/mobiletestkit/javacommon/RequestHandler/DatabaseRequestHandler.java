@@ -1,4 +1,5 @@
 package com.couchbase.mobiletestkit.javacommon.RequestHandler;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,6 +41,7 @@ import com.couchbase.lite.SelectResult;
 import com.couchbase.lite.Scope;
 import com.couchbase.lite.internal.utils.FileUtils;
 import com.couchbase.mobiletestkit.javacommon.Memory;
+
 public class DatabaseRequestHandler {
     private static final String TAG = "DATABASE";
     /* ------------ */
@@ -52,13 +54,13 @@ public class DatabaseRequestHandler {
         DatabaseConfiguration config = args.get("config");
         if (config != null) {
             String dbDir = config.getDirectory();
-             /*
-                dbDir is obtained from cblite database configuration
-                1. dbDir shouldn't be null unless a bad situation happen.
-                2. while TestServer app running as a daemon service,
-                cblite core sets dbDir "/", which will cause due permission issues.
-                set dbDir to wherever the application context points to
-                */
+            /*
+             * dbDir is obtained from cblite database configuration
+             * 1. dbDir shouldn't be null unless a bad situation happen.
+             * 2. while TestServer app running as a daemon service,
+             * cblite core sets dbDir "/", which will cause due permission issues.
+             * set dbDir to wherever the application context points to
+             */
             if (dbDir == null || dbDir.equals("/")) {
                 config.setDirectory(RequestHandlerDispatcher.context.getFilesDir().getAbsolutePath());
                 Log.i(TAG, "database_create directory=" + config.getDirectory());
@@ -68,7 +70,6 @@ public class DatabaseRequestHandler {
             return new Database(name);
         }
     }
-
 
     public long getCount(Args args) {
         Database database = args.get("database");
@@ -130,7 +131,9 @@ public class DatabaseRequestHandler {
                                 newVal.put(item.getKey().toString(), b.getProperties());
                             }
                         }
-                        if (isBlob) { doc.put(entry.getKey(), newVal); }
+                        if (isBlob) {
+                            doc.put(entry.getKey(), newVal);
+                        }
                     }
                 }
                 documents.put(id, doc);
@@ -161,8 +164,7 @@ public class DatabaseRequestHandler {
                 updatedDoc.setData(new_data);
                 try {
                     database.save(updatedDoc);
-                }
-                catch (CouchbaseLiteException e) {
+                } catch (CouchbaseLiteException e) {
                     Log.e(TAG, "DB Save failed", e);
                 }
             }
@@ -187,8 +189,7 @@ public class DatabaseRequestHandler {
                 MutableDocument document = new MutableDocument(id, new_data);
                 try {
                     database.save(document);
-                }
-                catch (CouchbaseLiteException e) {
+                } catch (CouchbaseLiteException e) {
                     Log.e(TAG, "DB Save failed", e);
                 }
             }
@@ -205,10 +206,10 @@ public class DatabaseRequestHandler {
         Database database = args.get("database");
         MutableDocument document = args.get("document");
         String concurrencyControlType = args.get("concurrencyControlType");
-        ConcurrencyControl concurrencyType
-            = ((concurrencyControlType != null) && (concurrencyControlType.equals("failOnConflict")))
-            ? ConcurrencyControl.FAIL_ON_CONFLICT
-            : ConcurrencyControl.LAST_WRITE_WINS;
+        ConcurrencyControl concurrencyType = ((concurrencyControlType != null)
+                && (concurrencyControlType.equals("failOnConflict")))
+                        ? ConcurrencyControl.FAIL_ON_CONFLICT
+                        : ConcurrencyControl.LAST_WRITE_WINS;
         database.save(document, concurrencyType);
     }
 
@@ -222,10 +223,10 @@ public class DatabaseRequestHandler {
         Database database = args.get("database");
         Document document = args.get("document");
         String concurrencyControlType = args.get("concurrencyControlType");
-        ConcurrencyControl concurrencyType
-            = ((concurrencyControlType != null) && (concurrencyControlType.equals("failOnConflict")))
-            ? ConcurrencyControl.FAIL_ON_CONFLICT
-            : ConcurrencyControl.LAST_WRITE_WINS;
+        ConcurrencyControl concurrencyType = ((concurrencyControlType != null)
+                && (concurrencyControlType.equals("failOnConflict")))
+                        ? ConcurrencyControl.FAIL_ON_CONFLICT
+                        : ConcurrencyControl.LAST_WRITE_WINS;
 
         database.delete(document, concurrencyType);
     }
@@ -235,8 +236,7 @@ public class DatabaseRequestHandler {
         try {
             database.delete();
             Log.i(TAG, "database deleted");
-        }
-        catch (CouchbaseLiteException ex) {
+        } catch (CouchbaseLiteException ex) {
             Log.e(TAG, "deleteDB() ERROR !!!!!!", ex);
         }
     }
@@ -245,12 +245,15 @@ public class DatabaseRequestHandler {
         Database database = args.get("database");
         String password = args.get("password");
         EncryptionKey encryptionKey;
-        if (password.equals("nil")) { encryptionKey = null; }
-        else { encryptionKey = new EncryptionKey(password); }
+        if (password.equals("nil")) {
+            encryptionKey = null;
+        } else {
+            encryptionKey = new EncryptionKey(password);
+        }
         database.changeEncryptionKey(encryptionKey);
     }
 
-    public void deleteDbByName(Args args) throws CouchbaseLiteException {
+    public void deleteDBByName(Args args) throws CouchbaseLiteException {
         String dbName = args.get("dbName");
         File directory = args.get("directory");
         Database.delete(dbName, directory.getParentFile());
@@ -270,8 +273,7 @@ public class DatabaseRequestHandler {
                 Document document = db.getDocument(id);
                 try {
                     db.delete(document);
-                }
-                catch (CouchbaseLiteException e) {
+                } catch (CouchbaseLiteException e) {
                     Log.e(TAG, "DB Delete failed", e);
                 }
             }
@@ -284,9 +286,9 @@ public class DatabaseRequestHandler {
         int limit = args.get("limit");
         int offset = args.get("offset");
         Query query = QueryBuilder
-            .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
-            .limit(Expression.intValue(limit), Expression.intValue(offset));
+                .select(SelectResult.expression(Meta.id))
+                .from(DataSource.database(database))
+                .limit(Expression.intValue(limit), Expression.intValue(offset));
         List<String> result = new ArrayList<>();
         ResultSet results = query.execute();
         for (Result row : results) {
@@ -304,8 +306,7 @@ public class DatabaseRequestHandler {
             String docId = args.get("docId");
             MyDocumentChangeListener changeListener = new MyDocumentChangeListener();
             token = database.addDocumentChangeListener(docId, ConcurrentExecutor.EXECUTOR, changeListener);
-        }
-        else {
+        } else {
             MyDatabaseChangeListener changeListener = new MyDatabaseChangeListener();
             token = database.addChangeListener(ConcurrentExecutor.EXECUTOR, changeListener);
         }
@@ -348,23 +349,24 @@ public class DatabaseRequestHandler {
         Database.copy(oldDbPath, dbName, dbConfig);
     }
 
-    public String  getPreBuiltDb(Args args) throws IOException {
+    public String getPreBuiltDb(Args args) throws IOException {
         String dbPath = args.get("dbPath");
         String dbFileName = new File(dbPath).getName();
         dbFileName = dbFileName.substring(0, dbFileName.lastIndexOf("."));
         Context context = RequestHandlerDispatcher.context;
-        //ZipUtils zipper = new ZipUtils();
-        //zipper.unzip(context.getAsset(dbPath), context.getFilesDir());
-        //zipper.unzip(context.getAsset("vstestDatabase.cblite2.zip"), context.getFilesDir());
-        String filesFolder =  context.getFilesDir().getAbsolutePath() + "/vsTestDatabase.cblite2";
+        // ZipUtils zipper = new ZipUtils();
+        // zipper.unzip(context.getAsset(dbPath), context.getFilesDir());
+        // zipper.unzip(context.getAsset("vstestDatabase.cblite2.zip"),
+        // context.getFilesDir());
+        String filesFolder = context.getFilesDir().getAbsolutePath() + "/vsTestDatabase.cblite2";
         InputStream dbsqlite = context.getAsset("vsTestDatabase.cblite2/db.sqlite3");
         InputStream dbsqliteshm = context.getAsset("vsTestDatabase.cblite2/db.sqlite3-shm");
         InputStream dbsqlwal = context.getAsset("vsTestDatabase.cblite2/db.sqlite3-wal");
         new File(filesFolder).mkdirs();
-        copyDbFile(dbsqlite,  new FileOutputStream(new File(filesFolder + "/db.sqlite3")));
-        copyDbFile(dbsqliteshm,  new FileOutputStream(new File(filesFolder + "/db.sqlite3-shm")));
-        copyDbFile(dbsqlwal,  new FileOutputStream(new File(filesFolder + "/db.sqlite3-wal")));
-        //Memory.copyFolder(preBuiltDbFolder, destFolder);
+        copyDbFile(dbsqlite, new FileOutputStream(new File(filesFolder + "/db.sqlite3")));
+        copyDbFile(dbsqliteshm, new FileOutputStream(new File(filesFolder + "/db.sqlite3-shm")));
+        copyDbFile(dbsqlwal, new FileOutputStream(new File(filesFolder + "/db.sqlite3-wal")));
+        // Memory.copyFolder(preBuiltDbFolder, destFolder);
         return filesFolder;
     }
 
@@ -375,7 +377,6 @@ public class DatabaseRequestHandler {
             target.write(buf, 0, length);
         }
     }
-
 
     private Map<String, Object> setDataBlob(Map<String, Object> data) {
         if (!data.containsKey("_attachments")) {
@@ -388,21 +389,20 @@ public class DatabaseRequestHandler {
         for (Map.Entry<String, Object> attItem : attachment_items.entrySet()) {
             String attItemKey = attItem.getKey();
             HashMap<String, String> attItemValue = (HashMap<String, String>) attItem.getValue();
-            if (attItemValue.get("data") != null){
-                String contentType = attItemKey.endsWith(".png") ? "image/jpeg": "text/plain";
+            if (attItemValue.get("data") != null) {
+                String contentType = attItemKey.endsWith(".png") ? "image/jpeg" : "text/plain";
                 Blob blob = new Blob(contentType,
                         RequestHandlerDispatcher.context.decodeBase64(attItemValue.get("data")));
                 data.put(attItemKey, blob);
 
-            }
-            else if (attItemValue.containsKey("digest")){
+            } else if (attItemValue.containsKey("digest")) {
                 existingBlobItems.put(attItemKey, attItemValue);
             }
         }
         data.remove("_attachments");
         // deal with partial blob situation,
         // remove all elements then add back blob type only items to _attachments key
-        if (existingBlobItems.size() > 0 && existingBlobItems.size() < attachment_items.size()){
+        if (existingBlobItems.size() > 0 && existingBlobItems.size() < attachment_items.size()) {
             data.remove("_attachments");
             data.put("_attachments", existingBlobItems);
         }
@@ -414,8 +414,12 @@ public class DatabaseRequestHandler {
 class MyDatabaseChangeListener implements DatabaseChangeListener {
     private List<DatabaseChange> changes;
 
-    public List<DatabaseChange> getChanges() { return changes; }
+    public List<DatabaseChange> getChanges() {
+        return changes;
+    }
 
     @Override
-    public void changed(DatabaseChange change) { changes.add(change); }
+    public void changed(DatabaseChange change) {
+        changes.add(change);
+    }
 }
