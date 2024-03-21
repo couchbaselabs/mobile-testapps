@@ -145,12 +145,12 @@ public class VectorSearchRequestHandler {
         Database database = args.get("database");
         String scopeName = args.get("scopeName") != null ? args.get("scopeName") : "_default";
         String collectionName = args.get("collectionName") != null ? args.get("collectionName") : "_default";
-
+        Log.d(TAG, "BEFORE GET COLLECTION");
         Collection collection = database.getCollection(collectionName, scopeName);
         if (collection == null) {
             throw new Exception("Could not open specified collection");
         }
-
+        Log.d(TAG, "AFTER GET COLLECTION");
         String indexName = args.get("indexName");
 
         String expression = args.get("expression");
@@ -204,7 +204,11 @@ public class VectorSearchRequestHandler {
         if (maxTrainingSize != null) {
             config.setMaxTrainingSize(maxTrainingSize);
         }
-
+        
+        Log.d(TAG, "BEFORE CREATING INDEX");
+        Args embeddingArgs = new Args();
+        embeddingArgs.put("input", "dinner");
+        this.getEmbedding(embeddingArgs);
         try {
             collection.createIndex(indexName, config);
             return String.format("Created index with name %s on collection %s", indexName, collectionName);
