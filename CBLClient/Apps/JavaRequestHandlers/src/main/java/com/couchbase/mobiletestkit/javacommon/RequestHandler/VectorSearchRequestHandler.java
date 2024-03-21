@@ -206,7 +206,12 @@ public class VectorSearchRequestHandler {
             config.setMaxTrainingSize(maxTrainingSize);
         }
 
-        collection.createIndex(indexName, config);
+        try {
+            collection.createIndex(indexName, config);
+            return String.format("Created index with name %s on collection %s", indexName, collectionName);
+        } catch (Exception e) {
+            return "Could not create index: " + e;
+        }
 
         return "???";
     }
