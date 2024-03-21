@@ -294,12 +294,14 @@ public class VectorSearchRequestHandler {
             String sql = String.format("select vector from %s where word = '%s'", collection, word);
             Query query = this.db.createQuery(sql);
             ResultSet rs = query.execute();
-            List<Object> resultArray = new ArrayList<>();
-            for (Object row : rs) {
-                resultArray.add(((ResultSet) row));
+            try {
+                List<Result> rl = rs.allResults();
+                Map<String, Object> res = rl.get(0).toMap();
+                return res.get("vector");
+            } catch (Exception e) {
+                System.err.println(e + "retrieving vector could not be done - getWordVector query returned no results");
+                return null;
             }
-            Object res = (resultArray.get(0) != null) ? resultArray.get(0) : null;
-            return res;
         }
 
         @Override
