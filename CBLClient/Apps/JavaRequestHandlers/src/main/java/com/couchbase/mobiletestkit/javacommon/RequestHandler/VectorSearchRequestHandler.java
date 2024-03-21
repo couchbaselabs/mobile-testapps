@@ -279,14 +279,17 @@ public class VectorSearchRequestHandler {
         return db1;
     }
 
-    private class vectorModel implements PredictiveModel throws CouchbaseLiteException
-    {
+    private class vectorModel implements PredictiveModel {
         String key;
         Database db;
 
         vectorModel(String key) {
-            this.key = key;
-            this.db = new Database(key);
+            try {
+                this.key = key;
+                this.db = new Database(key);
+            } catch (Exception e) {
+                System.err.println(e + "Error creating instance of vectorModel");
+            }
         }
 
         Object getWordVector(String word, String collection) {
