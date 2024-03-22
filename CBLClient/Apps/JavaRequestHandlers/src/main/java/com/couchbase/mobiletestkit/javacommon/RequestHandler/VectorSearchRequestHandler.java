@@ -292,11 +292,11 @@ public class VectorSearchRequestHandler {
         }
 
         Object getWordVector(String word, String collection) throws CouchbaseLiteException {
-            Database db = new Database(this.dbName)
+            Database db = new Database(this.dbName);
             String sql = String.format("select vector from %s where word = '%s'", collection, word);
             Query query = db.createQuery(sql);
             ResultSet rs = query.execute();
-            db.close()
+            db.close();
             try {
                 List<Result> rl = rs.allResults();
                 Map<String, Object> res = rl.get(0).toMap();
