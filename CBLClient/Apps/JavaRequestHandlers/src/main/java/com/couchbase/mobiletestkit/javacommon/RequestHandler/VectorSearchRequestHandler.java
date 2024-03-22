@@ -291,9 +291,9 @@ public class VectorSearchRequestHandler {
             }
         }
 
-        Object getWordVector(String word, String collection) throws CouchbaseLiteException {
+        Object getWordVector(String word) throws CouchbaseLiteException {
             Database db = new Database(this.dbName);
-            String sql = String.format("select vector from %s where word = '%s'", collection, word);
+            String sql = String.format("select vector from searchTerms where word = '%s'", word);
             Query query = db.createQuery(sql);
             ResultSet rs = query.execute();
             db.close();
@@ -316,18 +316,7 @@ public class VectorSearchRequestHandler {
             Object result = new ArrayList<>();
 
             try {
-                if (inputWord == "dinner") {
-                    result = getWordVector(inputWord, "searchTerms");
-                } else {
-                    result = getWordVector(inputWord, "docBodyVectors");
-                }
-
-                if (result == null) {
-                    result = getWordVector(inputWord, "auxiliaryWords");
-                }
-                if (result == null) {
-                    return null;
-                }
+                result = getWordVector(inputWord);
             } catch (CouchbaseLiteException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
