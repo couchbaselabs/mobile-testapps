@@ -244,6 +244,8 @@ public class VectorSearchRequestHandler {
             // copy docs
             try self.copyWordDocument(copyFrom: wordsCollection, copyTo: docBodyVectors, docIds: docIds)
             try self.copyWordDocument(copyFrom: wordsCollection, copyTo: indexVectors, docIds: docIds)
+            // add all docs with embeddings to searchTerms
+            try self.copyWordDocument(copyFrom: wordsCollection, copyTo: searchTerms, docIds: docIds)
             
             // remove word from first 5 cat3 docs in indexVectors
             // 101 is the beginning of cat3
@@ -261,9 +263,6 @@ public class VectorSearchRequestHandler {
                 let docIdCat1 = "word\(i)"
                 let docIdCat2 = "word\(cat2Offset+i)"
                 
-                // copy the documents to aux words for android app
-                try self.copyWordDocument(copyFrom: docBodyVectors, copyTo: auxiliaryWords, docIds: [docIdCat1, docIdCat2])
-                
                 let doc1 = try docBodyVectors.document(id: docIdCat1)?.toMutable()
                 let doc2 = try docBodyVectors.document(id: docIdCat2)?.toMutable()
                 
@@ -279,10 +278,20 @@ public class VectorSearchRequestHandler {
             for i in 0...9 {
                 let docId = "word\(newWordsOffset+1+i)"
                 let doc = MutableDocument(id: docId)
+
                 doc.setString(newWords[i], forKey: "word")
                 doc.setString("cat3", forKey: "catid")
                 
+                let embeddingArgs = Args()
+                embeddingArgs.set(value: newWords[i], forName: "input")
+                let embedding: [Double] = try await innerVectorSearchHandler.handleRequest(method: "vectorSearch_testPredict", args: embeddingArgs) as! [Double]
+                let searchDoc = MutableDocument(id: docId)
+                searchDoc.setString(newWords[i], forKey: "word")
+                searchDoc.setString("cat3", forKey: "catid")
+                searchDoc.setArray(MutableArrayObject(data:embedding), forKey: "vector")
+                
                 try auxiliaryWords.save(document: doc)
+                try searchTerms.save(document: searchDoc)
             }
             
             // add 15 words with cat1 to aux, 5 with, 5 without and 5 with wrong embeddings
@@ -301,6 +310,10 @@ public class VectorSearchRequestHandler {
                 let withoutDoc = MutableDocument(id: withoutId)
                 let wrongDoc = MutableDocument(id: wrongId)
                 
+                let cSDoc = MutableDocument(id: correctId)
+                let woSDoc = MutableDocument(id: withoutId)
+                let wrSDoc = MutableDocument(id: wrongId)
+                
                 let correctWord = correct[i]
                 let withoutWord = without[i]
                 let wrongWord = wrong[i]
@@ -316,16 +329,32 @@ public class VectorSearchRequestHandler {
                 correctDoc.setString("cat1", forKey: "catid")
                 correctDoc.setArray(MutableArrayObject(data: correctEmbedding), forKey: "vector")
                 
+                cSDoc.setString(correctWord, forKey: "word")
+                cSDoc.setString("cat1", forKey: "catid")
+                cSDoc.setArray(MutableArrayObject(data: correctEmbedding), forKey: "vector")
+                
                 withoutDoc.setString(withoutWord, forKey: "word")
                 withoutDoc.setString("cat1", forKey: "catid")
                 
+                woSDoc.setString(withoutWord, forKey: "word")
+                woSDoc.setString("cat1", forKey: "catid")
+                
                 wrongDoc.setString(wrongWord, forKey: "word")
                 wrongDoc.setString("cat1", forKey: "catid")
-                correctDoc.setArray(MutableArrayObject(data: wrongEmbedding), forKey: "vector")
+                wrongDoc.setArray(MutableArrayObject(data: wrongEmbedding), forKey: "vector")
+                
+                wrSDoc.setString(wrongWord, forKey: "word")
+                wrSDoc.setString("cat1", forKey: "catid")
+                wrSDoc.setArray(MutableArrayObject(data: wrongEmbedding), forKey: "vector")
                 
                 try auxiliaryWords.save(document: correctDoc)
                 try auxiliaryWords.save(document: withoutDoc)
                 try auxiliaryWords.save(document: wrongDoc)
+                
+                try searchTerms.save(document: cSDoc)
+                try searchTerms.save(document: woSDoc)
+                try searchTerms.save(document: wrSDoc)
+
             }
             
             // add dinner search term to searchTerms
