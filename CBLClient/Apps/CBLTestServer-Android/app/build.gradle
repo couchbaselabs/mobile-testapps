@@ -103,7 +103,7 @@ android {
         implementation 'org.nanohttpd:nanohttpd:2.3.2-SNAPSHOT'
 
         // Couchbase Lite:
-        implementation 'com.couchbase.lite:couchbase-lite-android-ee:3.2.0-90'
+        implementation 'com.couchbase.lite:couchbase-lite-android-ee:3.2.0-77'
         implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-arm64:1.0.0-7'
         // implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-x86_64:1.0.0-60000'
 
