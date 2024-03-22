@@ -217,7 +217,7 @@ public class VectorSearchRequestHandler {
     public String registerModel(Args args) {
         String key = args.get("key");
         String name = args.get("name");
-        vectorModel model = new vectorModel(key, name);
+        vectorModel model = new vectorModel(key, "giladDB");
         Database.prediction.registerModel(name, model);
         return "Registered model with name " + name;
     }
