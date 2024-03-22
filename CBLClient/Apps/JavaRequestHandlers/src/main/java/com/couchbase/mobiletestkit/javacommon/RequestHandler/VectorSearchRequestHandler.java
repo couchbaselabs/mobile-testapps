@@ -249,7 +249,6 @@ public class VectorSearchRequestHandler {
     }
 
     public Object getEmbedding(Args args) throws CouchbaseLiteException, IOException {
-        Database db = new Database("giladDB");
         vectorModel model1 = new vectorModel("word", "giladDB");
         MutableDictionary testDic = new MutableDictionary();
         String input = args.get("input");
@@ -281,21 +280,23 @@ public class VectorSearchRequestHandler {
 
     private class vectorModel implements PredictiveModel {
         String key;
-        Database db;
+        String dbName;
 
         vectorModel(String key, String name) {
             try {
                 this.key = key;
-                this.db = new Database(name);
+                this.dbName = name;
             } catch (Exception e) {
                 System.err.println(e + "Error creating instance of vectorModel");
             }
         }
 
         Object getWordVector(String word, String collection) throws CouchbaseLiteException {
+            Database db = new Database(this.dbName)
             String sql = String.format("select vector from %s where word = '%s'", collection, word);
-            Query query = this.db.createQuery(sql);
+            Query query = db.createQuery(sql);
             ResultSet rs = query.execute();
+            db.close()
             try {
                 List<Result> rl = rs.allResults();
                 Map<String, Object> res = rl.get(0).toMap();
