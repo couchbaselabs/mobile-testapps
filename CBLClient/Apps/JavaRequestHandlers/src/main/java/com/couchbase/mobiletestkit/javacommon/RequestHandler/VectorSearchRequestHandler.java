@@ -316,15 +316,14 @@ public class VectorSearchRequestHandler {
             Object result = new ArrayList<>();
 
             try {
-                result = getWordVector(inputWord, "docBodyVectors");
-                if (result == null) {
-                    result = getWordVector(inputWord, "indexVectors");
+                if (inputWord == "dinner") {
+                    result = getWordVector(inputWord, "searchTerms");
+                } else {
+                    result = getWordVector(inputWord, "docBodyVectors");
                 }
+
                 if (result == null) {
                     result = getWordVector(inputWord, "auxiliaryWords");
-                }
-                if (result == null) {
-                    result = getWordVector(inputWord, "searchTerms");
                 }
                 if (result == null) {
                     return null;
