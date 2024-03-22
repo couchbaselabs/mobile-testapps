@@ -187,7 +187,7 @@ public class VectorSearchRequestHandler {
         }
         if (metric != null) {
             switch (metric) {
-                 case "euclidean":
+                case "euclidean":
                     config.setMetric(VectorIndexConfiguration.DistanceMetric.EUCLIDEAN);
                     break;
                 case "cosine":
@@ -217,7 +217,7 @@ public class VectorSearchRequestHandler {
     public String registerModel(Args args) {
         String key = args.get("key");
         String name = args.get("name");
-        vectorModel model = new vectorModel(key);
+        vectorModel model = new vectorModel(key, name);
         Database.prediction.registerModel(name, model);
         return "Registered model with name " + name;
     }
@@ -250,7 +250,7 @@ public class VectorSearchRequestHandler {
 
     public Object getEmbedding(Args args) throws CouchbaseLiteException, IOException {
         Database db = new Database("giladDB");
-        vectorModel model1 = new vectorModel("giladDB");
+        vectorModel model1 = new vectorModel("word", "giladDB");
         MutableDictionary testDic = new MutableDictionary();
         String input = args.get("input");
         testDic.setValue("word", input);
@@ -283,10 +283,10 @@ public class VectorSearchRequestHandler {
         String key;
         Database db;
 
-        vectorModel(String key) {
+        vectorModel(String key, String name) {
             try {
                 this.key = key;
-                this.db = new Database(key);
+                this.db = new Database(name);
             } catch (Exception e) {
                 System.err.println(e + "Error creating instance of vectorModel");
             }
@@ -310,7 +310,7 @@ public class VectorSearchRequestHandler {
 
         @Override
         public Dictionary predict(Dictionary input) {
-            String inputWord = input.getString("word");
+            String inputWord = input.getString(this.key);
 
             Object result = new ArrayList<>();
 
