@@ -282,7 +282,7 @@ namespace Couchbase.Lite.Testing
                 ["blob_hashCode"] = BlobMethods.HashCode,
                 ["blob_length"] = BlobMethods.Length,
                 ["collection_defaultCollection"] = CollectionMethods.defaultCollection,
-                ["collection_createCollection"] = CollectionMethods.createColelction,
+                ["collection_createCollection"] = CollectionMethods.createCollection,
                 ["collection_deleteCollection"] = CollectionMethods.deleteCollection,
                 ["collection_collectionNames"] = CollectionMethods.collectionNames,
                 ["collection_getCollectionName"] = CollectionMethods.collectionName,

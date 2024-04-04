@@ -33,7 +33,7 @@ namespace Couchbase.Lite.Testing
             });
         }
 
-        public static void createColelction([NotNull] NameValueCollection args,
+        public static void createCollection([NotNull] NameValueCollection args,
                                             [NotNull] IReadOnlyDictionary<string, object> postBody,
                                             [NotNull] HttpListenerResponse response)
         {
