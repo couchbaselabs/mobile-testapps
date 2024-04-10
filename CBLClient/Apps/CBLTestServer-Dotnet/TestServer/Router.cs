@@ -305,7 +305,8 @@ namespace Couchbase.Lite.Testing
                 ["peerToPeer_configureCollection"] = P2PMethods.configureCollection,
                 ["copy_files"] = CopyFiles,
                 ["release"] = ReleaseObject,
-                ["flushMemory"] = flushMemory
+                ["flushMemory"] = flushMemory,
+                ["vectorSearch_createIndex"] = VectorSearchMethods.createIndex
             };
 
         #endregion

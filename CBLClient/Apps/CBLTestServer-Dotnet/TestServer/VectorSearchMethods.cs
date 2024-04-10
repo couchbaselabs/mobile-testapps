@@ -9,6 +9,7 @@ using Couchbase.Lite.Query;
 using JetBrains.Annotations;
 using Newtonsoft.Json.Linq;
 
+using static Couchbase.Lite.Testing.DatabaseMethods;
 
 namespace Couchbase.Lite.Testing
 {
@@ -17,7 +18,6 @@ namespace Couchbase.Lite.Testing
         public static void createIndex([NotNull] NameValueCollection args,
                                        [NotNull] IReadOnlyDictionary<string, object> postBody,
                                        [NotNull] HttpListenerResponse response)
-        // temp method body, check API spec and update correctly
         {
             With<Database>(postBody, "database", database =>
             {
@@ -26,5 +26,4 @@ namespace Couchbase.Lite.Testing
         }
 
     }
-
-}
+}   
