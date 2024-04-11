@@ -12,7 +12,7 @@ function Modify-Packages {
     $checkNextLine = $false
     for($i = 0; $i -lt $content.Length; $i++) {
         $line = $content[$i]
-        $isMatch = $line -match ".*?<PackageReference Include=`"Couchbase\.Lite(.*?)`""
+        $isMatch = $line -match "^(?!.*VectorSearch).*?<PackageReference Include=`"Couchbase\.Lite(.*?)`""
         if($isMatch) {
             $oldPackageName = $matches[1]
             $packageName = $oldPackageName.Replace(".Enterprise", "")
