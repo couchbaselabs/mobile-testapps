@@ -270,7 +270,7 @@ public class VectorSearchRequestHandler {
         DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
         DatabaseConfiguration dbConfig = new DatabaseConfiguration();
         dbConfig = configHandler.configure(args);
-        newArgs.put("dbPath", dbPath);
+        newArgs.put("dbPath", "/tmp/gilad_attempt");
         newArgs.put("dbName", "giladDB");
         newArgs.put("dbConfig", dbConfig);
         dbHandler.copy(newArgs);
