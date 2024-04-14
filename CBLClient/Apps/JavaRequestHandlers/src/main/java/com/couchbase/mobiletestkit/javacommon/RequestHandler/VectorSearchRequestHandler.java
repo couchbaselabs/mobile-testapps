@@ -261,14 +261,15 @@ public class VectorSearchRequestHandler {
         // loads the given database vsTestDatabase
         DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
         Args newArgs = args;
+        newArgs.put("directory","/tmp/gilad_attempt");
         newArgs.put("dbPath", "vstestDatabase.cblite2.zip");
         String dbPath = dbHandler.getPreBuiltDb(newArgs);
         Log.d(TAG, "dbPath=" + dbPath);
         Log.d(TAG, "dbPath=" + new File(dbPath).getParent());
         Database.exists("vstestDatabase.cblite2", new File(dbPath));
-        //DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
-        DatabaseConfiguration dbConfig = new DatabaseConfiguration().setDirectory("/tmp/gilad_attempt");
-        // dbConfig = configHandler.configure(args);
+        DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
+        DatabaseConfiguration dbConfig = new DatabaseConfiguration();
+        dbConfig = configHandler.configure(args);
         newArgs.put("dbPath", dbPath);
         newArgs.put("dbName", "giladDB");
         newArgs.put("dbConfig", dbConfig);
