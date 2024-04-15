@@ -268,7 +268,7 @@ public class VectorSearchRequestHandler {
             newArgs.put("directory", new File(dbPath).getParent());
         }
         else {
-            newArgs.put("directory", directory);
+            newArgs.put("directory", "giladDB");
         }
         Database.exists("vstestDatabase.cblite2", new File(dbPath));
         DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
