@@ -263,9 +263,9 @@ public class VectorSearchRequestHandler {
         Args newArgs = args;
         newArgs.put("dbPath", "vstestDatabase.cblite2");
         String dbPath = dbHandler.getPreBuiltDb(newArgs);
-        newArgs.put("directory", new File(dbPath).getParent());
+        //newArgs.put("directory", new File(dbPath).getParent());
         Log.d(TAG, "dbPath=" + dbPath);
-        Log.d(TAG, "dbPath=" + new File(dbPath).getParent());
+        //Log.d(TAG, "dbPath=" + new File(dbPath).getParent());
         Database.exists("vstestDatabase.cblite2", new File(dbPath));
         DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
         DatabaseConfiguration dbConfig = new DatabaseConfiguration();
