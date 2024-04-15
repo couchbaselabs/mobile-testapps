@@ -265,7 +265,8 @@ public class VectorSearchRequestHandler {
         String dbPath = dbHandler.getPreBuiltDb(newArgs);
         String directory = args.get("directory");
         if (directory == null) {
-            newArgs.put("directory", new File(dbPath).getParent());
+            // newArgs.put("directory", new File(dbPath).getParent());
+            newArgs.put("directory", "");
         }
         else {
             newArgs.put("directory", "");
