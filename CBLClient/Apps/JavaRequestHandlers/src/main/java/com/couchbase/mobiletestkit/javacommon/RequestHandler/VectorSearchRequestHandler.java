@@ -269,7 +269,7 @@ public class VectorSearchRequestHandler {
         Database.exists("vstestDatabase.cblite2", new File(dbPath));
         DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
         DatabaseConfiguration dbConfig = new DatabaseConfiguration();
-        dbConfig = configHandler.configure(args);
+        dbConfig = configHandler.configure(newArgs);
         newArgs.put("dbPath", dbPath);
         newArgs.put("dbName", "giladDB");
         newArgs.put("dbConfig", dbConfig);
