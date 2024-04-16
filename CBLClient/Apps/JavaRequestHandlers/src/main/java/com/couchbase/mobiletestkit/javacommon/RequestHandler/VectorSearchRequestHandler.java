@@ -143,7 +143,6 @@ public class VectorSearchRequestHandler {
      */
     public String createIndex(Args args) throws CouchbaseLiteException, Exception {
         Database database = args.get("database");
-        Log.d(TAG, "*******CHECKING THAT RUNNING THE LATEST BUILD*********");
         String scopeName = args.get("scopeName") != null ? args.get("scopeName") : "_default";
         String collectionName = args.get("collectionName") != null ? args.get("collectionName") : "_default";
 
@@ -265,6 +264,7 @@ public class VectorSearchRequestHandler {
         String dbPath = dbHandler.getPreBuiltDb(newArgs);
         String platform = args.get("platform");
         newArgs.put("directory", new File(dbPath).getParent());
+        Log.d(TAG, "************************" + platform);
         if (platform == "java") {
             newArgs.put("directory", "");
         }
