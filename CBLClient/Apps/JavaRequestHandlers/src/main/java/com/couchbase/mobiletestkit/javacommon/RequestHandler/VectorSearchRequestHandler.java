@@ -19,17 +19,16 @@ public class VectorSearchRequestHandler {
     private final Map<String, Object> wordMap = getWordVectMap("giladDB");
 
     Map<String, Object> getWordVectMap(String dbName) {
-        Database db = new Database(dbName);
-        String sql1 = String.format("select word, vector from docBodyVectors");
-        Query query1 = db.createQuery(sql1);
-        ResultSet rs1 = query1.execute();
-        String sql2 = String.format("select word, vector from searchTerms");
-        Query query2 = db.createQuery(sql2);
-        ResultSet rs2 = query2.execute();
-
-        Map<String, Object> wordMap = new HashMap<String, Object>();
-
         try {
+            Database db = new Database(dbName);
+            String sql1 = String.format("select word, vector from docBodyVectors");
+            Query query1 = db.createQuery(sql1);
+            ResultSet rs1 = query1.execute();
+            String sql2 = String.format("select word, vector from searchTerms");
+            Query query2 = db.createQuery(sql2);
+            ResultSet rs2 = query2.execute();
+
+            Map<String, Object> wordMap = new HashMap<String, Object>();
             List<Result> rl = rs1.allResults();
             List<Result> rl2 = rs2.allResults();
             rl.addAll(rl2);
