@@ -15,11 +15,29 @@ import com.couchbase.mobiletestkit.javacommon.util.Log;
 
 public class VectorSearchRequestHandler {
     private static final String TAG = "GILAD";
-    private final Map<String, Object> wordMap = getWordVectMap("giladDB");
+    private final Map<String, Object> wordMap = getWordVectMap();
 
-    Map<String, Object> getWordVectMap(String dbName) {
+    Map<String, Object> getWordVectMap() {
         try {
-            Database db = new Database(dbName);
+            DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
+            Args newArgs;
+            newArgs.put("dbPath", "vstestDatabase.cblite2");
+            String dbPath = dbHandler.getPreBuiltDb(newArgs);
+            String platform = "null";
+            newArgs.put("directory", new File(dbPath).getParent());
+            if (platform.equals("java")) {
+                newArgs.put("directory", "");
+            }
+            Database.exists("vstestDatabase.cblite2", new File(dbPath));
+            DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
+            DatabaseConfiguration dbConfig = new DatabaseConfiguration();
+            dbConfig = configHandler.configure(newArgs);
+            newArgs.put("dbPath", dbPath);
+            newArgs.put("dbName", "giladDB");
+            newArgs.put("dbConfig", dbConfig);
+            dbHandler.copy(newArgs);
+            Database db = new Database("giladDB");
+
             String sql1 = String.format("select word, vector from docBodyVectors");
             Query query1 = db.createQuery(sql1);
             ResultSet rs1 = query1.execute();
@@ -37,6 +55,7 @@ public class VectorSearchRequestHandler {
                 Object vector = r.getDouble("vector");
                 wordMap.put(word, vector);
             }
+            db.close();
             return wordMap;
 
         } catch (Exception e) {
