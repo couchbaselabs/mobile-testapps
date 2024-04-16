@@ -104,7 +104,7 @@ android {
 
         // Couchbase Lite:
         implementation 'com.couchbase.lite:couchbase-lite-android-ee:3.2.0-77'
-        implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-arm64:1.0.0-18'
+        implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-arm64:1.0.0-7'
         // implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-x86_64:1.0.0-60000'
 
         // Android SDK:
