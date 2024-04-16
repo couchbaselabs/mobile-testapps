@@ -4,7 +4,6 @@ import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -295,13 +294,9 @@ public class VectorSearchRequestHandler {
         String dbPath = dbHandler.getPreBuiltDb(newArgs);
         String platform = args.get("platform");
         newArgs.put("directory", new File(dbPath).getParent());
-        Log.d(TAG, "************************platform=" + platform);
-        Log.d(TAG, "************************equals=" + platform.equals("java"));
         if (platform.equals("java")) {
-            Log.d(TAG, "************************INSIDE IF");
             newArgs.put("directory", "");
         }
-        Log.d(TAG, "************************" + newArgs.get("directory"));
         Database.exists("vstestDatabase.cblite2", new File(dbPath));
         DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
         DatabaseConfiguration dbConfig = new DatabaseConfiguration();
