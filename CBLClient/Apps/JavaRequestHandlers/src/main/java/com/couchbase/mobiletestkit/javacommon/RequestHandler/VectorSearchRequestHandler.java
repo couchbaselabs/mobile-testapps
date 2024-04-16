@@ -290,7 +290,7 @@ public class VectorSearchRequestHandler {
         // loads the given database vsTestDatabase
         DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
         Args newArgs = args;
-        newArgs.put("dbPath", "vstestDatabase.cblite2");
+        // newArgs.put("dbPath", "vstestDatabase.cblite2");
         String dbPath = dbHandler.getPreBuiltDb(newArgs);
         String platform = args.get("platform");
         newArgs.put("directory", new File(dbPath).getParent());
@@ -299,15 +299,15 @@ public class VectorSearchRequestHandler {
                 newArgs.put("directory", "");
              }
         }
-        Database.exists("vstestDatabase.cblite2", new File(dbPath));
+        // Database.exists("vstestDatabase.cblite2", new File(dbPath));
         DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
         DatabaseConfiguration dbConfig = new DatabaseConfiguration();
         dbConfig = configHandler.configure(newArgs);
         newArgs.put("dbPath", dbPath);
-        newArgs.put("dbName", "giladDB");
+        newArgs.put("dbName", "giladDB1");
         newArgs.put("dbConfig", dbConfig);
         dbHandler.copy(newArgs);
-        Database db1 = new Database("giladDB");
+        Database db1 = new Database("giladDB1");
 
         return db1;
     }
