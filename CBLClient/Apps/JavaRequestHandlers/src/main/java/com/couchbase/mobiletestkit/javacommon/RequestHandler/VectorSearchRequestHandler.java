@@ -20,7 +20,7 @@ public class VectorSearchRequestHandler {
     Map<String, Object> getWordVectMap() {
         try {
             DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
-            Args newArgs;
+            Args newArgs = new Args();
             newArgs.put("dbPath", "vstestDatabase.cblite2");
             String dbPath = dbHandler.getPreBuiltDb(newArgs);
             String platform = "null";
@@ -316,7 +316,7 @@ public class VectorSearchRequestHandler {
         if (platform != null) {
             if (platform.equals("java")) {
                 newArgs.put("directory", "");
-             }
+            }
         }
         Database.exists("vstestDatabase.cblite2", new File(dbPath));
         DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
