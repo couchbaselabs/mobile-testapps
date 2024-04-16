@@ -323,10 +323,10 @@ public class VectorSearchRequestHandler {
         DatabaseConfiguration dbConfig = new DatabaseConfiguration();
         dbConfig = configHandler.configure(newArgs);
         newArgs.put("dbPath", dbPath);
-        newArgs.put("dbName", "giladDB1");
+        newArgs.put("dbName", "giladDB2");
         newArgs.put("dbConfig", dbConfig);
         dbHandler.copy(newArgs);
-        Database db1 = new Database("giladDB1");
+        Database db1 = new Database("giladDB2");
 
         return db1;
     }
