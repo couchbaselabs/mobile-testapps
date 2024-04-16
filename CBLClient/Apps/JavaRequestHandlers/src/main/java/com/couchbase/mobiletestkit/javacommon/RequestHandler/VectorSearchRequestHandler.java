@@ -4,6 +4,8 @@ import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,6 +16,36 @@ import com.couchbase.mobiletestkit.javacommon.util.Log;
 
 public class VectorSearchRequestHandler {
     private static final String TAG = "GILAD";
+    private final Map<String, Object> wordMap = getWordVectMap("giladDB");
+
+    Map<String, Object> getWordVectMap(String dbName) {
+        Database db = new Database(dbName);
+        String sql1 = String.format("select word, vector from docBodyVectors");
+        Query query1 = db.createQuery(sql1);
+        ResultSet rs1 = query1.execute();
+        String sql2 = String.format("select word, vector from searchTerms");
+        Query query2 = db.createQuery(sql2);
+        ResultSet rs2 = query2.execute();
+
+        Map<String, Object> wordMap = new HashMap<String, Object>();
+
+        try {
+            List<Result> rl = rs1.allResults();
+            List<Result> rl2 = rs2.allResults();
+            rl.addAll(rl2);
+
+            for (Result r : rl) {
+                String word = r.getString("word");
+                Object vector = r.getDouble("vector");
+                wordMap.put(word, vector);
+            }
+            return wordMap;
+
+        } catch (Exception e) {
+            System.err.println(e + "retrieving vector could not be done - getWordVector query returned no results");
+            return null;
+        }
+    }
 
     /*
      * public Object handleRequest(String method, Args args) throws Exception {
@@ -297,37 +329,34 @@ public class VectorSearchRequestHandler {
             }
         }
 
-        Object getWordVector(String word) throws CouchbaseLiteException {
-            Database db = new Database(this.dbName);
-            String sql = String.format("select vector from searchTerms where word = '%s'", word);
-            Query query = db.createQuery(sql);
-            ResultSet rs = query.execute();
-            db.close();
-            try {
-                List<Result> rl = rs.allResults();
-                Map<String, Object> res = rl.get(0).toMap();
-                Log.d("getWordVector", "vector=" + res);
-                Log.d("getWordVector", "vector=" + res.get("vector"));
-                return res.get("vector");
-            } catch (Exception e) {
-                System.err.println(e + "retrieving vector could not be done - getWordVector query returned no results");
-                return null;
-            }
-        }
+        /*
+         * Object getWordVector(String word) throws CouchbaseLiteException {
+         * Database db = new Database(this.dbName);
+         * String sql =
+         * String.format("select vector from searchTerms where word = '%s'", word);
+         * Query query = db.createQuery(sql);
+         * ResultSet rs = query.execute();
+         * db.close();
+         * try {
+         * List<Result> rl = rs.allResults();
+         * Map<String, Object> res = rl.get(0).toMap();
+         * Log.d("getWordVector", "vector=" + res);
+         * Log.d("getWordVector", "vector=" + res.get("vector"));
+         * return res.get("vector");
+         * } catch (Exception e) {
+         * System.err.println(e +
+         * "retrieving vector could not be done - getWordVector query returned no results"
+         * );
+         * return null;
+         * }
+         * }
+         */
 
         @Override
         public Dictionary predict(Dictionary input) {
             String inputWord = input.getString(this.key);
-
             Object result = new ArrayList<>();
-
-            try {
-                result = getWordVector(inputWord);
-            } catch (CouchbaseLiteException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
+            result = wordMap.get(inputWord);
             MutableDictionary output = new MutableDictionary();
             output.setValue("vector", result);
             return output;
