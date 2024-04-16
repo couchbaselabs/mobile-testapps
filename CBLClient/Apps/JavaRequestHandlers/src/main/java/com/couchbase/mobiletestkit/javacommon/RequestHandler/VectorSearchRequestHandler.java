@@ -313,18 +313,20 @@ public class VectorSearchRequestHandler {
         String dbPath = dbHandler.getPreBuiltDb(newArgs);
         String platform = args.get("platform");
         newArgs.put("directory", new File(dbPath).getParent());
-        if (platform.equals("java")) {
-            newArgs.put("directory", "");
+        if (platform != null) {
+            if (platform.equals("java")) {
+                newArgs.put("directory", "");
+             }
         }
         Database.exists("vstestDatabase.cblite2", new File(dbPath));
         DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
         DatabaseConfiguration dbConfig = new DatabaseConfiguration();
         dbConfig = configHandler.configure(newArgs);
         newArgs.put("dbPath", dbPath);
-        newArgs.put("dbName", "giladDB");
+        newArgs.put("dbName", "giladDB1");
         newArgs.put("dbConfig", dbConfig);
         dbHandler.copy(newArgs);
-        Database db1 = new Database("giladDB");
+        Database db1 = new Database("giladDB1");
 
         return db1;
     }
