@@ -218,29 +218,6 @@ public class VectorSearchRequestHandler {
             }
         }
 
-        /*
-         * Object getWordVector(String word) throws CouchbaseLiteException {
-         * Database db = new Database(this.dbName);
-         * String sql =
-         * String.format("select vector from searchTerms where word = '%s'", word);
-         * Query query = db.createQuery(sql);
-         * ResultSet rs = query.execute();
-         * db.close();
-         * try {
-         * List<Result> rl = rs.allResults();
-         * Map<String, Object> res = rl.get(0).toMap();
-         * Log.d("getWordVector", "vector=" + res);
-         * Log.d("getWordVector", "vector=" + res.get("vector"));
-         * return res.get("vector");
-         * } catch (Exception e) {
-         * System.err.println(e +
-         * "retrieving vector could not be done - getWordVector query returned no results"
-         * );
-         * return null;
-         * }
-         * }
-         */
-
         @Override
         public Dictionary predict(Dictionary input) {
             String inputWord = input.getString(this.key);
@@ -252,7 +229,4 @@ public class VectorSearchRequestHandler {
         }
 
     }
-    // Define other methods
 }
-
-// Define other helper classes and methods
