@@ -222,9 +222,9 @@ public class VectorSearchRequestHandler {
         public Dictionary predict(Dictionary input) {
             String inputWord = input.getString(this.key);
             Object result = new ArrayList<>();
-            Log.d(TAG, "Calling prediction word: " +  inputWord);
+            //Log.d(TAG, "Calling prediction word: " +  inputWord);
             result = wordMap.get(inputWord);
-            Log.d(TAG, "Calling prediction word: " +  result.toString());
+            //Log.d(TAG, "Calling prediction word: " +  result.toString());
             MutableDictionary output = new MutableDictionary();
             output.setValue("vector", result);
             return output;
