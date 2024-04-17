@@ -38,17 +38,12 @@ public class VectorSearchRequestHandler {
             dbHandler.copy(newArgs);
             Database db = new Database("giladDB");
 
-            String sql1 = String.format("select word, vector from docBodyVectors");
-            Query query1 = db.createQuery(sql1);
-            ResultSet rs1 = query1.execute();
-            String sql2 = String.format("select word, vector from searchTerms");
-            Query query2 = db.createQuery(sql2);
-            ResultSet rs2 = query2.execute();
+            String sql = String.format("select word, vector from searchTerms");
+            Query query = db.createQuery(sql);
+            ResultSet rs = query.execute();
 
             Map<String, Array> wordMap = new HashMap<String, Array>();
-            List<Result> rl = rs1.allResults();
-            List<Result> rl2 = rs2.allResults();
-            rl.addAll(rl2);
+            List<Result> rl = rs.allResults();
 
             for (Result r : rl) {
                 String word = r.getString("word");
