@@ -15,9 +15,9 @@ import com.couchbase.mobiletestkit.javacommon.util.Log;
 
 public class VectorSearchRequestHandler {
     private static final String TAG = "GILAD";
-    private static final Map<String, Object> wordMap = getWordVectMap();
+    private static final Map<String, Array> wordMap = getWordVectMap();
 
-    static Map<String, Object> getWordVectMap() {
+    static Map<String, Array> getWordVectMap() {
         try {
             DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
             Args newArgs = new Args();
@@ -45,14 +45,14 @@ public class VectorSearchRequestHandler {
             Query query2 = db.createQuery(sql2);
             ResultSet rs2 = query2.execute();
 
-            Map<String, Object> wordMap = new HashMap<String, Object>();
+            Map<String, Array> wordMap = new HashMap<String, Array>();
             List<Result> rl = rs1.allResults();
             List<Result> rl2 = rs2.allResults();
             rl.addAll(rl2);
 
             for (Result r : rl) {
                 String word = r.getString("word");
-                Object vector = r.getDouble("vector");
+                Array vector = r.getArray("vector");
                 wordMap.put(word, vector);
             }
             db.close();
