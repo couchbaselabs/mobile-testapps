@@ -38,12 +38,17 @@ public class VectorSearchRequestHandler {
             dbHandler.copy(newArgs);
             Database db = new Database("giladDB");
 
-            String sql = String.format("select word, vector from searchTerms");
-            Query query = db.createQuery(sql);
-            ResultSet rs = query.execute();
+            String sql1 = String.format("select word, vector from auxiliaryWords");
+            Query query1 = db.createQuery(sql1);
+            ResultSet rs1 = query1.execute();
+            String sql2 = String.format("select word, vector from searchTerms");
+            Query query2 = db.createQuery(sql2);
+            ResultSet rs2 = query2.execute();
 
             Map<String, Array> wordMap = new HashMap<String, Array>();
-            List<Result> rl = rs.allResults();
+            List<Result> rl = rs1.allResults();
+            List<Result> rl2 = rs2.allResults();
+            rl.addAll(rl2);
 
             for (Result r : rl) {
                 String word = r.getString("word");
@@ -59,132 +64,6 @@ public class VectorSearchRequestHandler {
         }
     }
 
-    /*
-     * public Object handleRequest(String method, Args args) throws Exception {
-     * switch (method) {
-     * case "createIndex":
-     * Database database = args.get("database");
-     * 
-     * String scopeName = args.get("scopeName") != null ? args.get("scopeName") :
-     * "_default";
-     * String collectionName = args.get("collectionName") != null ?
-     * args.get("collectionName") : "_default";
-     * 
-     * Collection collection = database.getCollection(collectionName, scopeName);
-     * if (collection == null) {
-     * throw new Exception("Could not open specified collection");
-     * }
-     * 
-     * String indexName = args.get("indexName");
-     * 
-     * String expression = args.get("expression");
-     * 
-     * int dimensions = args.get("dimensions");
-     * int centroids = args.get("centroids");
-     * 
-     * VectorEncoding.ScalarQuantizerType scalarEncoding =
-     * args.get("scalarEncoding");
-     * 
-     * Integer subquantizers = args.get("subquantizers");
-     * Integer bits = args.get("bits");
-     * 
-     * String metric = args.get("metric");
-     * 
-     * Integer minTrainingSize = args.get("minTrainingSize");
-     * Integer maxTrainingSize = args.get("maxTrainingSize");
-     * 
-     * if (scalarEncoding != null && (bits != null || subquantizers != null)) {
-     * throw new Exception(
-     * "Cannot have scalar quantization and arguments for product quantization at the same time"
-     * );
-     * }
-     * 
-     * if ((bits != null && subquantizers == null) || (bits == null && subquantizers
-     * != null)) {
-     * throw new
-     * Exception("Product quantization requires both bits and subquantizers set");
-     * }
-     * 
-     * VectorIndexConfiguration config = new VectorIndexConfiguration(expression,
-     * dimensions, centroids);
-     * if (scalarEncoding != null) {
-     * config.setEncoding(VectorEncoding.scalarQuantizer(scalarEncoding));
-     * }
-     * if (bits != null) {
-     * config.setEncoding(VectorEncoding.productQuantizer(subquantizers, bits));
-     * }
-     * if (metric != null) {
-     * switch (metric) {
-     * case "euclidean":
-     * config.setMetric(VectorIndexConfiguration.DistanceMetric.EUCLIDIAN);
-     * break;
-     * case "cosine":
-     * config.setMetric(VectorIndexConfiguration.DistanceMetric.COSINE);
-     * break;
-     * default:
-     * throw new Error("Invalid distance metric");
-     * }
-     * }
-     * 
-     * if (minTrainingSize != null) {
-     * config.setMinTrainingSize(minTrainingSize);
-     * }
-     * 
-     * if (maxTrainingSize != null) {
-     * config.setMaxTrainingSize(maxTrainingSize);
-     * }
-     * 
-     * collection.createIndex(indexName, config);
-     * 
-     * return "???";
-     * 
-     * case "registerModel":
-     * String key = args.get("key");
-     * String name = args.get("name");
-     * vectorModel model = new vectorModel(key);
-     * Database.prediction.registerModel(name, model);
-     * return "Registered model with name " + name;
-     * 
-     * case "query":
-     * String term = args.get("term");
-     * 
-     * Args embeddingArgs = new Args();
-     * embeddingArgs.put(term, "input");
-     * Object embeddedTerm = this.handleRequest("vectorSearch_getEmbedding",
-     * embeddingArgs);
-     * 
-     * String sql = args.get("sql");
-     * 
-     * Database db = args.get("database");
-     * 
-     * Parameters params = new Parameters();
-     * params.setValue("vector", embeddedTerm);
-     * Query query = db.createQuery(sql);
-     * query.setParameters(params);
-     * 
-     * List<Object> resultArray = new ArrayList<>();
-     * ResultSet queryResults = query.execute();
-     * for (Result row : queryResults) {
-     * resultArray.add(row.toMap());
-     * }
-     * 
-     * return resultArray;
-     * 
-     * case "getEmbedding":
-     * Database db3 = (Database) handleRequest("vectorSearch_loadDatabase", args);
-     * vectorModel model1 = new vectorModel("test", db3);
-     * MutableDictionary testDic = new MutableDictionary();
-     * String input = args.get("input");
-     * testDic.setValue(input, "test");
-     * Dictionary value = model1.predict(testDic);
-     * 
-     * return value;
-     * 
-     * default:
-     * throw new Exception(method);
-     * }
-     * }
-     */
     public String createIndex(Args args) throws CouchbaseLiteException, Exception {
         Database database = args.get("database");
         String scopeName = args.get("scopeName") != null ? args.get("scopeName") : "_default";
@@ -318,10 +197,10 @@ public class VectorSearchRequestHandler {
         DatabaseConfiguration dbConfig = new DatabaseConfiguration();
         dbConfig = configHandler.configure(newArgs);
         newArgs.put("dbPath", dbPath);
-        newArgs.put("dbName", "giladDB2");
+        newArgs.put("dbName", "giladDB1");
         newArgs.put("dbConfig", dbConfig);
         dbHandler.copy(newArgs);
-        Database db1 = new Database("giladDB2");
+        Database db1 = new Database("giladDB1");
 
         return db1;
     }
