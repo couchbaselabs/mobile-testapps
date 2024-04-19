@@ -14,7 +14,7 @@ import com.couchbase.lite.internal.utils.FileUtils;
 import com.couchbase.mobiletestkit.javacommon.util.Log;
 
 public class VectorSearchRequestHandler {
-    private static final String TAG = "GILAD"
+    private static final String TAG = "GILAD";
     private static final Map<String, Array> wordMap = getWordVectMap();
     private static final String appPlatform = RequestHandlerDispatcher.context.getPlatform();
 
