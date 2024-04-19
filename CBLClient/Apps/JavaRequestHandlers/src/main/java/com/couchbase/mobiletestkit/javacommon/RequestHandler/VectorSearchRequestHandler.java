@@ -16,8 +16,8 @@ import com.couchbase.mobiletestkit.javacommon.util.Log;
 public class VectorSearchRequestHandler {
     private static final String TAG = "GILAD";
     private static final Map<String, Array> wordMap = getWordVectMap();
-    private static final String appPlatform = RequestHandlerDispatcher.getDispatcherPlatform();
-
+    private static final String appPlatform = "android";
+    
     static Map<String, Array> getWordVectMap() {
         try {
             Log.d(TAG, "appPlatform: " + appPlatform);
