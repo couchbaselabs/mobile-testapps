@@ -14,8 +14,8 @@ import com.couchbase.lite.internal.utils.FileUtils;
 import com.couchbase.mobiletestkit.javacommon.util.Log;
 
 public class VectorSearchRequestHandler {
-    private static final String TAG = "GILAD";
     private static final Map<String, Array> wordMap = getWordVectMap();
+    private static final String appPlatform = RequestHandlerDispatcher.context.getPlatform();
 
     static Map<String, Array> getWordVectMap() {
         try {
@@ -23,10 +23,9 @@ public class VectorSearchRequestHandler {
             Args newArgs = new Args();
             newArgs.put("dbPath", "vstestDatabase.cblite2");
             String dbPath = dbHandler.getPreBuiltDb(newArgs);
-            String platform = "null";
-            newArgs.put("directory", new File(dbPath).getParent());
-            if (platform.equals("java")) {
-                newArgs.put("directory", "");
+            newArgs.put("directory", "");
+            if (appPlatform.equals("android")) {
+                newArgs.put("directory", new File(dbPath).getParent());
             }
             Database.exists("vstestDatabase.cblite2", new File(dbPath));
             DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
@@ -185,12 +184,9 @@ public class VectorSearchRequestHandler {
         Args newArgs = args;
         newArgs.put("dbPath", "vstestDatabase.cblite2");
         String dbPath = dbHandler.getPreBuiltDb(newArgs);
-        String platform = args.get("platform");
-        newArgs.put("directory", new File(dbPath).getParent());
-        if (platform != null) {
-            if (platform.equals("java")) {
-                newArgs.put("directory", "");
-            }
+        newArgs.put("directory", "");
+        if (appPlatform.equals("android")) {
+            newArgs.put("directory", new File(dbPath).getParent());
         }
         Database.exists("vstestDatabase.cblite2", new File(dbPath));
         DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
