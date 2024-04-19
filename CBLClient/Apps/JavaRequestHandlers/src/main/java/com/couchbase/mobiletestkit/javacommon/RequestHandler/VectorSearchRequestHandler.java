@@ -54,13 +54,6 @@ public class VectorSearchRequestHandler {
                 String word = r.getString("word");
                 Array vector = r.getArray("vector");
                 wordMap.put(word, vector);
-
-                // Debug print statements:
-                Log.d("wordMap", word + ": ");
-                for (Object value : vector) {
-                    Log.d("wordMap", value.toString());
-                }
-                Log.d("wordMap", "");
             }
             db.close();
             return wordMap;
@@ -151,7 +144,7 @@ public class VectorSearchRequestHandler {
         return "Registered model with name " + name;
     }
 
-    public List<Map<String, Object>> query(Args args) throws CouchbaseLiteException, IOException {
+    public List<Object> query(Args args) throws CouchbaseLiteException, IOException {
         String term = args.get("term");
 
         Args embeddingArgs = new Args();
@@ -167,7 +160,7 @@ public class VectorSearchRequestHandler {
         Query query = db.createQuery(sql);
         query.setParameters(params);
 
-        List<Map<String, Object>> resultArray = new ArrayList<>();
+        List<Object> resultArray = new ArrayList<>();
         try (ResultSet rs = query.execute()) {
             for (Result row : rs) {
                 resultArray.add(row.toMap());
@@ -177,13 +170,13 @@ public class VectorSearchRequestHandler {
         return resultArray;
     }
 
-    public Array getEmbedding(Args args) throws CouchbaseLiteException, IOException {
+    public Object getEmbedding(Args args) throws CouchbaseLiteException, IOException {
         vectorModel model1 = new vectorModel("word", "giladDB");
         MutableDictionary testDic = new MutableDictionary();
         String input = args.get("input");
         testDic.setValue("word", input);
         Dictionary value = model1.predict(testDic);
-        return value.getArray("vector");
+        return value.getValue("vector");
     }
 
     public Database loadDatabase(Args args) throws CouchbaseLiteException, IOException {
