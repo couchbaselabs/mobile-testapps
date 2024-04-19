@@ -23,7 +23,7 @@ public class VectorSearchRequestHandler {
             Args newArgs = new Args();
             newArgs.put("dbPath", "vstestDatabase.cblite2");
             String dbPath = dbHandler.getPreBuiltDb(newArgs);
-            String platform = null;
+            String platform = "null";
             newArgs.put("directory", new File(dbPath).getParent());
             if (platform.equals("java")) {
                 newArgs.put("directory", "");
