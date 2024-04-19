@@ -21,12 +21,14 @@ public class VectorSearchRequestHandler {
     static Map<String, Array> getWordVectMap() {
         try {
             Log.d(TAG, "appPlatform: " + appPlatform);
+            String platform = RequestHandlerDispatcher.context.getPlatform();
+            Log.d(TAG, "platform: " + platform);
             DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
             Args newArgs = new Args();
             newArgs.put("dbPath", "vstestDatabase.cblite2");
             String dbPath = dbHandler.getPreBuiltDb(newArgs);
             newArgs.put("directory", "");
-            if (appPlatform.equals("android")) {
+            if (platform.equals("android")) {
                 newArgs.put("directory", new File(dbPath).getParent());
             }
             Database.exists("vstestDatabase.cblite2", new File(dbPath));
