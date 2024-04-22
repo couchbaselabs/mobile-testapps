@@ -166,8 +166,8 @@ public class VectorSearchRequestHandler {
     public Database loadDatabase(Args args) throws CouchbaseLiteException, IOException {
         if (useInMemoryDb) {
             wordMap = getWordVectMap();
-            Database db1 = new Database(inMemoryDbname);
-            return db1;
+            Database db = new Database(inMemoryDbname);
+            return db;
         }
         Database db = preparePredefinedDatabase("dummtDBIgnoreIt");
         return db;
