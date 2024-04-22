@@ -30,7 +30,7 @@ public class VectorSearchRequestHandler {
             Query query2 = db.createQuery(sql2);
             ResultSet rs2 = query2.execute();
 
-            Map<String, Array> wordMap = new HashMap<String, Array>();
+            Map<String, Array> words = new HashMap<String, Array>();
             List<Result> rl = rs1.allResults();
             List<Result> rl2 = rs2.allResults();
             rl.addAll(rl2);
@@ -38,9 +38,9 @@ public class VectorSearchRequestHandler {
             for (Result r : rl) {
                 String word = r.getString("word");
                 Array vector = r.getArray("vector");
-                wordMap.put(word, vector);
+                words.put(word, vector);
             }
-            return wordMap;
+            return words;
 
         } catch (Exception e) {
             System.err.println(e + "retrieving vector could not be done - getWordVector query returned no results");
