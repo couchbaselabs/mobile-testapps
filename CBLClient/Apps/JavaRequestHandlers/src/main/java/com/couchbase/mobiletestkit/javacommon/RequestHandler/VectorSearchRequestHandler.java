@@ -164,7 +164,7 @@ public class VectorSearchRequestHandler {
 
     public Database loadDatabase(Args args) throws CouchbaseLiteException, IOException {
         // loads the given database vsTestDatabase
-        Database db1 = this.preparePredefinedDatabase(args, "fromLoadingDatabase");
+        Database db1 = preparePredefinedDatabase("fromLoadingDatabase");
         return db1;
     }
 
@@ -185,9 +185,7 @@ public class VectorSearchRequestHandler {
         public Dictionary predict(Dictionary input) {
             String inputWord = input.getString(this.key);
             Object result = new ArrayList<>();
-            // Log.d(TAG, "Calling prediction word: " + inputWord);
             result = wordMap.get(inputWord);
-            // Log.d(TAG, "Calling prediction word: " + result.toString());
             MutableDictionary output = new MutableDictionary();
             output.setValue("vector", result);
             return output;
