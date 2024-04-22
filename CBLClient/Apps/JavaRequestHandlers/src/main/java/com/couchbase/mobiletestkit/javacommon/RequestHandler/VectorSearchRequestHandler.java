@@ -14,7 +14,7 @@ import com.couchbase.lite.internal.utils.FileUtils;
 import com.couchbase.mobiletestkit.javacommon.util.Log;
 
 public class VectorSearchRequestHandler {
-    private static Map<String, Array> wordMap;
+    private static final Map<String, Array> wordMap = getWordVectMap();
     private static final boolean useInMemoryDatabase = true;
     
     static Map<String, Array> getWordVectMap() {
@@ -165,15 +165,14 @@ public class VectorSearchRequestHandler {
 
     public Database loadDatabase(Args args) throws CouchbaseLiteException, IOException {
         if (useInMemoryDatabase) {
-            wordMap = getWordVectMap(); 
+            Database db = new Database("loadingToInMemory");
+            return db;
         }
         else {
             // loads the given database vsTestDatabase
             Database db = preparePredefinedDatabase("fromLoadingDatabase");
             return db;
         }
-        Database db = new Database("dummyDatabaseIsNotInUseIgnore");
-        return db;
 
     }
 
