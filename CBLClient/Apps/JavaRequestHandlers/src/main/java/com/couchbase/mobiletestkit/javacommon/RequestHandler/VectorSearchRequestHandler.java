@@ -15,7 +15,6 @@ import com.couchbase.mobiletestkit.javacommon.util.Log;
 
 public class VectorSearchRequestHandler {
     private static final Map<String, Array> wordMap = getWordVectMap();
-    private static final Boolean useInMemoryDatabase = true;
     private static final String inMemoryDbname = "InMemoryDb";
     
     static Map<String, Array> getWordVectMap() {
@@ -40,6 +39,7 @@ public class VectorSearchRequestHandler {
                 Array vector = r.getArray("vector");
                 wordMap.put(word, vector);
             }
+            db.delete();
             return wordMap;
 
         } catch (Exception e) {
@@ -164,16 +164,8 @@ public class VectorSearchRequestHandler {
     }
 
     public Database loadDatabase(Args args) throws CouchbaseLiteException, IOException {
-        if (useInMemoryDatabase) {
-            Database db = new Database(inMemoryDbname);
-            return db;
-        }
-        else {
-            // loads the given database vsTestDatabase
-            Database db = preparePredefinedDatabase("fromLoadingDatabase");
-            return db;
-        }
-
+        Database db = preparePredefinedDatabase("dummtDBIgnoreIt");
+        return db;
     }
 
     private class vectorModel implements PredictiveModel {
