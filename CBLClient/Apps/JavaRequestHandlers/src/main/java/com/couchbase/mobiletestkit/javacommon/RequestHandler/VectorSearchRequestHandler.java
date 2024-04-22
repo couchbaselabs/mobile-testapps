@@ -19,22 +19,7 @@ public class VectorSearchRequestHandler {
     static Map<String, Array> getWordVectMap() {
         try {
             DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
-            Args newArgs = new Args();
-            newArgs.put("dbPath", "vstestDatabase.cblite2");
-            String dbPath = dbHandler.getPreBuiltDb(newArgs);
-            newArgs.put("directory", "");
-            if (RequestHandlerDispatcher.context.getPlatform().equals("android")) {
-                newArgs.put("directory", new File(dbPath).getParent());
-            }
-            Database.exists("vstestDatabase.cblite2", new File(dbPath));
-            DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
-            DatabaseConfiguration dbConfig = new DatabaseConfiguration();
-            dbConfig = configHandler.configure(newArgs);
-            newArgs.put("dbPath", dbPath);
-            newArgs.put("dbName", "giladDB");
-            newArgs.put("dbConfig", dbConfig);
-            dbHandler.copy(newArgs);
-            Database db = new Database("giladDB");
+            Database db = preparePredefinedDatabase("loadingToInMemory");
 
             String sql1 = String.format("select word, vector from auxiliaryWords");
             Query query1 = db.createQuery(sql1);
@@ -179,24 +164,7 @@ public class VectorSearchRequestHandler {
 
     public Database loadDatabase(Args args) throws CouchbaseLiteException, IOException {
         // loads the given database vsTestDatabase
-        DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
-        Args newArgs = args;
-        newArgs.put("dbPath", "vstestDatabase.cblite2");
-        String dbPath = dbHandler.getPreBuiltDb(newArgs);
-        newArgs.put("directory", "");
-        if (RequestHandlerDispatcher.context.getPlatform().equals("android")) {
-            newArgs.put("directory", new File(dbPath).getParent());
-        }
-        Database.exists("vstestDatabase.cblite2", new File(dbPath));
-        DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
-        DatabaseConfiguration dbConfig = new DatabaseConfiguration();
-        dbConfig = configHandler.configure(newArgs);
-        newArgs.put("dbPath", dbPath);
-        newArgs.put("dbName", "giladDB1");
-        newArgs.put("dbConfig", dbConfig);
-        dbHandler.copy(newArgs);
-        Database db1 = new Database("giladDB1");
-
+        Database db1 = this.preparePredefinedDatabase(args, "fromLoadingDatabase");
         return db1;
     }
 
@@ -225,5 +193,28 @@ public class VectorSearchRequestHandler {
             return output;
         }
 
+    }
+
+    private static Database preparePredefinedDatabase(String dbName) throws CouchbaseLiteException, IOException {
+         // loads the given database vsTestDatabase
+         DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
+         Args newArgs = new Args();
+         newArgs.put("dbPath", "vstestDatabase.cblite2");
+         String dbPath = dbHandler.getPreBuiltDb(newArgs);
+         newArgs.put("directory", "");
+         if (RequestHandlerDispatcher.context.getPlatform().equals("android")) {
+             newArgs.put("directory", new File(dbPath).getParent());
+         }
+         Database.exists("vstestDatabase.cblite2", new File(dbPath));
+         DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
+         DatabaseConfiguration dbConfig = new DatabaseConfiguration();
+         dbConfig = configHandler.configure(newArgs);
+         newArgs.put("dbPath", dbPath);
+         newArgs.put("dbName", dbName);
+         newArgs.put("dbConfig", dbConfig);
+         dbHandler.copy(newArgs);
+         Database db1 = new Database(dbName);
+
+         return db1;
     }
 }
