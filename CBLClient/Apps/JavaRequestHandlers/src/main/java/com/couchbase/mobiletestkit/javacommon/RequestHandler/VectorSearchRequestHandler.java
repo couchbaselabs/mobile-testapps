@@ -53,7 +53,7 @@ public class VectorSearchRequestHandler {
                 Array vector = r.getArray("vector");
                 wordMap.put(word, vector);
             }
-            db.close();
+            db.delete();
             return wordMap;
 
         } catch (Exception e) {
