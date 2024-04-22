@@ -16,12 +16,12 @@ import com.couchbase.mobiletestkit.javacommon.util.Log;
 public class VectorSearchRequestHandler {
     private static  Map<String, Array> wordMap;
     private static final Boolean useInMemoryDb = true;
-    private static final String inMemoryDbname = "InMemoryDb";
+    private static final String inMemoryDbName = "InMemoryDb";
     
     static Map<String, Array> getWordVectMap() {
         try {
             DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
-            Database db = preparePredefinedDatabase(inMemoryDbname);
+            Database db = preparePredefinedDatabase(inMemoryDbName);
 
             String sql1 = String.format("select word, vector from auxiliaryWords");
             Query query1 = db.createQuery(sql1);
@@ -123,7 +123,7 @@ public class VectorSearchRequestHandler {
     public String registerModel(Args args) {
         String key = args.get("key");
         String name = args.get("name");
-        vectorModel model = new vectorModel(key, "giladDB");
+        vectorModel model = new vectorModel(key, inMemoryDbName);
         Database.prediction.registerModel(name, model);
         return "Registered model with name " + name;
     }
@@ -155,7 +155,7 @@ public class VectorSearchRequestHandler {
     }
 
     public Object getEmbedding(Args args) throws CouchbaseLiteException, IOException {
-        vectorModel model1 = new vectorModel("word", "giladDB");
+        vectorModel model1 = new vectorModel("word", inMemoryDbName);
         MutableDictionary testDic = new MutableDictionary();
         String input = args.get("input");
         testDic.setValue("word", input);
@@ -166,11 +166,13 @@ public class VectorSearchRequestHandler {
     public Database loadDatabase(Args args) throws CouchbaseLiteException, IOException {
         if (useInMemoryDb) {
             wordMap = getWordVectMap();
-            Database db = new Database(inMemoryDbname);
+            Database db = new Database(inMemoryDbName);
             return db;
         }
-        Database db = preparePredefinedDatabase("dummtDBIgnoreIt");
-        return db;
+        else {
+            Database db = preparePredefinedDatabase("dummtDBIgnoreIt");
+            return db;
+        }
     }
 
     private class vectorModel implements PredictiveModel {
