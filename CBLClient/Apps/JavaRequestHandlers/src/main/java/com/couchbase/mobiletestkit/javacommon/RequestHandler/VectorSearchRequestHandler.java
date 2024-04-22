@@ -165,15 +165,16 @@ public class VectorSearchRequestHandler {
 
     public Database loadDatabase(Args args) throws CouchbaseLiteException, IOException {
         if (useInMemoryDatabase) {
-            wordMap = getWordVectMap();
-            Database db = new Database("dummyDatabaseWillNotBeUsed");
-            return db;
+            wordMap = getWordVectMap(); 
         }
         else {
-            // loads the predefined database vsTestDatabase
+            // loads the given database vsTestDatabase
             Database db = preparePredefinedDatabase("fromLoadingDatabase");
             return db;
         }
+        Database db = new Database("dummyDatabaseIsNotInUseIgnore");
+        return db;
+
     }
 
     private class vectorModel implements PredictiveModel {
