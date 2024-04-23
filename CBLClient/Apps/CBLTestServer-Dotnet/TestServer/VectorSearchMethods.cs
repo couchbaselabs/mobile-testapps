@@ -33,22 +33,23 @@ namespace Couchbase.Lite.Testing
                 string indexName = postBody["indexName"].ToString();
                 string expression = postBody["expression"].ToString();
 
-                _ = Int32.TryParse(postBody["dimensions"], out int dimensions);
-                _ = Int32.TryParse(postBody["centroids"], out int centroids);
+                int dimensions = (int)postBody["dimensions"];
+                int centroids = (int)postBody["centroids"];
+
                 // IExpression dimensions = expression.Int((int)postBody["dimensions"]);
                 // IExpression centroids = expression.Int((int)postBody["centroids"]);
 
                 VectorEncoding.ScalarQuantizerType scalarEncoding = postBody["scalarEncoding"]; // unsure about the types and get method here
 
-                _ = Int32.TryParse(postBody["subquantizers"], out int subquantizers);
-                _ = Int32.TryParse(postBody["bits"], out int bits);
+                int subquantizers = (int)postBody["subquantizers"];
+                int bits = (int)postBody["bits"];
                 // IExpression subquantizers = expression.Int((int)postBody["subquantizers"]);
                 // IExpression bits = expression.Int((int)postBody["bits"]);
 
                 string metric = postBody["metric"].ToString();
 
-                _ = Int32.TryParse(postBody["minTrainingSize"], out int minTrainingSize);
-                _ = Int32.TryParse(postBody["maxTrainingSize"], out int maxTrainingSize);
+                int minTrainingSize = (int)postBody["minTrainingSize"];
+                int maxTrainingSize = (int)postBody["maxTrainingSize"];
                 // IExpression minTrainingSize = expression.Int((int)postBody["minTrainingSize"]);
                 // IExpression maxTrainingSize = expression.Int((int)postBody["maxTrainingSize"]);
 
