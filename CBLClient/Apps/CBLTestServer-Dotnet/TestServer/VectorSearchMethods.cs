@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Couchbase.Lite.Query;
+using Couchbase.Lite.VectorSearch;
 using JetBrains.Annotations;
 using Newtonsoft.Json.Linq;
 
