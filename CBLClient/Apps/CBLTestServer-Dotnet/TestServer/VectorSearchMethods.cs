@@ -1,14 +1,14 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
-using Couchbase.Lite.Query;
-using Couchbase.Lite.VectorSearch;
+
 using JetBrains.Annotations;
-using Newtonsoft.Json.Linq;
+
+using Couchbase.Lite;
+using Couchbase.Lite.Enterprise.Query;
+using Couchbase.Lite.Logging;
+using Couchbase.Lite.Query;
 
 using static Couchbase.Lite.Testing.DatabaseMethods;
 
@@ -23,36 +23,25 @@ namespace Couchbase.Lite.Testing
             // using db get defualt collection and store in Collection collection
             With<Database>(postBody, "database", database =>
             {
-                Collection collection = database.GetDefaultCollection();
-
-                if (collection == null)
-                {
-                    throw new InvalidOperationException("Could not open specified collection");
-                }
+                Collection collection = database.GetDefaultCollection() ?? throw new InvalidOperationException("Could not open specified collection");
 
                 // get values from postBody
                 string indexName = postBody["indexName"].ToString();
                 string expression = postBody["expression"].ToString();
 
-                int? dimensions = (int)postBody["dimensions"];
-                int? centroids = (int)postBody["centroids"];
+                // null coalescing checks
+                var dimensions = postBody["dimensions"] as uint? ?? null;
+                var centroids = postBody["centroids"] as uint? ?? null;
+                var subquantizers = postBody["subquantizers"] as uint? ?? null;
+                var bits = postBody["bits"] as uint? ?? null;
+                var minTrainingSize = postBody["minTrainingSize"] as uint? ?? null;
+                var maxTrainingSize = postBody["maxTrainingSize"] as uint? ?? null;
+                var scalarEncoding = postBody["scalarEncoding"] as ScalarQuantizerType? ?? null;
 
-                // IExpression dimensions = expression.Int((int)postBody["dimensions"]);
-                // IExpression centroids = expression.Int((int)postBody["centroids"]);
 
-                VectorEncoding.ScalarQuantizerType scalarEncoding = postBody["scalarEncoding"]; // unsure about the types and get method here
-
-                int? subquantizers = (int)postBody["subquantizers"];
-                int? bits = (int)postBody["bits"];
-                // IExpression subquantizers = expression.Int((int)postBody["subquantizers"]);
-                // IExpression bits = expression.Int((int)postBody["bits"]);
 
                 string metric = postBody["metric"].ToString();
 
-                int? minTrainingSize = (int)postBody["minTrainingSize"];
-                int? maxTrainingSize = (int)postBody["maxTrainingSize"];
-                // IExpression minTrainingSize = expression.Int((int)postBody["minTrainingSize"]);
-                // IExpression maxTrainingSize = expression.Int((int)postBody["maxTrainingSize"]);
 
                 // correctness checks
                 if (scalarEncoding != null && (bits != null || subquantizers != null))
@@ -65,39 +54,41 @@ namespace Couchbase.Lite.Testing
                     throw new InvalidOperationException("Product quantization requires both bits and subquantizers set");
                 }
 
-                VectorIndexConfiguration config = new VectorIndexConfiguration(expression, dimensions, centroids); // unure on types here again, undocumented specifics
-
+                // setting values based on config from input
+                VectorEncoding encoding = null;
                 if (scalarEncoding != null)
                 {
-                    config.SetEncoding(VectorEncoding.ScalarQuantizer(scalarEncoding));
+                    encoding = VectorEncoding.ScalarQuantizer((ScalarQuantizerType)scalarEncoding);
                 }
                 if (bits != null)
                 {
-                    config.SetEncoding(VectorEncoding.ProductQuantizer(subquantizers, bits));
+                    encoding = VectorEncoding.ProductQuantizer((uint)subquantizers, (uint)bits);
                 }
+
+                DistanceMetric dMetric = new DistanceMetric();
                 if (metric != null)
                 {
                     switch (metric)
                     {
                         case "euclidean":
-                            config.SetMetric(VectorIndexConfiguration.DistanceMetric.EUCLIDEAN);
+                            dMetric = DistanceMetric.Euclidean;
                             break;
                         case "cosine":
-                            config.SetMetric(VectorIndexConfiguration.DistanceMetric.COSINE);
+                            dMetric = DistanceMetric.Cosine;
                             break;
                         default:
                             throw new Exception("Invalid distance metric");
                     }
                 }
 
-                if (minTrainingSize != null)
+                VectorIndexConfiguration config = new VectorIndexConfiguration(expression, (uint)dimensions, (uint)centroids) // unure on types here again, undocumented specifics
                 {
-                    config.SetMinTrainingSize(minTrainingSize);
-                }
-                if (maxTrainingSize != null)
-                {
-                    config.MaxTrainingSize(maxTrainingSize);
-                }
+                    Encoding = encoding,
+                    DistanceMetric = dMetric,
+                    MinTrainingSize = (uint)minTrainingSize,
+                    MaxTrainingSize = (uint)maxTrainingSize
+                };
+
 
                 try
                 {
