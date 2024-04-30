@@ -32,12 +32,13 @@ jar {
 repositories {
     mavenCentral()
     maven {
-        url 'http://proget.build.couchbase.com/maven2/internalmaven/'
+        //url 'http://proget.build.couchbase.com/maven2/internalmaven/'
+         url 'https://mobile.maven.couchbase.com/maven2/dev/'
     }
     maven {
         url 'https://oss.sonatype.org/content/repositories/snapshots'
     }
-    maven { url 'https://proget.sc.couchbase.com/maven2/internalmaven' }
+    // maven { url 'https://proget.sc.couchbase.com/maven2/internalmaven' }
 }
 
 java {
