@@ -58,8 +58,10 @@ dependencies {
     implementation 'commons-daemon:commons-daemon:1.2.2'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 
-    implementation "com.couchbase.lite:couchbase-lite-java-ee:${COUCHBASE_LITE_JAVA_VERSION}"
-    implementation 'com.couchbase.lite:couchbase-lite-java-vector-search:1.0.0-18'
+    //implementation "com.couchbase.lite:couchbase-lite-java-ee:${COUCHBASE_LITE_JAVA_VERSION}"
+    implementation "com.couchbase.lite:couchbase-lite-java-ee:3.2.0-beta.2"
+    //implementation 'com.couchbase.lite:couchbase-lite-java-vector-search:1.0.0-18'
+    implementation 'com.couchbase.lite:couchbase-lite-java-vector-search:1.0.0-beta.2
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'org.nanohttpd:nanohttpd:2.3.2-SNAPSHOT'
 }
