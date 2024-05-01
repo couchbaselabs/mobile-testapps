@@ -109,7 +109,7 @@ namespace Couchbase.Lite.Testing
                                   [NotNull] HttpListenerResponse response)
         {
             string modelName = postBody["model_name"].ToString();
-            VectorModel vectorModel = new();
+            VectorModel vectorModel = new(modelName);
             Database.Prediction.RegisterModel(modelName, vectorModel);
             response.WriteBody(MemoryMap.Store(vectorModel));
         }
