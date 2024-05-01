@@ -16,7 +16,7 @@ namespace Couchbase.Lite.Testing
 {
     public static class VectorSearchMethods
     {
-        public static void createIndex([NotNull] NameValueCollection args,
+        public static void CreateIndex([NotNull] NameValueCollection args,
                                        [NotNull] IReadOnlyDictionary<string, object> postBody,
                                        [NotNull] HttpListenerResponse response)
         {
@@ -65,7 +65,7 @@ namespace Couchbase.Lite.Testing
                     encoding = VectorEncoding.ProductQuantizer((uint)subquantizers, (uint)bits);
                 }
 
-                DistanceMetric dMetric = new DistanceMetric();
+                DistanceMetric dMetric = new();
                 if (metric != null)
                 {
                     switch (metric)
@@ -81,7 +81,7 @@ namespace Couchbase.Lite.Testing
                     }
                 }
 
-                VectorIndexConfiguration config = new VectorIndexConfiguration(expression, (uint)dimensions, (uint)centroids) // unure on types here again, undocumented specifics
+                VectorIndexConfiguration config = new(expression, (uint)dimensions, (uint)centroids) // unure on types here again, undocumented specifics
                 {
                     Encoding = encoding,
                     DistanceMetric = dMetric,
@@ -104,5 +104,30 @@ namespace Couchbase.Lite.Testing
 
         }
 
+        public static void RegisterModel([NotNull] NameValueCollection args,
+                                  [NotNull] IReadOnlyDictionary<string, object> postBody,
+                                  [NotNull] HttpListenerResponse response)
+        {
+            string modelName = postBody["model_name"].ToString();
+            VectorModel vectorModel = new();
+            Database.Prediction.RegisterModel(modelName, vectorModel);
+            response.WriteBody(MemoryMap.Store(vectorModel));
+        }
+
+    }
+
+
+
+    public sealed class VectorModel : IPredictiveModel
+    {
+        public string name;
+        public VectorModel(string name)
+        {
+            this.name = name;
+        }
+        public DictionaryObject? Predict(DictionaryObject input)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
