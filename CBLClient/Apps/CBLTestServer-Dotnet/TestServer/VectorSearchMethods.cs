@@ -9,6 +9,9 @@ using Couchbase.Lite;
 using Couchbase.Lite.Enterprise.Query;
 using Couchbase.Lite.Logging;
 using Couchbase.Lite.Query;
+using Couchbase.Lite.Couchbase.Lite.MutableDictionaryObject;
+using Couchbase.Lite.DatabaseConfiguration;
+using Couchbase.Lite.Database;
 
 using static Couchbase.Lite.Testing.DatabaseMethods;
 
@@ -109,9 +112,52 @@ namespace Couchbase.Lite.Testing
                                   [NotNull] HttpListenerResponse response)
         {
             string modelName = postBody["model_name"].ToString();
-            VectorModel vectorModel = new(modelName);
+            string key = postBody["key"].ToString();
+
+            VectorModel vectorModel = new(key, modelName);
             Database.Prediction.RegisterModel(modelName, vectorModel);
             response.WriteBody(MemoryMap.Store(vectorModel));
+        }
+
+        public static void LoadDatabase([NotNull] NameValueCollection args,
+                                  [NotNull] IReadOnlyDictionary<string, object> postBody,
+                                  [NotNull] HttpListenerResponse response)
+        {
+
+            using NameValueCollection preBuiltArgs = NameValueCollection();
+
+            string dbPath = TestServer.FilePathResolver("Databases/vsTestDatabase.cblite2", true);
+            dbPath = dbPath + "/";
+
+            string dbName = "vsTestDatabase";
+
+            string currDir = Directory.GetCurrentDirectory();
+            string databasePath = Path.Combine(currDir, dbPath);
+
+            DatabaseConfiguration dbConfig = DatabaseConfiguration();
+            Database.Copy(databasePath, dbName, dbConfig);
+            response.WriteEmptyBody();
+
+        }
+
+        public static void Query([NotNull] NameValueCollection args,
+                                  [NotNull] IReadOnlyDictionary<string, object> postBody,
+                                  [NotNull] HttpListenerResponse response)
+        {
+            string term = postBody["term"].ToString();
+
+        }
+
+        private object GetEmbedding(NameValueCollection args)
+        {
+            VectorModel vm1 = new("word", inMemoryDbName);
+            MutableDictionary testDic = new();
+
+            string input = args["input"].ToString();
+            testDic.SetValue("word", input);
+
+            Dictionary value = vm1.Predict(testDic);
+            return value.GetValue("vector");
         }
 
     }
@@ -121,9 +167,12 @@ namespace Couchbase.Lite.Testing
     public sealed class VectorModel : IPredictiveModel
     {
         public string name;
-        public VectorModel(string name)
+        public string key;
+
+        public VectorModel(string key, string name)
         {
             this.name = name;
+            this.key = key;
         }
         public DictionaryObject? Predict(DictionaryObject input)
         {

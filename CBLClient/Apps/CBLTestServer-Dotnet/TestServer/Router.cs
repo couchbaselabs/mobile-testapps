@@ -306,7 +306,9 @@ namespace Couchbase.Lite.Testing
                 ["copy_files"] = CopyFiles,
                 ["release"] = ReleaseObject,
                 ["flushMemory"] = flushMemory,
-                ["vectorSearch_createIndex"] = VectorSearchMethods.CreateIndex
+                ["vectorSearch_createIndex"] = VectorSearchMethods.CreateIndex,
+                ["vectorSearch_registerModel"] = VectorSearchMethods.RegisterModel,
+                ["vectorSearch_loadDatabase"] = VectorSearchMethods.LoadDatabase
             };
 
         #endregion
