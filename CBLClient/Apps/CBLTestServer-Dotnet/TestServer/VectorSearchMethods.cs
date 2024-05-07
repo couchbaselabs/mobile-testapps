@@ -9,8 +9,8 @@ using Couchbase.Lite;
 using Couchbase.Lite.Enterprise.Query;
 using Couchbase.Lite.Logging;
 using Couchbase.Lite.Query;
+using Couchbase.Lite.MutableDictionaryObject;
 
-using static Couchbase.Lite.MutableDictionaryObject;
 using static Couchbase.Lite.DatabaseConfiguration;
 using static Couchbase.Lite.Database;
 
