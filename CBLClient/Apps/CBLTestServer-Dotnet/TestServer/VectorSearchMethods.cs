@@ -134,7 +134,9 @@ namespace Couchbase.Lite.Testing
                 string currDir = Directory.GetCurrentDirectory();
                 string databasePath = Path.Combine(currDir, dbPath);
 
-                database.Copy(databasePath, dbName);
+                DatabaseConfiguration dbConfig = new();
+
+                database.Copy(databasePath, dbName, dbConfig);
                 response.WriteEmptyBody();
                 database.Close();
             });
