@@ -9,8 +9,8 @@ using Couchbase.Lite;
 using Couchbase.Lite.Enterprise.Query;
 using Couchbase.Lite.Logging;
 using Couchbase.Lite.Query;
-using Couchbase.Lite.MutableDictionaryObject;
 
+using static Couchbase.Lite.MutableDictionaryObject;
 using static Couchbase.Lite.DatabaseConfiguration;
 using static Couchbase.Lite.Database;
 
@@ -141,25 +141,7 @@ namespace Couchbase.Lite.Testing
 
         }
 
-        public static void Query([NotNull] NameValueCollection args,
-                                  [NotNull] IReadOnlyDictionary<string, object> postBody,
-                                  [NotNull] HttpListenerResponse response)
-        {
-            string term = postBody["term"].ToString();
 
-        }
-
-        private object GetEmbedding(NameValueCollection args)
-        {
-            VectorModel vm1 = new("word", inMemoryDbName);
-            MutableDictionary testDic = new();
-
-            string input = args["input"].ToString();
-            testDic.SetValue("word", input);
-
-            Dictionary value = vm1.Predict(testDic);
-            return value.GetValue("vector");
-        }
 
     }
 
