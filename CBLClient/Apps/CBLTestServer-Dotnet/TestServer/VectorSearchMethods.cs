@@ -137,14 +137,9 @@ namespace Couchbase.Lite.Testing
                 database.Copy(databasePath, dbName);
                 response.WriteEmptyBody();
                 database.Close();
-            })
-
-
+            });
 
         }
-
-
-
     }
 
 
