@@ -125,8 +125,6 @@ namespace Couchbase.Lite.Testing
                                   [NotNull] HttpListenerResponse response)
         {
 
-            using NameValueCollection preBuiltArgs = NameValueCollection();
-
             string dbPath = TestServer.FilePathResolver("Databases/vsTestDatabase.cblite2", true);
             dbPath = dbPath + "/";
 
@@ -135,13 +133,32 @@ namespace Couchbase.Lite.Testing
             string currDir = Directory.GetCurrentDirectory();
             string databasePath = Path.Combine(currDir, dbPath);
 
-            DatabaseConfiguration dbConfig = DatabaseConfiguration();
+            DatabaseConfiguration dbConfig = new();
             Database.Copy(databasePath, dbName, dbConfig);
             response.WriteEmptyBody();
 
         }
 
+        public static void Query([NotNull] NameValueCollection args,
+                                  [NotNull] IReadOnlyDictionary<string, object> postBody,
+                                  [NotNull] HttpListenerResponse response)
+        {
+            string term = postBody["term"].ToString();
 
+        }
+
+
+        private object GetEmbedding(NameValueCollection args)
+        {
+            VectorModel vm1 = new("word", inMemoryDbName);
+            MutableDictionary testDic = new();
+
+            string input = args["input"].ToString();
+            testDic.SetValue("word", input);
+
+            Dictionary value = vm1.Predict(testDic);
+            return value.GetValue("vector");
+        }
 
     }
 
