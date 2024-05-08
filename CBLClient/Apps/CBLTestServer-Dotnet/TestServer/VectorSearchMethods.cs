@@ -125,8 +125,7 @@ namespace Couchbase.Lite.Testing
                                   [NotNull] HttpListenerResponse response)
         {
 
-            string dbPath = TestServer.FilePathResolver("Databases/vsTestDatabase.cblite2", true);
-            dbPath = dbPath + "/";
+            string dbPath = "Databases/vsTestDatabase.cblite2/";
 
             string dbName = "vsTestDatabase";
 
@@ -138,8 +137,6 @@ namespace Couchbase.Lite.Testing
             response.WriteEmptyBody();
 
         }
-
-
 
     }
 
