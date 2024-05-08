@@ -133,7 +133,7 @@ namespace Couchbase.Lite.Testing
             string databasePath = Path.Combine(currDir, dbPath);
 
             DatabaseConfiguration dbConfig = new();
-            Database.Copy(databasePath, dbName, dbConfig);
+            //Database.Copy(databasePath, dbName, dbConfig);
 
             var databaseId = MemoryMap.New<Database>(dbName, dbConfig);
             response.WriteBody(databaseId);
