@@ -134,7 +134,9 @@ namespace Couchbase.Lite.Testing
 
             DatabaseConfiguration dbConfig = new();
             Database.Copy(databasePath, dbName, dbConfig);
-            response.WriteEmptyBody();
+
+            Database db = new Database(dbName);
+            response.WriteBody(db);
 
         }
 
