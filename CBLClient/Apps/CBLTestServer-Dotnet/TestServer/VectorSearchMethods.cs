@@ -124,24 +124,23 @@ namespace Couchbase.Lite.Testing
                                   [NotNull] IReadOnlyDictionary<string, object> postBody,
                                   [NotNull] HttpListenerResponse response)
         {
-            With<Database>(postBody, "database", database =>
-            {
-                string dbPath = TestServer.FilePathResolver("Databases/vsTestDatabase.cblite2", true);
-                dbPath = dbPath + "/";
 
-                string dbName = "vsTestDatabase";
+            string dbPath = TestServer.FilePathResolver("Databases/vsTestDatabase.cblite2", true);
+            dbPath = dbPath + "/";
 
-                string currDir = Directory.GetCurrentDirectory();
-                string databasePath = Path.Combine(currDir, dbPath);
+            string dbName = "vsTestDatabase";
 
-                DatabaseConfiguration dbConfig = new();
+            string currDir = Directory.GetCurrentDirectory();
+            string databasePath = Path.Combine(currDir, dbPath);
 
-                database.Copy(databasePath, dbName, dbConfig);
-                response.WriteEmptyBody();
-                database.Close();
-            });
+            DatabaseConfiguration dbConfig = new();
+            Database.Copy(databasePath, dbName, dbConfig);
+            response.WriteEmptyBody();
 
         }
+
+
+
     }
 
 
