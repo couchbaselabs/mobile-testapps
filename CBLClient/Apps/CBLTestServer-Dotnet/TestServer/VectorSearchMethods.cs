@@ -112,7 +112,7 @@ namespace Couchbase.Lite.Testing
                                   [NotNull] IReadOnlyDictionary<string, object> postBody,
                                   [NotNull] HttpListenerResponse response)
         {
-            string modelName = postBody["model_name"].ToString();
+            string modelName = postBody["name"].ToString();
             string key = postBody["key"].ToString();
 
             VectorModel vectorModel = new(key, modelName);
