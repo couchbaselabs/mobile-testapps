@@ -135,7 +135,7 @@ namespace Couchbase.Lite.Testing
             DatabaseConfiguration dbConfig = new();
             Database.Copy(databasePath, dbName, dbConfig);
 
-            var databaseId = MemoryMap.New<Database>(dbName, default(DatabaseConfiguration));
+            var databaseId = MemoryMap.New<Database>(dbName, dbConfig);
             response.WriteBody(databaseId);
 
         }
