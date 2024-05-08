@@ -136,6 +136,9 @@ namespace Couchbase.Lite.Testing
             Database.Copy(databasePath, dbName, dbConfig);
 
             var databaseId = MemoryMap.New<Database>(dbName, dbConfig);
+            Console.WriteLine("DEBUG");
+            Console.WriteLine(databaseId);
+            Console.WriteLine("DEBUG");
             response.WriteBody(databaseId);
 
         }
