@@ -132,10 +132,10 @@ namespace Couchbase.Lite.Testing
             string currDir = Directory.GetCurrentDirectory();
             string databasePath = Path.Combine(currDir, dbPath);
 
-            DatabaseConfiguration dbConfig = new();
+            //DatabaseConfiguration dbConfig = new();
             //Database.Copy(databasePath, dbName, dbConfig);
 
-            var databaseId = MemoryMap.New<Database>(dbName, dbConfig);
+            var databaseId = MemoryMap.New<Database>(dbName, default(DatabaseConfiguration));
             response.WriteBody(databaseId);
 
         }
