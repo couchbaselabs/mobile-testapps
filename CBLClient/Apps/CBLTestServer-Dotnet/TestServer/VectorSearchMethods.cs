@@ -125,7 +125,7 @@ namespace Couchbase.Lite.Testing
                                   [NotNull] HttpListenerResponse response)
         {
 
-            string dbPath = "Databases/vsTestDatabase.cblite2/";
+            string dbPath = "Databases\\vsTestDatabase.cblite2\\";
 
             string dbName = "vsTestDatabase";
 
