@@ -36,21 +36,17 @@ namespace Couchbase.Lite.Testing
                 Console.WriteLine("=========================================After expression");
 
                 // null coalescing checks
-                var dimensions = postBody["dimensions"];
+                var dimensions = (uint)postBody["dimensions"];
                 Console.WriteLine("=========================================After dimensions");
-                // Console.WriteLine("================ dimensions = " + dimensions);
 
-                var centroids = postBody["centroids"];
-                //Console.WriteLine("================ centroids = " + centroids);
+                var centroids = (uint)postBody["centroids"];
                 Console.WriteLine("=========================================After centroids");
 
-                var minTrainingSize = postBody["minTrainingSize"];
-                //Console.WriteLine("================ minTrainingSize = " + minTrainingSize);
+                var minTrainingSize = (uint)postBody["minTrainingSize"];
                 Console.WriteLine("=========================================After minTrainingSize");
 
-                var maxTrainingSize = postBody["maxTrainingSize"];
+                var maxTrainingSize = (uint)postBody["maxTrainingSize"];
                 Console.WriteLine("=========================================After maxTrainingSize");
-                //Console.WriteLine("================ maxTrainingSize = " + maxTrainingSize);
 
                 uint? bits = 0;
                 uint? subquantizers = 0;
@@ -62,34 +58,28 @@ namespace Couchbase.Lite.Testing
                     Console.WriteLine("=========================================After bits");
                     subquantizers = (uint)postBody["subquantizers"];
                     Console.WriteLine("=========================================After subquantizers");
-                    //Console.WriteLine("------ bits + subs assigned");
                 }
                 catch (Exception e)
                 {
                     bits = null;
                     subquantizers = null;
                 }
-                //Console.WriteLine("================ bits = " + bits);
-                //Console.WriteLine("================ subquantizers = " + subquantizers);
 
                 try
                 {
                     scalarEncoding = (ScalarQuantizerType)postBody["scalarEncoding"];
                     Console.WriteLine("=========================================After scalarEncoding");
-                    //    Console.WriteLine("------ scalarEncoding assigned");
                 }
                 catch (Exception e)
                 {
                     scalarEncoding = null;
                     Console.WriteLine("=========================================At scalarEncoding=NULL");
                 }
-                //Console.WriteLine("================ scalarEncoding = " + scalarEncoding);
 
 
 
 
                 string metric = postBody["metric"].ToString();
-                //Console.WriteLine("================ metric = " + metric);
                 Console.WriteLine("=========================================After metric");
 
                 // correctness checks
@@ -102,10 +92,15 @@ namespace Couchbase.Lite.Testing
                 {
                     throw new InvalidOperationException("Product quantization requires both bits and subquantizers set");
                 }
+                if (bits == null && subquantizers == null)
+                {
+                    Console.WriteLine("======== broken because bits and subquantizers are null");
+                    throw new InvalidOperationException("broken");
+                }
 
                 // setting values based on config from input
                 Console.WriteLine("=========================================Before VectorEncoding encoding");
-                VectorEncoding encoding = null;
+                VectorEncoding encoding = VectorEncoding.None();
                 if (scalarEncoding != null)
                 {
                     encoding = VectorEncoding.ScalarQuantizer((ScalarQuantizerType)scalarEncoding);
@@ -135,12 +130,12 @@ namespace Couchbase.Lite.Testing
                 Console.WriteLine("expression == " + expression + ", dimensions == " + dimensions + ", centroids == " + centroids + ", encoding == " + encoding + ", distance metric == " + dMetric + ", minSize == " + minTrainingSize + ", maxSize == " + maxTrainingSize);
 
                 Console.WriteLine("=========================================Before  DVectorIndexConfiguration config");
-                VectorIndexConfiguration config = new(expression, (uint)dimensions, (uint)centroids) // unure on types here again, undocumented specifics
+                VectorIndexConfiguration config = new(expression, dimensions, centroids) // unure on types here again, undocumented specifics
                 {
                     Encoding = encoding,
                     DistanceMetric = dMetric,
-                    MinTrainingSize = (uint)minTrainingSize,
-                    MaxTrainingSize = (uint)maxTrainingSize
+                    MinTrainingSize = minTrainingSize,
+                    MaxTrainingSize = maxTrainingSize
                 };
 
                 Console.WriteLine("=========================================Before  creating final index");
