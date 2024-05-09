@@ -308,7 +308,8 @@ namespace Couchbase.Lite.Testing
                 ["flushMemory"] = flushMemory,
                 ["vectorSearch_createIndex"] = VectorSearchMethods.CreateIndex,
                 ["vectorSearch_registerModel"] = VectorSearchMethods.RegisterModel,
-                ["vectorSearch_loadDatabase"] = VectorSearchMethods.LoadDatabase
+                ["vectorSearch_loadDatabase"] = VectorSearchMethods.LoadDatabase,
+                ["vectorSearch_query"] = VectorSearchMethods.Query
             };
 
         #endregion
