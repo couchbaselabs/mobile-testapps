@@ -177,9 +177,8 @@ namespace Couchbase.Lite.Testing
         {
             string modelName = postBody["name"].ToString();
             string key = postBody["key"].ToString();
-            Database db = (Database)postBody["database"];
 
-            VectorModel vectorModel = new(key, modelName, db);
+            VectorModel vectorModel = new(key, modelName);
             Database.Prediction.RegisterModel(modelName, vectorModel);
             response.WriteBody(MemoryMap.Store(vectorModel));
         }
@@ -256,6 +255,11 @@ namespace Couchbase.Lite.Testing
 
         public Database database;
 
+        public VectorModel(string key, string name)
+        {
+            this.name = name;
+            this.key = key;
+        }
         public VectorModel(string key, string name, Database database)
         {
             this.name = name;
