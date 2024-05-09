@@ -130,6 +130,10 @@ namespace Couchbase.Lite.Testing
                             throw new Exception("Invalid distance metric");
                     }
                 }
+
+                Console.WriteLine("========== DEBUG PRINTING VALUES ===============");
+                Console.WriteLine("expression == " + expression + ", dimensions == " + dimensions + ", centroids == " + centroids + ", encoding == " + encoding + ", distance metric == " + dMetric + ", minSize == " + minTrainingSize + ", maxSize == " + maxTrainingSize);
+
                 Console.WriteLine("=========================================Before  DVectorIndexConfiguration config");
                 VectorIndexConfiguration config = new(expression, (uint)dimensions, (uint)centroids) // unure on types here again, undocumented specifics
                 {
