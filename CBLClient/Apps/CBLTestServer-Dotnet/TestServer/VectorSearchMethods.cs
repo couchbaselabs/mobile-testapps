@@ -35,22 +35,22 @@ namespace Couchbase.Lite.Testing
 
                 // null coalescing checks
                 var dimensions = postBody["dimensions"] as uint? ?? null;
-                var bits = postBody["bits"] as uint? ?? null;
+                var centroids = postBody["centroids"] as uint? ?? null;
                 var minTrainingSize = postBody["minTrainingSize"] as uint? ?? null;
                 var maxTrainingSize = postBody["maxTrainingSize"] as uint? ?? null;
 
-                uint? centroids = 0;
+                uint? bits = 0;
                 uint? subquantizers = 0;
                 ScalarQuantizerType? scalarEncoding = new();
 
                 try
                 {
-                    centroids = (uint)postBody["centroids"];
+                    bits = (uint)postBody["bits"];
                     subquantizers = (uint)postBody["subquantizers"];
                 }
                 catch (Exception e)
                 {
-                    centroids = null;
+                    bits = null;
                     subquantizers = null;
                 }
 
