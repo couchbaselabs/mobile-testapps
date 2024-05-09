@@ -36,16 +36,16 @@ namespace Couchbase.Lite.Testing
                 Console.WriteLine("=========================================After expression");
 
                 // null coalescing checks
-                var dimensions = (uint)postBody["dimensions"];
+                uint dimensions = (uint)postBody["dimensions"];
                 Console.WriteLine("=========================================After dimensions");
 
-                var centroids = (uint)postBody["centroids"];
+                uint centroids = (uint)postBody["centroids"];
                 Console.WriteLine("=========================================After centroids");
 
-                var minTrainingSize = (uint)postBody["minTrainingSize"];
+                uint minTrainingSize = (uint)postBody["minTrainingSize"];
                 Console.WriteLine("=========================================After minTrainingSize");
 
-                var maxTrainingSize = (uint)postBody["maxTrainingSize"];
+                uint maxTrainingSize = (uint)postBody["maxTrainingSize"];
                 Console.WriteLine("=========================================After maxTrainingSize");
 
                 uint? bits = 0;
