@@ -109,17 +109,12 @@ namespace Couchbase.Lite.Testing
                 DistanceMetric dMetric = new();
                 if (metric != null)
                 {
-                    switch (metric)
+                    dMetric = metric switch
                     {
-                        case "euclidean":
-                            dMetric = DistanceMetric.Euclidean;
-                            break;
-                        case "cosine":
-                            dMetric = DistanceMetric.Cosine;
-                            break;
-                        default:
-                            throw new Exception("Invalid distance metric");
-                    }
+                        "euclidean" => DistanceMetric.Euclidean,
+                        "cosine" => DistanceMetric.Cosine,
+                        _ => throw new Exception("Invalid distance metric"),
+                    };
                 }
 
                 Console.WriteLine("========== DEBUG PRINTING VALUES ===============");
