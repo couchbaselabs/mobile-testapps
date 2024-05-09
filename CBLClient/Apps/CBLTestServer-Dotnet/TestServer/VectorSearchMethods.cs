@@ -34,16 +34,16 @@ namespace Couchbase.Lite.Testing
                 string expression = postBody["expression"].ToString();
 
                 // null coalescing checks
-                var dimensions = (int)postBody["dimensions"];
+                var dimensions = (uint)postBody["dimensions"];
                 Console.WriteLine("================ dimensions = " + dimensions);
 
-                var centroids = (int)postBody["centroids"];
+                var centroids = (uint)postBody["centroids"];
                 Console.WriteLine("================ centroids = " + centroids);
 
-                var minTrainingSize = (int)postBody["minTrainingSize"];
+                var minTrainingSize = (uint)postBody["minTrainingSize"];
                 Console.WriteLine("================ minTrainingSize = " + minTrainingSize);
 
-                var maxTrainingSize = (int)postBody["maxTrainingSize"];
+                var maxTrainingSize = (uint)postBody["maxTrainingSize"];
                 Console.WriteLine("================ maxTrainingSize = " + maxTrainingSize);
 
                 uint? bits = 0;
@@ -52,8 +52,8 @@ namespace Couchbase.Lite.Testing
 
                 try
                 {
-                    bits = (int)postBody["bits"];
-                    subquantizers = (int)postBody["subquantizers"];
+                    bits = (uint)postBody["bits"];
+                    subquantizers = (uint)postBody["subquantizers"];
                     Console.WriteLine("------ bits + subs assigned");
                 }
                 catch (Exception e)
