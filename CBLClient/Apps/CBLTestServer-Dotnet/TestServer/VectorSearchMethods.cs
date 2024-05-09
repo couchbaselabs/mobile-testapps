@@ -177,8 +177,9 @@ namespace Couchbase.Lite.Testing
         {
             string modelName = postBody["name"].ToString();
             string key = postBody["key"].ToString();
+            Database db = (Database)postBody["database"];
 
-            VectorModel vectorModel = new(key, modelName);
+            VectorModel vectorModel = new(key, modelName, db);
             Database.Prediction.RegisterModel(modelName, vectorModel);
             response.WriteBody(MemoryMap.Store(vectorModel));
         }
@@ -203,9 +204,9 @@ namespace Couchbase.Lite.Testing
 
         }
 
-        public static object GetEmbedding(NameValueCollection input)
+        public static object GetEmbedding(Dictionary<string, object> input)
         {
-            VectorModel model = new("word", "vsTestDatabase");
+            VectorModel model = new("word", "vsTestDatabase", (Database)input["database"]);
             MutableDictionaryObject testDic = new();
             testDic.SetValue("word", input["input"].ToString());
             DictionaryObject value = model.Predict(testDic);
@@ -216,11 +217,13 @@ namespace Couchbase.Lite.Testing
                                   [NotNull] IReadOnlyDictionary<string, object> postBody,
                                   [NotNull] HttpListenerResponse response)
         {
-            string term = postBody["term"].ToString();
+            object term = postBody["term"];
+            object db = postBody["database"];
 
-            NameValueCollection embeddingArgs = new()
+            Dictionary<string, object> embeddingArgs = new()
             {
-                { "input", term }
+                { "input", term },
+                { "database", db }
             };
 
             object embeddedTerm = GetEmbedding(embeddingArgs);
@@ -228,9 +231,9 @@ namespace Couchbase.Lite.Testing
 
             string sql = postBody["sql"].ToString();
 
-            Database db = (Database)postBody["database"];
+            Database database = (Database)db;
 
-            IQuery query = db.CreateQuery(sql);
+            IQuery query = database.CreateQuery(sql);
             query.Parameters.SetValue("vector", embeddedTerm);
 
             List<object> resultArray = new();
@@ -251,14 +254,43 @@ namespace Couchbase.Lite.Testing
         public string name;
         public string key;
 
-        public VectorModel(string key, string name)
+        public Database database;
+
+        public VectorModel(string key, string name, Database database)
         {
             this.name = name;
             this.key = key;
+            this.database = database;
         }
+
+        private List<object?>? GetWordVector(string word, string collection)
+        {
+            using var query = database.CreateQuery($"SELECT vector FROM {collection} WHERE word = '{word}'");
+            using var rs = query.Execute();
+
+            // Important to call ToList here, otherwise disposing the above result set invalidates the data
+            var val = rs.FirstOrDefault()?.GetArray(0)?.ToList();
+            return val;
+        }
+
         public DictionaryObject? Predict(DictionaryObject input)
         {
-            throw new NotImplementedException();
+            var inputWord = input.GetString("word");
+            if (inputWord == null)
+            {
+                Console.WriteLine("ERROR: no inputWord!");
+                return null;
+            }
+
+            var result = GetWordVector(inputWord, "words") ?? GetWordVector(inputWord, "extwords");
+            if (result == null)
+            {
+                return null;
+            }
+
+            var retVal = new MutableDictionaryObject();
+            retVal.SetValue("vector", result);
+            return retVal;
         }
     }
 }
