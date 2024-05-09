@@ -28,25 +28,19 @@ namespace Couchbase.Lite.Testing
             With<Database>(postBody, "database", database =>
             {
                 Collection collection = database.GetDefaultCollection() ?? throw new InvalidOperationException("Could not open specified collection");
-                Console.WriteLine("=========================================AT START");
+
                 // get values from postBody
                 string indexName = postBody["indexName"].ToString();
-                Console.WriteLine("=========================================After indexName");
                 string expression = postBody["expression"].ToString();
-                Console.WriteLine("=========================================After expression");
 
                 // null coalescing checks
                 uint dimensions = Convert.ToUInt32(postBody["dimensions"]);
-                Console.WriteLine("=========================================After dimensions");
 
                 uint centroids = Convert.ToUInt32(postBody["centroids"]);
-                Console.WriteLine("=========================================After centroids");
 
                 uint minTrainingSize = Convert.ToUInt32(postBody["minTrainingSize"]);
-                Console.WriteLine("=========================================After minTrainingSize");
 
                 uint maxTrainingSize = Convert.ToUInt32(postBody["maxTrainingSize"]);
-                Console.WriteLine("=========================================After maxTrainingSize");
 
                 uint? bits = 0;
                 uint? subquantizers = 0;
@@ -55,9 +49,7 @@ namespace Couchbase.Lite.Testing
                 try
                 {
                     bits = Convert.ToUInt32(postBody["bits"]);
-                    Console.WriteLine("=========================================After bits");
                     subquantizers = Convert.ToUInt32(postBody["subquantizers"]);
-                    Console.WriteLine("=========================================After subquantizers");
                 }
                 catch (Exception e)
                 {
@@ -68,19 +60,16 @@ namespace Couchbase.Lite.Testing
                 try
                 {
                     scalarEncoding = (ScalarQuantizerType)postBody["scalarEncoding"];
-                    Console.WriteLine("=========================================After scalarEncoding");
                 }
                 catch (Exception e)
                 {
                     scalarEncoding = null;
-                    Console.WriteLine("=========================================At scalarEncoding=NULL");
                 }
 
 
 
 
                 string metric = postBody["metric"].ToString();
-                Console.WriteLine("=========================================After metric");
 
                 // correctness checks
                 if (scalarEncoding != null && (bits != null || subquantizers != null))
@@ -95,7 +84,6 @@ namespace Couchbase.Lite.Testing
 
 
                 // setting values based on config from input
-                Console.WriteLine("=========================================Before VectorEncoding encoding");
                 VectorEncoding encoding = VectorEncoding.None();
                 if (scalarEncoding != null)
                 {
@@ -105,7 +93,6 @@ namespace Couchbase.Lite.Testing
                 {
                     encoding = VectorEncoding.ProductQuantizer((uint)subquantizers, (uint)bits);
                 }
-                Console.WriteLine("=========================================Before  DistanceMetric dMetric ");
                 DistanceMetric dMetric = new();
                 if (metric != null)
                 {
@@ -116,12 +103,6 @@ namespace Couchbase.Lite.Testing
                         _ => throw new Exception("Invalid distance metric"),
                     };
                 }
-
-                Console.WriteLine("========== DEBUG PRINTING VALUES ===============");
-                Console.WriteLine("expression == " + expression + ", dimensions == " + dimensions + ", centroids == " + centroids + ", encoding == " + encoding + ", distance metric == " + dMetric + ", minSize == " + minTrainingSize + ", maxSize == " + maxTrainingSize);
-
-                Console.WriteLine("=========================================Before  DVectorIndexConfiguration config");
-
 
                 VectorIndexConfiguration config = new(expression, dimensions, centroids) // unure on types here again, undocumented specifics
                 {
@@ -146,15 +127,15 @@ namespace Couchbase.Lite.Testing
                 //     MaxTrainingSize = xMAX_TRAINING_SIZE
                 // };
 
-
-                Console.WriteLine("=========================================Before  creating final index");
                 try
                 {
                     collection.CreateIndex(indexName, config);
+                    Console.WriteLine("Successfully created index");
                     response.WriteBody("Created index with name " + indexName);
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine("Failed to create index");
                     response.WriteBody("Could not create index: " + e);
                 }
 
@@ -171,6 +152,7 @@ namespace Couchbase.Lite.Testing
 
             VectorModel vectorModel = new(key, modelName);
             Database.Prediction.RegisterModel(modelName, vectorModel);
+            Console.WriteLine("Successfully registered Model");
             response.WriteBody(MemoryMap.Store(vectorModel));
         }
 
@@ -178,7 +160,6 @@ namespace Couchbase.Lite.Testing
                                   [NotNull] IReadOnlyDictionary<string, object> postBody,
                                   [NotNull] HttpListenerResponse response)
         {
-            Console.WriteLine("I AM HERE!!!!!!!!!!!!!!!!!!!!!GILAD");
             string dbPath = "Databases\\vsTestDatabase.cblite2\\";
 
             string dbName = "vsTestDatabase";
@@ -190,16 +171,21 @@ namespace Couchbase.Lite.Testing
             Database.Copy(databasePath, dbName, dbConfig);
 
             var databaseId = MemoryMap.New<Database>(dbName, dbConfig);
+            Console.WriteLine("Succesfully loaded database");
             response.WriteBody(databaseId);
 
         }
 
         public static object GetEmbedding(Dictionary<string, object> input)
         {
+            Console.WriteLine("===== START METHOD: GET EMBEDDING");
             VectorModel model = new("word", "vsTestDatabase", (Database)input["database"]);
+            Console.WriteLine("=== instantiated vector model");
             MutableDictionaryObject testDic = new();
             testDic.SetValue("word", input["input"].ToString());
             DictionaryObject value = model.Predict(testDic);
+            Console.WriteLine("=== called prediction on model");
+            Console.WriteLine("=== prediction result val = " + value.GetValue("vector"));
             return value.GetValue("vector");
         }
 
@@ -207,6 +193,7 @@ namespace Couchbase.Lite.Testing
                                   [NotNull] IReadOnlyDictionary<string, object> postBody,
                                   [NotNull] HttpListenerResponse response)
         {
+            Console.WriteLine("===== START METHOD: QUERY");
             object term = postBody["term"];
             object db = postBody["database"];
 
@@ -216,22 +203,28 @@ namespace Couchbase.Lite.Testing
                 { "database", db }
             };
 
+            Console.WriteLine("=== Call Get Embedding with embeddingArgs");
             object embeddedTerm = GetEmbedding(embeddingArgs);
-
+            Console.WriteLine("=== value of embeddedTerm from Get Embedding method = " + embeddedTerm);
 
             string sql = postBody["sql"].ToString();
 
             Database database = (Database)db;
 
+            Console.WriteLine("=== create IQuery and set params");
             IQuery query = database.CreateQuery(sql);
             query.Parameters.SetValue("vector", embeddedTerm);
 
+            Console.WriteLine("=== call query.execute on each query");
             List<object> resultArray = new();
             foreach (Result row in query.Execute())
             {
                 resultArray.Add(row.ToDictionary());
+                Console.WriteLine("=== added result of query to result array");
+                Console.WriteLine("=== query result = " + row.ToDictionary());
             }
 
+            Console.WriteLine("=== completed query executions, writing result array to response");
             response.WriteBody(resultArray);
         }
 
@@ -260,16 +253,20 @@ namespace Couchbase.Lite.Testing
 
         private List<object?>? GetWordVector(string word, string collection)
         {
+            Console.WriteLine("===== START METHOD: GetWordVector");
             using var query = database.CreateQuery($"SELECT vector FROM {collection} WHERE word = '{word}'");
             using var rs = query.Execute();
+            Console.WriteLine("=== executed word vector query");
 
             // Important to call ToList here, otherwise disposing the above result set invalidates the data
             var val = rs.FirstOrDefault()?.GetArray(0)?.ToList();
+            Console.WriteLine("=== return val of get word vector = " + val);
             return val;
         }
 
         public DictionaryObject? Predict(DictionaryObject input)
         {
+            Console.WriteLine("===== START METHOD: PREDICT");
             var inputWord = input.GetString("word");
             if (inputWord == null)
             {
@@ -278,6 +275,7 @@ namespace Couchbase.Lite.Testing
             }
 
             var result = GetWordVector(inputWord, "words") ?? GetWordVector(inputWord, "extwords");
+            Console.WriteLine("=== returned a val from call of get word vector");
             if (result == null)
             {
                 return null;
@@ -285,6 +283,7 @@ namespace Couchbase.Lite.Testing
 
             var retVal = new MutableDictionaryObject();
             retVal.SetValue("vector", result);
+            Console.WriteLine("=== return val of predict = " + retVal);
             return retVal;
         }
     }
