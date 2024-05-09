@@ -35,9 +35,16 @@ namespace Couchbase.Lite.Testing
 
                 // null coalescing checks
                 var dimensions = postBody["dimensions"] as uint? ?? null;
+                Console.WriteLine("================ dimensions = " + dimensions);
+
                 var centroids = postBody["centroids"] as uint? ?? null;
+                Console.WriteLine("================ centroids = " + centroids);
+
                 var minTrainingSize = postBody["minTrainingSize"] as uint? ?? null;
+                Console.WriteLine("================ minTrainingSize = " + minTrainingSize);
+
                 var maxTrainingSize = postBody["maxTrainingSize"] as uint? ?? null;
+                Console.WriteLine("================ maxTrainingSize = " + maxTrainingSize);
 
                 uint? bits = 0;
                 uint? subquantizers = 0;
@@ -53,6 +60,8 @@ namespace Couchbase.Lite.Testing
                     bits = null;
                     subquantizers = null;
                 }
+                Console.WriteLine("================ bits = " + bits);
+                Console.WriteLine("================ subquantizers = " + subquantizers);
 
                 try
                 {
@@ -62,11 +71,13 @@ namespace Couchbase.Lite.Testing
                 {
                     scalarEncoding = null;
                 }
+                Console.WriteLine("================ scalarEncoding = " + scalarEncoding);
 
 
 
 
                 string metric = postBody["metric"].ToString();
+                Console.WriteLine("================ metric = " + metric);
 
 
                 // correctness checks
