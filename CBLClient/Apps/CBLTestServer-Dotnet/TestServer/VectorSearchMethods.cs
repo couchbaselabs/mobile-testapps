@@ -175,6 +175,45 @@ namespace Couchbase.Lite.Testing
 
         }
 
+        public static object GetEmbedding(NameValueCollection input)
+        {
+            VectorModel model = new("word", "vsTestDatabase");
+            MutableDictionaryObject testDic = new();
+            testDic.SetValue("word", input["input"].ToString());
+            DictionaryObject value = model.Predict(testDic);
+            return value.GetValue("vector");
+        }
+
+        public static List<object> Query([NotNull] NameValueCollection args,
+                                  [NotNull] IReadOnlyDictionary<string, object> postBody,
+                                  [NotNull] HttpListenerResponse response)
+        {
+            string term = postBody["term"].ToString();
+
+            NameValueCollection embeddingArgs = new()
+            {
+                { "input", term }
+            };
+
+            object embeddedTerm = GetEmbedding(embeddingArgs);
+
+
+            string sql = postBody["sql"].ToString();
+
+            Database db = (Database)postBody["database"];
+
+            IQuery query = db.CreateQuery(sql);
+            query.Parameters.SetValue("vector", embeddedTerm);
+
+            List<object> resultArray = new();
+            foreach (Result row in query.Execute())
+            {
+                resultArray.Add(row.ToDictionary());
+            }
+
+            return resultArray;
+        }
+
     }
 
 
