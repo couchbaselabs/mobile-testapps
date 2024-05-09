@@ -203,7 +203,7 @@ namespace Couchbase.Lite.Testing
             return value.GetValue("vector");
         }
 
-        public static List<object> Query([NotNull] NameValueCollection args,
+        public static void Query([NotNull] NameValueCollection args,
                                   [NotNull] IReadOnlyDictionary<string, object> postBody,
                                   [NotNull] HttpListenerResponse response)
         {
@@ -232,7 +232,7 @@ namespace Couchbase.Lite.Testing
                 resultArray.Add(row.ToDictionary());
             }
 
-            return resultArray;
+            response.WriteBody(resultArray);
         }
 
     }
