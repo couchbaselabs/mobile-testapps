@@ -92,11 +92,7 @@ namespace Couchbase.Lite.Testing
                 {
                     throw new InvalidOperationException("Product quantization requires both bits and subquantizers set");
                 }
-                if (bits == null && subquantizers == null)
-                {
-                    Console.WriteLine("======== broken because bits and subquantizers are null");
-                    throw new InvalidOperationException("broken");
-                }
+
 
                 // setting values based on config from input
                 Console.WriteLine("=========================================Before VectorEncoding encoding");
