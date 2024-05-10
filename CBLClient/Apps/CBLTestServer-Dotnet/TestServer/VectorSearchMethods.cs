@@ -197,6 +197,7 @@ namespace Couchbase.Lite.Testing
             object term = postBody["term"];
             string db = postBody["database"].ToString();
 
+            DatabaseConfiguration dbConfig = new();
             Database database = new(db);
 
             Dictionary<string, object> embeddingArgs = new()
