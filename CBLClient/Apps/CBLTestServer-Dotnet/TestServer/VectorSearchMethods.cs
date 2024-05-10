@@ -195,12 +195,14 @@ namespace Couchbase.Lite.Testing
         {
             Console.WriteLine("===== START METHOD: QUERY");
             object term = postBody["term"];
-            object db = postBody["database"];
+            string db = postBody["database"].ToString();
+
+            Database database = new(db);
 
             Dictionary<string, object> embeddingArgs = new()
             {
                 { "input", term },
-                { "database", db }
+                { "database", database }
             };
 
             Console.WriteLine("=== Call Get Embedding with embeddingArgs");
@@ -208,8 +210,6 @@ namespace Couchbase.Lite.Testing
             Console.WriteLine("=== value of embeddedTerm from Get Embedding method = " + embeddedTerm);
 
             string sql = postBody["sql"].ToString();
-
-            Database database = (Database)db;
 
             Console.WriteLine("=== create IQuery and set params");
             IQuery query = database.CreateQuery(sql);
