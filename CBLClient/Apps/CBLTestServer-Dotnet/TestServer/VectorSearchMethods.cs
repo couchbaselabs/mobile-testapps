@@ -274,7 +274,7 @@ namespace Couchbase.Lite.Testing
                 return null;
             }
 
-            var result = GetWordVector(inputWord, "words") ?? GetWordVector(inputWord, "extwords");
+            var result = GetWordVector(inputWord, "searchTerms") ?? GetWordVector(inputWord, "docBodyVectors") ?? GetWordVector(inputWord, "indexVectors") ?? GetWordVector(inputWord, "auxiliaryWords");
             Console.WriteLine("=== returned a val from call of get word vector");
             if (result == null)
             {
