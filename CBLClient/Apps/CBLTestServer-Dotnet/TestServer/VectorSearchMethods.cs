@@ -195,38 +195,37 @@ namespace Couchbase.Lite.Testing
         {
             Console.WriteLine("===== START METHOD: QUERY");
             object term = postBody["term"];
-            string db = postBody["database"].ToString();
+            //string db = postBody["database"].ToString();
 
-            DatabaseConfiguration dbConfig = new();
-            Database database = new(db);
+            With<Database>(postBody, "database", db => {
+                Dictionary<string, object> embeddingArgs = new()
+                {
+                    { "input", term },
+                    { "database", db }
+                };
 
-            Dictionary<string, object> embeddingArgs = new()
-            {
-                { "input", term },
-                { "database", database }
-            };
+                Console.WriteLine("=== Call Get Embedding with embeddingArgs");
+                object embeddedTerm = GetEmbedding(embeddingArgs);
+                Console.WriteLine("=== value of embeddedTerm from Get Embedding method = " + embeddedTerm);
 
-            Console.WriteLine("=== Call Get Embedding with embeddingArgs");
-            object embeddedTerm = GetEmbedding(embeddingArgs);
-            Console.WriteLine("=== value of embeddedTerm from Get Embedding method = " + embeddedTerm);
+                string sql = postBody["sql"].ToString();
 
-            string sql = postBody["sql"].ToString();
+                Console.WriteLine("=== create IQuery and set params");
+                IQuery query = db.CreateQuery(sql);
+                query.Parameters.SetValue("vector", embeddedTerm);
 
-            Console.WriteLine("=== create IQuery and set params");
-            IQuery query = database.CreateQuery(sql);
-            query.Parameters.SetValue("vector", embeddedTerm);
+                Console.WriteLine("=== call query.execute on each query");
+                List<object> resultArray = new();
+                foreach (Result row in query.Execute())
+                {
+                    resultArray.Add(row.ToDictionary());
+                    Console.WriteLine("=== added result of query to result array");
+                    Console.WriteLine("=== query result = " + row.ToDictionary());
+                }
 
-            Console.WriteLine("=== call query.execute on each query");
-            List<object> resultArray = new();
-            foreach (Result row in query.Execute())
-            {
-                resultArray.Add(row.ToDictionary());
-                Console.WriteLine("=== added result of query to result array");
-                Console.WriteLine("=== query result = " + row.ToDictionary());
-            }
-
-            Console.WriteLine("=== completed query executions, writing result array to response");
-            response.WriteBody(resultArray);
+                Console.WriteLine("=== completed query executions, writing result array to response");
+                response.WriteBody(resultArray);
+            });
         }
 
     }
