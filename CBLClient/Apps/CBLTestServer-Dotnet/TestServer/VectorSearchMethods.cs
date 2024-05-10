@@ -28,7 +28,7 @@ namespace Couchbase.Lite.Testing
             With<Database>(postBody, "database", database =>
             {
                 //Collection collection = database.GetDefaultCollection() ?? throw new InvalidOperationException("Could not open specified collection");
-                Collection collection = postBody["collectionName"];
+                Collection collection = database.GetCollection(postBody["collectionName"].ToString(), "_default"); // TO: change the hardocded scope
                 // get values from postBody
                 string indexName = postBody["indexName"].ToString();
                 string expression = postBody["expression"].ToString();
