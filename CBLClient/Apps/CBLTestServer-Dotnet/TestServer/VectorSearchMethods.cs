@@ -27,8 +27,8 @@ namespace Couchbase.Lite.Testing
             // using db get defualt collection and store in Collection collection
             With<Database>(postBody, "database", database =>
             {
-                Collection collection = database.GetDefaultCollection() ?? throw new InvalidOperationException("Could not open specified collection");
-
+                //Collection collection = database.GetDefaultCollection() ?? throw new InvalidOperationException("Could not open specified collection");
+                Colleciton collection = postBody["collectionName"];
                 // get values from postBody
                 string indexName = postBody["indexName"].ToString();
                 string expression = postBody["expression"].ToString();
