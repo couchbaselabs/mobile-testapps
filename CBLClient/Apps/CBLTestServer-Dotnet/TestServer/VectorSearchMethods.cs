@@ -27,25 +27,49 @@ namespace Couchbase.Lite.Testing
             // using db get defualt collection and store in Collection collection
             With<Database>(postBody, "database", database =>
             {
-                Collection collection = database.GetDefaultCollection() ?? throw new InvalidOperationException("Could not open specified collection");
-
+                //Collection collection = database.GetDefaultCollection() ?? throw new InvalidOperationException("Could not open specified collection");
+                Collection collection = database.GetCollection(postBody["collectionName"].ToString(), "_default"); // TO: change the hardocded scope
                 // get values from postBody
                 string indexName = postBody["indexName"].ToString();
                 string expression = postBody["expression"].ToString();
 
                 // null coalescing checks
-                var dimensions = postBody["dimensions"] as uint? ?? null;
-                var centroids = postBody["centroids"] as uint? ?? null;
-                var subquantizers = postBody["subquantizers"] as uint? ?? null;
-                var bits = postBody["bits"] as uint? ?? null;
-                var minTrainingSize = postBody["minTrainingSize"] as uint? ?? null;
-                var maxTrainingSize = postBody["maxTrainingSize"] as uint? ?? null;
-                var scalarEncoding = postBody["scalarEncoding"] as ScalarQuantizerType? ?? null;
+                uint dimensions = Convert.ToUInt32(postBody["dimensions"]);
+
+                uint centroids = Convert.ToUInt32(postBody["centroids"]);
+
+                uint minTrainingSize = Convert.ToUInt32(postBody["minTrainingSize"]);
+
+                uint maxTrainingSize = Convert.ToUInt32(postBody["maxTrainingSize"]);
+
+                uint? bits = 0;
+                uint? subquantizers = 0;
+                ScalarQuantizerType? scalarEncoding = new();
+
+                try
+                {
+                    bits = Convert.ToUInt32(postBody["bits"]);
+                    subquantizers = Convert.ToUInt32(postBody["subquantizers"]);
+                }
+                catch (Exception e)
+                {
+                    bits = null;
+                    subquantizers = null;
+                }
+
+                try
+                {
+                    scalarEncoding = (ScalarQuantizerType)postBody["scalarEncoding"];
+                }
+                catch (Exception e)
+                {
+                    scalarEncoding = null;
+                }
+
 
 
 
                 string metric = postBody["metric"].ToString();
-
 
                 // correctness checks
                 if (scalarEncoding != null && (bits != null || subquantizers != null))
@@ -58,8 +82,9 @@ namespace Couchbase.Lite.Testing
                     throw new InvalidOperationException("Product quantization requires both bits and subquantizers set");
                 }
 
+
                 // setting values based on config from input
-                VectorEncoding encoding = null;
+                VectorEncoding encoding = VectorEncoding.None();
                 if (scalarEncoding != null)
                 {
                     encoding = VectorEncoding.ScalarQuantizer((ScalarQuantizerType)scalarEncoding);
@@ -68,39 +93,49 @@ namespace Couchbase.Lite.Testing
                 {
                     encoding = VectorEncoding.ProductQuantizer((uint)subquantizers, (uint)bits);
                 }
-
                 DistanceMetric dMetric = new();
                 if (metric != null)
                 {
-                    switch (metric)
+                    dMetric = metric switch
                     {
-                        case "euclidean":
-                            dMetric = DistanceMetric.Euclidean;
-                            break;
-                        case "cosine":
-                            dMetric = DistanceMetric.Cosine;
-                            break;
-                        default:
-                            throw new Exception("Invalid distance metric");
-                    }
+                        "euclidean" => DistanceMetric.Euclidean,
+                        "cosine" => DistanceMetric.Cosine,
+                        _ => throw new Exception("Invalid distance metric"),
+                    };
                 }
 
-                VectorIndexConfiguration config = new(expression, (uint)dimensions, (uint)centroids) // unure on types here again, undocumented specifics
+                VectorIndexConfiguration config = new(expression, dimensions, centroids) // unure on types here again, undocumented specifics
                 {
                     Encoding = encoding,
                     DistanceMetric = dMetric,
-                    MinTrainingSize = (uint)minTrainingSize,
-                    MaxTrainingSize = (uint)maxTrainingSize
+                    MinTrainingSize = minTrainingSize,
+                    MaxTrainingSize = maxTrainingSize
                 };
 
+                // const uint xDIMENSIONS = 300;
+                // const uint xCENTROIDS = 20;
+                // const uint xMIN_TRAINING_SIZE = 100;
+                // const uint xMAX_TRAINING_SIZE = 200;
+                // const string xEXPRESSION = "vector";
+                // const DistanceMetric xMETRIC = DistanceMetric.Cosine;
+
+                // var config = new VectorIndexConfiguration(xEXPRESSION, xDIMENSIONS, xCENTROIDS)
+                // {
+                //     Encoding = VectorEncoding.None(),
+                //     DistanceMetric = xMETRIC,
+                //     MinTrainingSize = xMIN_TRAINING_SIZE,
+                //     MaxTrainingSize = xMAX_TRAINING_SIZE
+                // };
 
                 try
                 {
                     collection.CreateIndex(indexName, config);
+                    Console.WriteLine("Successfully created index");
                     response.WriteBody("Created index with name " + indexName);
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine("Failed to create index");
                     response.WriteBody("Could not create index: " + e);
                 }
 
@@ -112,19 +147,19 @@ namespace Couchbase.Lite.Testing
                                   [NotNull] IReadOnlyDictionary<string, object> postBody,
                                   [NotNull] HttpListenerResponse response)
         {
-            string modelName = postBody["model_name"].ToString();
+            string modelName = postBody["name"].ToString();
             string key = postBody["key"].ToString();
 
             VectorModel vectorModel = new(key, modelName);
             Database.Prediction.RegisterModel(modelName, vectorModel);
-            response.WriteBody(MemoryMap.Store(vectorModel));
+            Console.WriteLine("Successfully registered Model");
+            response.WriteBody("Successfully registered model: " + modelName);
         }
 
         public static void LoadDatabase([NotNull] NameValueCollection args,
                                   [NotNull] IReadOnlyDictionary<string, object> postBody,
                                   [NotNull] HttpListenerResponse response)
         {
-
             string dbPath = "Databases\\vsTestDatabase.cblite2\\";
 
             string dbName = "vsTestDatabase";
@@ -136,11 +171,67 @@ namespace Couchbase.Lite.Testing
             Database.Copy(databasePath, dbName, dbConfig);
 
             var databaseId = MemoryMap.New<Database>(dbName, dbConfig);
-            Console.WriteLine("DEBUG");
-            Console.WriteLine(databaseId);
-            Console.WriteLine("DEBUG");
+            Console.WriteLine("Succesfully loaded database");
             response.WriteBody(databaseId);
 
+        }
+
+        public static object GetEmbedding(Dictionary<string, object> input)
+        {
+            Console.WriteLine("===== START METHOD: GET EMBEDDING");
+            VectorModel model = new("word", "vsTestDatabase", (Database)input["database"]);
+            Database.Prediction.RegisterModel("vsTestDatabase", model);
+            Console.WriteLine("=== instantiated vector model");
+            MutableDictionaryObject testDic = new();
+            testDic.SetValue("word", input["input"].ToString());
+            Console.WriteLine("XXXXXXXX inputWord in GetEmbedding = " + testDic["word"].ToString() + " XXXXXXXX");
+            DictionaryObject value = model.Predict(testDic);
+            Console.WriteLine("=== called prediction on model");
+            Console.WriteLine("=== prediction result val = " + value.GetValue("vector"));
+            return value.GetValue("vector");
+        }
+
+        public static void Query([NotNull] NameValueCollection args,
+                                  [NotNull] IReadOnlyDictionary<string, object> postBody,
+                                  [NotNull] HttpListenerResponse response)
+        {
+            Console.WriteLine("===== START METHOD: QUERY");
+            object term = postBody["term"];
+            //string db = postBody["database"].ToString();
+
+            With<Database>(postBody, "database", db =>
+            {
+                Dictionary<string, object> embeddingArgs = new()
+                {
+                    { "input", term },
+                    { "database", db }
+                };
+
+                Console.WriteLine("=== Call Get Embedding with embeddingArgs");
+                Console.WriteLine("XXXXXXXX inputWord in query = " + embeddingArgs["input"].ToString() + " XXXXXXXX");
+                object embeddedTerm = GetEmbedding(embeddingArgs);
+                Console.WriteLine("=== value of embeddedTerm from Get Embedding method = " + embeddedTerm);
+
+                string sql = postBody["sql"].ToString();
+
+                Console.WriteLine("=== create IQuery and set params");
+                IQuery query = db.CreateQuery(sql);
+                query.Parameters.SetValue("vector", embeddedTerm);
+
+                Console.WriteLine("=== call query.execute on each query");
+                List<object> resultArray = new();
+                int c = 0;
+                foreach (Result row in query.Execute())
+                {
+                    resultArray.Add(row.ToDictionary());
+                    Console.WriteLine("=== added result of query to result array");
+                    Console.WriteLine("=== query result = " + resultArray[c].ToString());
+                    c++;
+                }
+
+                Console.WriteLine("=== completed query executions, writing result array to response");
+                response.WriteBody(resultArray);
+            });
         }
 
     }
@@ -152,14 +243,55 @@ namespace Couchbase.Lite.Testing
         public string name;
         public string key;
 
+        public Database database;
+
         public VectorModel(string key, string name)
         {
             this.name = name;
             this.key = key;
         }
+        public VectorModel(string key, string name, Database database)
+        {
+            this.name = name;
+            this.key = key;
+            this.database = database;
+        }
+
+        private List<object?>? GetWordVector(string word, string collection)
+        {
+            Console.WriteLine("===== START METHOD: GetWordVector");
+            using var query = database.CreateQuery($"SELECT vector FROM {collection} WHERE word = '{word}'");
+            using var rs = query.Execute();
+            Console.WriteLine("=== executed word vector query");
+
+            // Important to call ToList here, otherwise disposing the above result set invalidates the data
+            var val = rs.FirstOrDefault()?.GetArray(0)?.ToList();
+            Console.WriteLine("=== return val of get word vector = " + val);
+            return val;
+        }
+
         public DictionaryObject? Predict(DictionaryObject input)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("===== START METHOD: PREDICT");
+            var inputWord = input.GetString(key);
+            Console.WriteLine("XXXXXXXX inputWord in Predict = " + inputWord + " XXXXXXXX");
+            if (inputWord == null)
+            {
+                Console.WriteLine("ERROR: no inputWord!");
+                return null;
+            }
+
+            var result = GetWordVector(inputWord, "searchTerms") ?? GetWordVector(inputWord, "docBodyVectors") ?? GetWordVector(inputWord, "indexVectors") ?? GetWordVector(inputWord, "auxiliaryWords");
+            Console.WriteLine("=== returned a val from call of get word vector");
+            if (result == null)
+            {
+                return null;
+            }
+
+            MutableDictionaryObject retVal = new();
+            retVal.SetValue("vector", result);
+            Console.WriteLine("=== return val of predict = " + retVal);
+            return retVal;
         }
     }
 }
