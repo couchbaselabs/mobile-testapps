@@ -153,7 +153,7 @@ namespace Couchbase.Lite.Testing
             VectorModel vectorModel = new(key, modelName);
             Database.Prediction.RegisterModel(modelName, vectorModel);
             Console.WriteLine("Successfully registered Model");
-            response.WriteBody(MemoryMap.Store(vectorModel));
+            response.WriteBody("Successfully registered model: " + modelName);
         }
 
         public static void LoadDatabase([NotNull] NameValueCollection args,
@@ -197,7 +197,8 @@ namespace Couchbase.Lite.Testing
             object term = postBody["term"];
             //string db = postBody["database"].ToString();
 
-            With<Database>(postBody, "database", db => {
+            With<Database>(postBody, "database", db =>
+            {
                 Dictionary<string, object> embeddingArgs = new()
                 {
                     { "input", term },
@@ -216,11 +217,13 @@ namespace Couchbase.Lite.Testing
 
                 Console.WriteLine("=== call query.execute on each query");
                 List<object> resultArray = new();
+                int c = 0;
                 foreach (Result row in query.Execute())
                 {
                     resultArray.Add(row.ToDictionary());
                     Console.WriteLine("=== added result of query to result array");
-                    Console.WriteLine("=== query result = " + row.ToDictionary());
+                    Console.WriteLine("=== query result = " + resultArray[c].ToString());
+                    c++;
                 }
 
                 Console.WriteLine("=== completed query executions, writing result array to response");
@@ -267,7 +270,7 @@ namespace Couchbase.Lite.Testing
         public DictionaryObject? Predict(DictionaryObject input)
         {
             Console.WriteLine("===== START METHOD: PREDICT");
-            var inputWord = input.GetString("word");
+            var inputWord = input.GetString(key);
             if (inputWord == null)
             {
                 Console.WriteLine("ERROR: no inputWord!");
@@ -281,7 +284,7 @@ namespace Couchbase.Lite.Testing
                 return null;
             }
 
-            var retVal = new MutableDictionaryObject();
+            MutableDictionaryObject retVal = new();
             retVal.SetValue("vector", result);
             Console.WriteLine("=== return val of predict = " + retVal);
             return retVal;
