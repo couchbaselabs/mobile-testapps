@@ -184,6 +184,7 @@ namespace Couchbase.Lite.Testing
             Console.WriteLine("=== instantiated vector model");
             MutableDictionaryObject testDic = new();
             testDic.SetValue("word", input["input"].ToString());
+            Console.WriteLine("XXXXXXXX inputWord in GetEmbedding = " + testDic["word"].ToString() + " XXXXXXXX");
             DictionaryObject value = model.Predict(testDic);
             Console.WriteLine("=== called prediction on model");
             Console.WriteLine("=== prediction result val = " + value.GetValue("vector"));
@@ -207,6 +208,7 @@ namespace Couchbase.Lite.Testing
                 };
 
                 Console.WriteLine("=== Call Get Embedding with embeddingArgs");
+                Console.WriteLine("XXXXXXXX inputWord in query = " + embeddingArgs["input"].ToString() + " XXXXXXXX");
                 object embeddedTerm = GetEmbedding(embeddingArgs);
                 Console.WriteLine("=== value of embeddedTerm from Get Embedding method = " + embeddedTerm);
 
@@ -272,6 +274,7 @@ namespace Couchbase.Lite.Testing
         {
             Console.WriteLine("===== START METHOD: PREDICT");
             var inputWord = input.GetString(key);
+            Console.WriteLine("XXXXXXXX inputWord in Predict = " + inputWord + " XXXXXXXX");
             if (inputWord == null)
             {
                 Console.WriteLine("ERROR: no inputWord!");
