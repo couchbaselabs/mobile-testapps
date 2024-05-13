@@ -180,6 +180,7 @@ namespace Couchbase.Lite.Testing
         {
             Console.WriteLine("===== START METHOD: GET EMBEDDING");
             VectorModel model = new("word", "vsTestDatabase", (Database)input["database"]);
+            Database.Prediction.RegisterModel("vsTestDatabase", model);
             Console.WriteLine("=== instantiated vector model");
             MutableDictionaryObject testDic = new();
             testDic.SetValue("word", input["input"].ToString());
