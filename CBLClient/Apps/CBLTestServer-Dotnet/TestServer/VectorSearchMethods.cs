@@ -20,6 +20,11 @@ namespace Couchbase.Lite.Testing
 {
     public static class VectorSearchMethods
     {
+        public static MutableDictionaryObject wordMap;
+        private static readonly bool UseInMemoryDb = true;
+        private static readonly string InMemoryDbName = "vsTestDatabase";
+
+
         public static void CreateIndex([NotNull] NameValueCollection args,
                                        [NotNull] IReadOnlyDictionary<string, object> postBody,
                                        [NotNull] HttpListenerResponse response)
@@ -156,13 +161,61 @@ namespace Couchbase.Lite.Testing
             response.WriteBody("Successfully registered model: " + modelName);
         }
 
+        static MutableDictionaryObject GetWordVectMap()
+        {
+            try
+            {
+                Database db = PreparePredefinedDatabase(InMemoryDbName);
+
+                string sql1 = String.Format("select word, vector from auxiliaryWords");
+                IQuery query1 = db.CreateQuery(sql1);
+                IResultSet rs1 = query1.Execute();
+                string sql2 = string.Format("select word, vector from searchTerms");
+                IQuery query2 = db.CreateQuery(sql2);
+                IResultSet rs2 = query2.Execute();
+
+                MutableDictionaryObject words = new();
+                List<Result> rl = rs1.AllResults();
+                List<Result> rl2 = rs2.AllResults();
+                rl.AddRange(rl2);
+
+                foreach (Result r in rl)
+                {
+                    string word = r.GetString("word");
+                    ArrayObject vector = r.GetArray("vector");
+                    words.SetValue(word, vector);
+                }
+                return words;
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e + "retrieving vector could not be done - getWordVector query returned no results");
+                return null;
+            }
+        }
+
         public static void LoadDatabase([NotNull] NameValueCollection args,
                                   [NotNull] IReadOnlyDictionary<string, object> postBody,
                                   [NotNull] HttpListenerResponse response)
         {
-            string dbPath = "Databases\\vsTestDatabase.cblite2\\";
+            if (UseInMemoryDb)
+            {
+                wordMap = GetWordVectMap();
+                Database db = new(InMemoryDbName);
+                response.WriteBody(db);
+            }
+            else
+            {
+                Database db = PreparePredefinedDatabase("dummtDBIgnoreIt");
+                response.WriteBody(db);
+            }
 
-            string dbName = "vsTestDatabase";
+        }
+
+        private static Database PreparePredefinedDatabase(string dbName)
+        {
+            string dbPath = "Databases\\vsTestDatabase.cblite2\\";
 
             string currDir = Directory.GetCurrentDirectory();
             string databasePath = Path.Combine(currDir, dbPath);
@@ -172,9 +225,10 @@ namespace Couchbase.Lite.Testing
 
             Database db = new(dbName, dbConfig);
             Console.WriteLine("Succesfully loaded database");
-            response.WriteBody(db);
-
+            return db;
         }
+
+
 
         public static object GetEmbedding(Dictionary<string, object> input)
         {
@@ -192,7 +246,7 @@ namespace Couchbase.Lite.Testing
             MutableDictionaryObject testDic = new();
             testDic.SetValue("word", input["input"].ToString());
             Console.WriteLine("XXXXXXXX inputWord in GetEmbedding = " + testDic["word"].ToString() + " XXXXXXXX");
-            DictionaryObject value = model.Predict(testDic);
+            DictionaryObject value = model.Predict(testDic, wordMap);
             Console.WriteLine("=== called prediction on model");
             Console.WriteLine("=== prediction result val = " + value.GetValue("vector"));
             return value.GetValue("vector");
@@ -264,41 +318,32 @@ namespace Couchbase.Lite.Testing
             this.database = database;
         }
 
-        private List<object?>? GetWordVector(string word, string collection)
-        {
-            Console.WriteLine("===== START METHOD: GetWordVector");
-            using var query = database.CreateQuery($"SELECT vector FROM {collection} WHERE word = '{word}'");
-            using var rs = query.Execute();
-            Console.WriteLine("=== executed word vector query");
+        // private List<object?>? GetWordVector(string word, string collection)
+        // {
+        //     Console.WriteLine("===== START METHOD: GetWordVector");
+        //     using var query = database.CreateQuery($"SELECT vector FROM {collection} WHERE word = '{word}'");
+        //     using var rs = query.Execute();
+        //     Console.WriteLine("=== executed word vector query");
 
-            // Important to call ToList here, otherwise disposing the above result set invalidates the data
-            var val = rs.FirstOrDefault()?.GetArray(0)?.ToList();
-            Console.WriteLine("=== return val of get word vector = " + val);
-            return val;
+        //     // Important to call ToList here, otherwise disposing the above result set invalidates the data
+        //     var val = rs.FirstOrDefault()?.GetArray(0)?.ToList();
+        //     Console.WriteLine("=== return val of get word vector = " + val);
+        //     return val;
+        // }
+
+        public DictionaryObject? Predict(DictionaryObject input, MutableDictionaryObject wordMap)
+        {
+            String inputWord = input.GetString(key);
+            object result = new();
+            result = wordMap.GetValue(inputWord);
+            MutableDictionaryObject output = new();
+            output.SetValue("vector", result);
+            return output;
         }
 
         public DictionaryObject? Predict(DictionaryObject input)
         {
-            Console.WriteLine("===== START METHOD: PREDICT");
-            var inputWord = input.GetString(key);
-            Console.WriteLine("XXXXXXXX inputWord in Predict = " + inputWord + " XXXXXXXX");
-            if (inputWord == null)
-            {
-                Console.WriteLine("ERROR: no inputWord!");
-                return null;
-            }
-
-            var result = GetWordVector(inputWord, "searchTerms") ?? GetWordVector(inputWord, "docBodyVectors") ?? GetWordVector(inputWord, "indexVectors") ?? GetWordVector(inputWord, "auxiliaryWords");
-            Console.WriteLine("=== returned a val from call of get word vector");
-            if (result == null)
-            {
-                return null;
-            }
-
-            MutableDictionaryObject retVal = new();
-            retVal.SetValue("vector", result);
-            Console.WriteLine("=== return val of predict = " + retVal);
-            return retVal;
+            throw new NotImplementedException();
         }
     }
 }
