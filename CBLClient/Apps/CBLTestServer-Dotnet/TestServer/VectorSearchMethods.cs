@@ -242,12 +242,14 @@ namespace Couchbase.Lite.Testing
                                   [NotNull] IReadOnlyDictionary<string, object> postBody,
                                   [NotNull] HttpListenerResponse response)
         {
+            List<object> resultArray = new List<object>();
             VectorModel model = new("word");
             MutableDictionaryObject testDic = new();
             string input = postBody["input"].ToString();
             testDic.SetValue("word", input);
             DictionaryObject value = model.Predict(testDic);
-            response.WriteBody(value.GetArray("vector"));
+            resultArray.Add(value("vector"));
+            response.WriteBody(resultArray);
         }
 
         public static void Query([NotNull] NameValueCollection args,
