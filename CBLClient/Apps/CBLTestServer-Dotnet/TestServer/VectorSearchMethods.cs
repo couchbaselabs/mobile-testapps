@@ -223,7 +223,7 @@ namespace Couchbase.Lite.Testing
             Database.Copy(databasePath, dbName, dbConfig);
 
             var db = MemoryMap.New<Database>(dbName, dbConfig);
-            Console.WriteLine("Succesfully loaded database");
+            Console.WriteLine("Succesfully loaded database " + dbName);
             return db;
         }
 
@@ -231,23 +231,10 @@ namespace Couchbase.Lite.Testing
 
         public static object GetEmbedding(Dictionary<string, object> input)
         {
-            Console.WriteLine("===== START METHOD: GET EMBEDDING");
-            if ((Database)input["database"] == null)
-            {
-                Console.WriteLine("===== DATABASE IS NULL!!!" + (Database)input["database"]);
-            }
-            else
-            {
-                Console.WriteLine("===== DATABASE IS NOT NULL!!!" + (Database)input["database"]);
-            }
             VectorModel model = new("word");
-            Console.WriteLine("=== instantiated vector model");
             MutableDictionaryObject testDic = new();
             testDic.SetValue("word", input["input"].ToString());
-            Console.WriteLine("XXXXXXXX inputWord in GetEmbedding = " + testDic["word"].ToString() + " XXXXXXXX");
             DictionaryObject value = model.Predict(testDic);
-            Console.WriteLine("=== called prediction on model");
-            Console.WriteLine("=== prediction result val = " + value.GetValue("vector"));
             return value.GetValue("vector");
         }
 
@@ -267,7 +254,6 @@ namespace Couchbase.Lite.Testing
                                   [NotNull] IReadOnlyDictionary<string, object> postBody,
                                   [NotNull] HttpListenerResponse response)
         {
-            Console.WriteLine("===== START METHOD: QUERY");
             object term = postBody["term"];
             //string db = postBody["database"].ToString();
 
@@ -278,30 +264,21 @@ namespace Couchbase.Lite.Testing
                     { "input", term },
                     { "database", db }
                 };
-
-                Console.WriteLine("=== Call Get Embedding with embeddingArgs");
-                Console.WriteLine("XXXXXXXX inputWord in query = " + embeddingArgs["input"].ToString() + " XXXXXXXX");
                 object embeddedTerm = GetEmbedding(embeddingArgs);
-                Console.WriteLine("=== value of embeddedTerm from Get Embedding method = " + embeddedTerm);
 
                 string sql = postBody["sql"].ToString();
+                Console.WriteLine("QE-DEBUG Calling query string: " + sql)
 
-                Console.WriteLine("=== create IQuery and set params");
                 IQuery query = db.CreateQuery(sql);
                 query.Parameters.SetValue("vector", embeddedTerm);
 
-                Console.WriteLine("=== call query.execute on each query");
                 List<object> resultArray = new();
                 int c = 0;
                 foreach (Result row in query.Execute())
                 {
                     resultArray.Add(row.ToDictionary());
-                    Console.WriteLine("=== added result of query to result array");
-                    Console.WriteLine("=== query result = " + resultArray[c].ToString());
                     c++;
                 }
-
-                Console.WriteLine("=== completed query executions, writing result array to response");
                 response.WriteBody(resultArray);
             });
         }
@@ -313,13 +290,21 @@ namespace Couchbase.Lite.Testing
             public VectorModel(string key)
             {
                 this.key = key;
+                Console.WriteLine("QE-DEBUG Vector Model object instantiated with key: " + key);
             }
 
             public DictionaryObject? Predict(DictionaryObject input)
             {
+                Console.WriteLine("QE-DEBUG Calling predict function");
                 string inputWord = input.GetString(key);
+                Console.WriteLine("QE-DEBUG Predicting for word: " + inputWord);
                 object result = new();
                 result = wordMap.GetValue(inputWord);
+                if (result == null) {
+                    Console.WriteLine("QE-DEBUG Prediction gave null result");
+                } else {
+                    Console.WriteLine("QE-DEBUG Prediction gave non-null result");
+                }
                 MutableDictionaryObject output = new();
                 output.SetValue("vector", result);
                 return output;
