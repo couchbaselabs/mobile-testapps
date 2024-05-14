@@ -294,7 +294,7 @@ namespace Couchbase.Lite.Testing
                 ["collection_getDocument"] = CollectionMethods.getDocument,
                 ["collection_getDocuments"] = CollectionMethods.getDocuments,
                 ["collection_updateDocument"] = CollectionMethods.updateDocument,
-                ["collection_deleteDocument"] = CollectionMethods.deleteCollection,
+                ["collection_deleteDocument"] = CollectionMethods.deleteDocument,
                 ["collection_purgeDocument"] = CollectionMethods.purgeDocument,
                 ["collection_purgeDocumentID"] = CollectionMethods.purgeDocumentById,
                 ["collection_saveDocuments"] = CollectionMethods.saveDocuments,
