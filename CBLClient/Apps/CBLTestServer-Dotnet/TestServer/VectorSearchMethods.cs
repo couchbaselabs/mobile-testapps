@@ -260,12 +260,6 @@ namespace Couchbase.Lite.Testing
         private List<object?>? GetWordVector(string word, string collection)
         {
             Console.WriteLine("===== START METHOD: GetWordVector");
-            if (database == null) {
-                Console.WriteLine("===== DATABASE is null!!!");
-            }
-            else {
-                Console.WriteLine("===== DATABASE is NOT null!!!");
-            }
             using var query = database.CreateQuery($"SELECT vector FROM {collection} WHERE word = '{word}'");
             using var rs = query.Execute();
             Console.WriteLine("=== executed word vector query");
