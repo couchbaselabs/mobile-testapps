@@ -248,7 +248,7 @@ namespace Couchbase.Lite.Testing
             string input = postBody["input"].ToString();
             testDic.SetValue("word", input);
             DictionaryObject value = model.Predict(testDic);
-            resultArray.Add(value["vector"]);
+            resultArray.Add(value);
             response.WriteBody(resultArray);
         }
 
