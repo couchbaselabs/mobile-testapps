@@ -179,7 +179,7 @@ namespace Couchbase.Lite.Testing
         public static object GetEmbedding(Dictionary<string, object> input)
         {
             Console.WriteLine("===== START METHOD: GET EMBEDDING");
-            with<Database>(input, "database", db => {
+            With<Database>(input, "database", db => {
                 VectorModel model = new("word", "vsTestDatabase", db);
                 Database.Prediction.RegisterModel("vsTestDatabase", model);
                 Console.WriteLine("=== instantiated vector model");
