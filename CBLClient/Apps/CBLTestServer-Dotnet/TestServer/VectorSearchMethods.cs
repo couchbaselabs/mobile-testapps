@@ -155,7 +155,7 @@ namespace Couchbase.Lite.Testing
             string modelName = postBody["name"].ToString();
             string key = postBody["key"].ToString();
 
-            VectorModel vectorModel = new(key, modelName);
+            VectorModel vectorModel = new(key);
             Database.Prediction.RegisterModel(modelName, vectorModel);
             Console.WriteLine("Successfully registered Model");
             response.WriteBody("Successfully registered model: " + modelName);
@@ -241,7 +241,7 @@ namespace Couchbase.Lite.Testing
             {
                 Console.WriteLine("===== DATABASE IS NOT NULL!!!" + (Database)input["database"]);
             }
-            VectorModel model = new("word", "vsTestDatabase", (Database)input["database"]);
+            VectorModel model = new("word");
             Console.WriteLine("=== instantiated vector model");
             MutableDictionaryObject testDic = new();
             testDic.SetValue("word", input["input"].ToString());
@@ -295,55 +295,25 @@ namespace Couchbase.Lite.Testing
             });
         }
 
-    }
-
-
-
-    public sealed class VectorModel : IPredictiveModel
-    {
-        public string name;
-        public string key;
-
-        public Database database;
-
-        public VectorModel(string key, string name)
+        public sealed class VectorModel : IPredictiveModel
         {
-            this.name = name;
-            this.key = key;
-        }
-        public VectorModel(string key, string name, Database database)
-        {
-            this.name = name;
-            this.key = key;
-            this.database = database;
+            public string key;
+
+            public VectorModel(string key)
+            {
+                this.key = key;
+            }
+
+            public DictionaryObject? Predict(DictionaryObject input)
+            {
+                string inputWord = input.GetString(key);
+                object result = new();
+                result = wordMap.GetValue(inputWord);
+                MutableDictionaryObject output = new();
+                output.SetValue("vector", result);
+                return output;
+            }
         }
 
-        // private List<object?>? GetWordVector(string word, string collection)
-        // {
-        //     Console.WriteLine("===== START METHOD: GetWordVector");
-        //     using var query = database.CreateQuery($"SELECT vector FROM {collection} WHERE word = '{word}'");
-        //     using var rs = query.Execute();
-        //     Console.WriteLine("=== executed word vector query");
-
-        //     // Important to call ToList here, otherwise disposing the above result set invalidates the data
-        //     var val = rs.FirstOrDefault()?.GetArray(0)?.ToList();
-        //     Console.WriteLine("=== return val of get word vector = " + val);
-        //     return val;
-        // }
-
-        public DictionaryObject? Predict(DictionaryObject input, MutableDictionaryObject wordMap)
-        {
-            string inputWord = input.GetString(key);
-            object result = new();
-            result = wordMap.GetValue(inputWord);
-            MutableDictionaryObject output = new();
-            output.SetValue("vector", result);
-            return output;
-        }
-
-        public DictionaryObject? Predict(DictionaryObject input)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
