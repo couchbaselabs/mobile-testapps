@@ -190,7 +190,7 @@ namespace Couchbase.Lite.Testing
                 Console.WriteLine("=== called prediction on model");
                 Console.WriteLine("=== prediction result val = " + value.GetValue("vector"));
                 return value.GetValue("vector");
-            })
+            });
         }
 
         public static void Query([NotNull] NameValueCollection args,
