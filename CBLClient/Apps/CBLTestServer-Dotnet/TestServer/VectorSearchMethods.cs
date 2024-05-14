@@ -170,15 +170,23 @@ namespace Couchbase.Lite.Testing
             DatabaseConfiguration dbConfig = new();
             Database.Copy(databasePath, dbName, dbConfig);
 
-            var databaseId = MemoryMap.New<Database>(dbName, dbConfig);
+            Database db = new(dbName, dbConfig);
             Console.WriteLine("Succesfully loaded database");
-            response.WriteBody(databaseId);
+            response.WriteBody(db);
 
         }
 
         public static object GetEmbedding(Dictionary<string, object> input)
         {
             Console.WriteLine("===== START METHOD: GET EMBEDDING");
+            if ((Database)input["database"] == null)
+            {
+                Console.WriteLine("===== DATABASE IS NULL!!!" + (Database)input["database"]);
+            }
+            else
+            {
+                Console.WriteLine("===== DATABASE IS NOT NULL!!!" + (Database)input["database"]);
+            }
             VectorModel model = new("word", "vsTestDatabase", (Database)input["database"]);
             Console.WriteLine("=== instantiated vector model");
             MutableDictionaryObject testDic = new();
