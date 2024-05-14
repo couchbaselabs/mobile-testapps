@@ -333,7 +333,7 @@ namespace Couchbase.Lite.Testing
 
         public DictionaryObject? Predict(DictionaryObject input, MutableDictionaryObject wordMap)
         {
-            String inputWord = input.GetString(key);
+            string inputWord = input.GetString(key);
             object result = new();
             result = wordMap.GetValue(inputWord);
             MutableDictionaryObject output = new();
