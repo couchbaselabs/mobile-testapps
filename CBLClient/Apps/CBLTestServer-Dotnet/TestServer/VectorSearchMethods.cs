@@ -178,21 +178,17 @@ namespace Couchbase.Lite.Testing
 
         public static object GetEmbedding(Dictionary<string, object> input)
         {
-            string returnValue = "Init value";
             Console.WriteLine("===== START METHOD: GET EMBEDDING");
-            With<Database>(input, "database", db => {
-                VectorModel model = new("word", "vsTestDatabase", db);
-                Database.Prediction.RegisterModel("vsTestDatabase", model);
-                Console.WriteLine("=== instantiated vector model");
-                MutableDictionaryObject testDic = new();
-                testDic.SetValue("word", input["input"].ToString());
-                Console.WriteLine("XXXXXXXX inputWord in GetEmbedding = " + testDic["word"].ToString() + " XXXXXXXX");
-                DictionaryObject value = model.Predict(testDic);
-                Console.WriteLine("=== called prediction on model");
-                Console.WriteLine("=== prediction result val = " + value.GetValue("vector"));
-                returnValue = (string)value.GetValue("vector");
-            });
-            return returnValue;
+            VectorModel model = new("word", "vsTestDatabase", (database)input("database"));
+            Database.Prediction.RegisterModel("vsTestDatabase", model);
+            Console.WriteLine("=== instantiated vector model");
+            MutableDictionaryObject testDic = new();
+            testDic.SetValue("word", input["input"].ToString());
+            Console.WriteLine("XXXXXXXX inputWord in GetEmbedding = " + testDic["word"].ToString() + " XXXXXXXX");
+            DictionaryObject value = model.Predict(testDic);
+            Console.WriteLine("=== called prediction on model");
+            Console.WriteLine("=== prediction result val = " + value.GetValue("vector"));
+            return value.GetValue("vector");
         }
 
         public static void Query([NotNull] NameValueCollection args,
