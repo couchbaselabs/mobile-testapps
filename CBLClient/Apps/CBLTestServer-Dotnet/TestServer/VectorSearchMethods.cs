@@ -165,8 +165,7 @@ namespace Couchbase.Lite.Testing
         {
             try
             {
-                Database db = PreparePredefinedDatabase(InMemoryDbName);
-
+                Database db = new(InMemoryDbName);
                 string sql1 = String.Format("select word, vector from auxiliaryWords");
                 IQuery query1 = db.CreateQuery(sql1);
                 IResultSet rs1 = query1.Execute();
@@ -201,19 +200,19 @@ namespace Couchbase.Lite.Testing
         {
             if (UseInMemoryDb)
             {
+                string dbID = PreparePredefinedDatabase(InMemoryDbName);
                 wordMap = GetWordVectMap();
-                Database db = new(InMemoryDbName);
-                response.WriteBody(db);
+                response.WriteBody(dbID);
             }
             else
             {
-                Database db = PreparePredefinedDatabase("dummtDBIgnoreIt");
-                response.WriteBody(db);
+                string dbID = PreparePredefinedDatabase("dummtDBIgnoreIt");
+                response.WriteBody(dbID);
             }
 
         }
 
-        private static Database PreparePredefinedDatabase(string dbName)
+        private static string PreparePredefinedDatabase(string dbName)
         {
             string dbPath = "Databases\\vsTestDatabase.cblite2\\";
 
@@ -223,7 +222,7 @@ namespace Couchbase.Lite.Testing
             DatabaseConfiguration dbConfig = new();
             Database.Copy(databasePath, dbName, dbConfig);
 
-            Database db = new(dbName, dbConfig);
+            var db = MemoryMap.New<Database>(dbName, dbConfig);
             Console.WriteLine("Succesfully loaded database");
             return db;
         }
