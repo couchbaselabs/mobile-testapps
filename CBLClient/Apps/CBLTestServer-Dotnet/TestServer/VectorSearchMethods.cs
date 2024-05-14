@@ -245,7 +245,7 @@ namespace Couchbase.Lite.Testing
             MutableDictionaryObject testDic = new();
             testDic.SetValue("word", input["input"].ToString());
             Console.WriteLine("XXXXXXXX inputWord in GetEmbedding = " + testDic["word"].ToString() + " XXXXXXXX");
-            DictionaryObject value = model.Predict(testDic, wordMap);
+            DictionaryObject value = model.Predict(testDic);
             Console.WriteLine("=== called prediction on model");
             Console.WriteLine("=== prediction result val = " + value.GetValue("vector"));
             return value.GetValue("vector");
