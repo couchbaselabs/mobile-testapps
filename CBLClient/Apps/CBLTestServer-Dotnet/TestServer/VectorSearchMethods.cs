@@ -178,6 +178,7 @@ namespace Couchbase.Lite.Testing
 
         public static object GetEmbedding(Dictionary<string, object> input)
         {
+            string returnValue = "Init value"
             Console.WriteLine("===== START METHOD: GET EMBEDDING");
             With<Database>(input, "database", db => {
                 VectorModel model = new("word", "vsTestDatabase", db);
@@ -189,9 +190,9 @@ namespace Couchbase.Lite.Testing
                 DictionaryObject value = model.Predict(testDic);
                 Console.WriteLine("=== called prediction on model");
                 Console.WriteLine("=== prediction result val = " + value.GetValue("vector"));
-                return value.GetValue("vector");
+                returnValue = value.GetValue("vector");
             });
-            return null; // Should never hit this.
+            return returnValue
         }
 
         public static void Query([NotNull] NameValueCollection args,
