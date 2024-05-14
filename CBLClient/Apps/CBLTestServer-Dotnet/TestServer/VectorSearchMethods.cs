@@ -260,7 +260,8 @@ namespace Couchbase.Lite.Testing
             string input = postBody["input"].ToString();
             testDic.SetValue("word", input);
             DictionaryObject value = model.Predict(testDic);
-            response.WriteBody(value.GetArray("vector"));
+            var rep = MemoryMap.New<MutableDictionaryObject>(value);
+            response.WriteBody(rep);
         }
 
         public static void Query([NotNull] NameValueCollection args,
