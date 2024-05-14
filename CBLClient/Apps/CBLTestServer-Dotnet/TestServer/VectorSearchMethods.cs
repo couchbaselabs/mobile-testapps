@@ -166,7 +166,7 @@ namespace Couchbase.Lite.Testing
             try
             {
                 Database db = new(InMemoryDbName);
-                string sql1 = String.Format("select word, vector from auxiliaryWords");
+                string sql1 = string.Format("select word, vector from auxiliaryWords");
                 IQuery query1 = db.CreateQuery(sql1);
                 IResultSet rs1 = query1.Execute();
                 string sql2 = string.Format("select word, vector from searchTerms");
@@ -249,6 +249,18 @@ namespace Couchbase.Lite.Testing
             Console.WriteLine("=== called prediction on model");
             Console.WriteLine("=== prediction result val = " + value.GetValue("vector"));
             return value.GetValue("vector");
+        }
+
+        public static void ExtGetEmbedding([NotNull] NameValueCollection args,
+                                  [NotNull] IReadOnlyDictionary<string, object> postBody,
+                                  [NotNull] HttpListenerResponse response)
+        {
+            VectorModel model = new("word");
+            MutableDictionaryObject testDic = new();
+            string input = postBody["input"].ToString();
+            testDic.SetValue("word", input);
+            DictionaryObject value = model.Predict(testDic);
+            response.WriteBody(value.GetValue("vector"));
         }
 
         public static void Query([NotNull] NameValueCollection args,
