@@ -173,7 +173,7 @@ namespace Couchbase.Lite.Testing
             With<Collection>(postBody, "collection", collection =>
             {
                 String docId = postBody["docId"].ToString();
-                response.WriteBody(collection.GetDocument(docId));
+                response.WriteBody(MemoryMap.Store(collection.GetDocument(docId)));
             });
         }
 
