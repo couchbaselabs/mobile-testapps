@@ -190,7 +190,7 @@ namespace Couchbase.Lite.Testing
                 DictionaryObject value = model.Predict(testDic);
                 Console.WriteLine("=== called prediction on model");
                 Console.WriteLine("=== prediction result val = " + value.GetValue("vector"));
-                returnValue = value.GetValue("vector");
+                returnValue = (string)value.GetValue("vector");
             });
             return returnValue;
         }
