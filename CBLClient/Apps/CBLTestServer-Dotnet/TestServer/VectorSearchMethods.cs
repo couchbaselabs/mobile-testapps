@@ -267,7 +267,7 @@ namespace Couchbase.Lite.Testing
                 object embeddedTerm = GetEmbedding(embeddingArgs);
 
                 string sql = postBody["sql"].ToString();
-                Console.WriteLine("QE-DEBUG Calling query string: " + sql)
+                Console.WriteLine("QE-DEBUG Calling query string: " + sql);
 
                 IQuery query = db.CreateQuery(sql);
                 query.Parameters.SetValue("vector", embeddedTerm);
