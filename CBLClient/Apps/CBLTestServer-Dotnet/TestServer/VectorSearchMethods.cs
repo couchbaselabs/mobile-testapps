@@ -218,9 +218,9 @@ namespace Couchbase.Lite.Testing
 
             string currDir = Directory.GetCurrentDirectory();
             string databasePath = Path.Combine(currDir, dbPath);
-
+            Console.WriteLine("GILAD current dir= " + currDir);
             DatabaseConfiguration dbConfig = new();
-            Database.Copy(databasePath, dbName, dbConfig);
+            Database.Copy(databasePath, dbName+"zhovna", dbConfig);
 
             var db = MemoryMap.New<Database>(dbName, dbConfig);
             Console.WriteLine("Succesfully loaded database " + dbName);
