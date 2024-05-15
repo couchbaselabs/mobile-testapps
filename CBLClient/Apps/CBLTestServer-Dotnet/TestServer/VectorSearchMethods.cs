@@ -231,7 +231,7 @@ namespace Couchbase.Lite.Testing
                     { "input", term },
                     { "database", db }
                 };
-                object embeddedTermDic = GetEmbedding(embeddingArgs);
+                DictionaryObject embeddedTermDic = GetEmbedding(embeddingArgs);
                 var embeddedTerm = value.GetValue("vector");
                 string sql = postBody["sql"].ToString();
                 Console.WriteLine("QE-DEBUG Calling query string: " + sql);
@@ -250,7 +250,7 @@ namespace Couchbase.Lite.Testing
             });
         }
 
-        private static object GetEmbedding(Dictionary<string, object> input)
+        private static DictionaryObject GetEmbedding(Dictionary<string, object> input)
         {
             VectorModel model = new("word");
             MutableDictionaryObject testDic = new();
