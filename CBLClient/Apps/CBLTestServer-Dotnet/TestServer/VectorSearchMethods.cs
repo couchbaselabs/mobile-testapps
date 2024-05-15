@@ -214,7 +214,7 @@ namespace Couchbase.Lite.Testing
             };
             DictionaryObject value = GetEmbedding(embeddingArgs);
             Dictionary<String, Object> vectorDict = value.ToDictionary();
-            List<object> embedding = (List<object>)vectorDict;
+            List<object> embedding = (List<object>)vectorDict["vector"];
             response.WriteBody(embedding);
         }
 
