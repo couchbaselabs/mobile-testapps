@@ -226,7 +226,7 @@ namespace Couchbase.Lite.Testing
                     { "input", term },
                     { "database", db }
                 };*/
-                object embeddedTerm = GetEmbedding()//embeddingArgs);
+                object embeddedTerm = GetEmbedding();//embeddingArgs);
 
                 string sql = postBody["sql"].ToString();
                 Console.WriteLine("QE-DEBUG Calling query string: " + sql);
