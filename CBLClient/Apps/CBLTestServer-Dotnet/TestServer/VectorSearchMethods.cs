@@ -32,7 +32,6 @@ namespace Couchbase.Lite.Testing
             // using db get defualt collection and store in Collection collection
             With<Database>(postBody, "database", database =>
             {
-                //Collection collection = database.GetDefaultCollection() ?? throw new InvalidOperationException("Could not open specified collection");
                 Collection collection = database.GetCollection(postBody["collectionName"].ToString(), "_default"); // TO: change the hardocded scope
                 // get values from postBody
                 string indexName = postBody["indexName"].ToString();
@@ -199,48 +198,18 @@ namespace Couchbase.Lite.Testing
 
         }
 
-        private static string PreparePredefinedDatabase(string dbName)
-        {
-            string dbPath = "Databases\\vsTestDatabase.cblite2\\";
-
-            //string currDir = Directory.GetCurrentDirectory();
-            string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath);
-
-            // Workaround: copying the predefined database vsTestDatabase.cblite to the db current directory, so it can be copied
-
-            string databasePath = Path.Combine(strWorkPath, dbPath);
-            //string databasePath = Path.Combine(currDir, dbPath);
-            DatabaseConfiguration dbConfig = new();
-            Database.Copy(databasePath, dbName, dbConfig);
-
-            var db = MemoryMap.New<Database>(dbName, dbConfig);
-            Console.WriteLine("Succesfully loaded database " + dbName);
-            return db;
-        }
-
-
-
-        public static object GetEmbedding(Dictionary<string, object> input)
-        {
-            VectorModel model = new("word");
-            MutableDictionaryObject testDic = new();
-            testDic.SetValue("word", input["input"].ToString());
-            DictionaryObject value = model.Predict(testDic);
-            return value.GetValue("vector");
-        }
-
         public static void ExtGetEmbedding([NotNull] NameValueCollection args,
                                   [NotNull] IReadOnlyDictionary<string, object> postBody,
                                   [NotNull] HttpListenerResponse response)
         {
-            VectorModel model = new("word");
-            MutableDictionaryObject testDic = new();
-            string input = postBody["input"].ToString();
-            testDic.SetValue("word", input);
-            DictionaryObject value = model.Predict(testDic);
-            Dictionary<String, Object> vectorDict = value.ToDictionary();
-            List<object> embedding = (List<object>)vectorDict["vector"];
+            //VectorModel model = new("word");
+            //MutableDictionaryObject testDic = new();
+            //string input = postBody["input"].ToString();
+            //testDic.SetValue("word", input);
+            //DictionaryObject value = model.Predict(testDic);
+             List<object> embedding = this.GetEmbedding(ars);
+            //Dictionary<String, Object> vectorDict = value.ToDictionary();
+            //List<object> embedding = (List<object>)vectorDict;
             response.WriteBody(embedding);
         }
 
@@ -275,6 +244,29 @@ namespace Couchbase.Lite.Testing
                 response.WriteBody(resultArray);
             });
         }
+
+        private static object GetEmbedding(Dictionary<string, object> input)
+        {
+            VectorModel model = new("word");
+            MutableDictionaryObject testDic = new();
+            testDic.SetValue("word", input["input"].ToString());
+            DictionaryObject value = model.Predict(testDic);
+            return value.GetValue("vector");
+        }
+
+        private static string PreparePredefinedDatabase(string dbName)
+        {
+            string dbPath = "Databases\\vsTestDatabase.cblite2\\";
+            string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath);
+            string databasePath = Path.Combine(strWorkPath, dbPath);
+            DatabaseConfiguration dbConfig = new();
+            Database.Copy(databasePath, dbName, dbConfig);
+            var db = MemoryMap.New<Database>(dbName, dbConfig);
+            Console.WriteLine("Succesfully loaded database " + dbName);
+            return db;
+        }
+
 
         public sealed class VectorModel : IPredictiveModel
         {
