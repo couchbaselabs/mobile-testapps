@@ -310,7 +310,7 @@ namespace Couchbase.Lite.Testing
                 ["vectorSearch_registerModel"] = VectorSearchMethods.RegisterModel,
                 ["vectorSearch_loadDatabase"] = VectorSearchMethods.LoadDatabase,
                 ["vectorSearch_query"] = VectorSearchMethods.Query,
-                ["vectorSearch_getEmbedding"] = VectorSearchMethods.ExtGetEmbedding
+                ["vectorSearch_getEmbedding"] = VectorSearchMethods.GetEmbedding
             };
 
         #endregion
