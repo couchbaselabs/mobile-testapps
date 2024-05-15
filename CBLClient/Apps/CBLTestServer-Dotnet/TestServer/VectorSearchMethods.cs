@@ -198,21 +198,11 @@ namespace Couchbase.Lite.Testing
 
         }
 
-        public static void ExtGetEmbedding([NotNull] NameValueCollection args,
+        public static void GetEmbedding([NotNull] NameValueCollection args,
                                   [NotNull] IReadOnlyDictionary<string, object> postBody,
                                   [NotNull] HttpListenerResponse response)
         {
-            //VectorModel model = new("word");
-            //MutableDictionaryObject testDic = new();
-            //string input = postBody["input"].ToString();
-            //testDic.SetValue("word", input);
-            //DictionaryObject value = model.Predict(testDic);
-            Dictionary<string, object> embeddingArgs = new()
-            {
-                { "input", postBody["input"].ToString() }
-                 
-            };
-            DictionaryObject value = GetEmbedding(embeddingArgs);
+            DictionaryObject value = GetEmbeddingDic(postBody["input"].ToString());
             Dictionary<String, Object> vectorDict = value.ToDictionary();
             List<object> embedding = (List<object>)vectorDict["vector"];
             response.WriteBody(embedding);
@@ -226,12 +216,7 @@ namespace Couchbase.Lite.Testing
 
             With<Database>(postBody, "database", db =>
             {
-                Dictionary<string, object> embeddingArgs = new()
-                {
-                    { "input", term },
-                    { "database", db }
-                };
-                DictionaryObject embeddedTermDic = GetEmbedding(embeddingArgs);
+                DictionaryObject embeddedTermDic = GetEmbeddingDic(term.ToString());
                 var embeddedTerm = embeddedTermDic.GetValue("vector");
                 string sql = postBody["sql"].ToString();
                 Console.WriteLine("QE-DEBUG Calling query string: " + sql);
@@ -250,13 +235,12 @@ namespace Couchbase.Lite.Testing
             });
         }
 
-        private static DictionaryObject GetEmbedding(Dictionary<string, object> input)
+        private static DictionaryObject GetEmbeddingDic(string term)
         {
             VectorModel model = new("word");
             MutableDictionaryObject testDic = new();
-            testDic.SetValue("word", input["input"].ToString());
+            testDic.SetValue("word", term);
             DictionaryObject value = model.Predict(testDic);
-            //return value.GetValue("vector");
             return value;
         }
 
