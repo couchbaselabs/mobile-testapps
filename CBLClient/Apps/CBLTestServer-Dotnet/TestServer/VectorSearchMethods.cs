@@ -207,9 +207,9 @@ namespace Couchbase.Lite.Testing
             //string input = postBody["input"].ToString();
             //testDic.SetValue("word", input);
             //DictionaryObject value = model.Predict(testDic);
-             List<object> embedding = GetEmbedding();
-            //Dictionary<String, Object> vectorDict = value.ToDictionary();
-            //List<object> embedding = (List<object>)vectorDict;
+            DictionaryObject value = GetEmbedding();
+            Dictionary<String, Object> vectorDict = value.ToDictionary();
+            List<object> embedding = (List<object>)vectorDict;
             response.WriteBody(embedding);
         }
 
@@ -226,8 +226,8 @@ namespace Couchbase.Lite.Testing
                     { "input", term },
                     { "database", db }
                 };*/
-                object embeddedTerm = GetEmbedding();//embeddingArgs);
-
+                object embeddedTermDic = GetEmbedding();//embeddingArgs);
+                var embeddedTerm = value.GetValue("vector")
                 string sql = postBody["sql"].ToString();
                 Console.WriteLine("QE-DEBUG Calling query string: " + sql);
 
@@ -256,7 +256,8 @@ namespace Couchbase.Lite.Testing
             MutableDictionaryObject testDic = new();
             testDic.SetValue("word", input["input"].ToString());
             DictionaryObject value = model.Predict(testDic);
-            return value.GetValue("vector");
+            //return value.GetValue("vector");
+            return value;
         }
 
         private static string PreparePredefinedDatabase(string dbName)
