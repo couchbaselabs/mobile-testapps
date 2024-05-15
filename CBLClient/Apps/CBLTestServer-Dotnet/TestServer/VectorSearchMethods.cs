@@ -207,7 +207,12 @@ namespace Couchbase.Lite.Testing
             //string input = postBody["input"].ToString();
             //testDic.SetValue("word", input);
             //DictionaryObject value = model.Predict(testDic);
-            DictionaryObject value = GetEmbedding();
+            Dictionary<string, object> embeddingArgs = new()
+            {
+                { "input", postBody["input"].ToString() }
+                 
+            };
+            DictionaryObject value = GetEmbedding(embeddingArgs);
             Dictionary<String, Object> vectorDict = value.ToDictionary();
             List<object> embedding = (List<object>)vectorDict;
             response.WriteBody(embedding);
@@ -221,13 +226,13 @@ namespace Couchbase.Lite.Testing
 
             With<Database>(postBody, "database", db =>
             {
-                /*Dictionary<string, object> embeddingArgs = new()
+                Dictionary<string, object> embeddingArgs = new()
                 {
                     { "input", term },
                     { "database", db }
-                };*/
-                object embeddedTermDic = GetEmbedding();//embeddingArgs);
-                var embeddedTerm = embeddedTermDic.GetValue("vector");
+                };
+                object embeddedTermDic = GetEmbedding(embeddingArgs);
+                var embeddedTerm = value.GetValue("vector");
                 string sql = postBody["sql"].ToString();
                 Console.WriteLine("QE-DEBUG Calling query string: " + sql);
 
@@ -245,13 +250,8 @@ namespace Couchbase.Lite.Testing
             });
         }
 
-        private static object GetEmbedding()//Dictionary<string, object> input)
+        private static object GetEmbedding(Dictionary<string, object> input)
         {
-            Dictionary<string, object> embeddingArgs = new()
-            {
-                { "input", term },
-                { "database", db }
-            };
             VectorModel model = new("word");
             MutableDictionaryObject testDic = new();
             testDic.SetValue("word", input["input"].ToString());
