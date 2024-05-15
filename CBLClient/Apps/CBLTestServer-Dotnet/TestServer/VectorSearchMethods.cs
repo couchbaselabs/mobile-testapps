@@ -184,14 +184,14 @@ namespace Couchbase.Lite.Testing
                     ArrayObject vector = r.GetArray("vector");
                     words.SetValue(word, vector);
                 }
-                db.Close(InMemoryDbName);
+                db.Close();
                 return words;
 
             }
             catch (Exception e)
             {
                 Console.WriteLine(e + "retrieving vector could not be done - getWordVector query returned no results");
-                db.Close(InMemoryDbName);
+                db.Close();
                 return null;
             }
         }
