@@ -13,7 +13,7 @@ function Modify-Packages {
     for($i = 0; $i -lt $content.Length; $i++) {
         $line = $content[$i]
         $isMatch = $line -match "^(?!.*VectorSearch).*?<PackageReference Include=`"Couchbase\.Lite(.*?)`""
-        if($isMatch) {
+	if($isMatch) {
             $oldPackageName = $matches[1]
             $packageName = $oldPackageName.Replace(".Enterprise", "")
             if(-Not $community) {
@@ -63,10 +63,10 @@ Push-Location $PSScriptRoot
 $fullVersion = Calculate-Version
 
 try {
-    Modify-Packages "$PSScriptRoot\TestServer.NetCore.csproj" $fullVersion $Community
-    Modify-Packages "$PSScriptRoot\..\TestServer\TestServer.csproj" $fullVersion $Community
+    Modify-Packages "$PSScriptRoot/TestServer.NetCore.csproj" $fullVersion $Community
+    Modify-Packages "$PSScriptRoot/../TestServer/TestServer.csproj" $fullVersion $Community
 
-    Push-Location ..\TestServer
+    Push-Location ../TestServer
     dotnet restore
     if($LASTEXITCODE -ne 0) {
         Write-Error "Restore failed for TestServer"
@@ -91,15 +91,16 @@ try {
         New-Item -ItemType Directory "zips"
     }
 
-    if(Test-Path "zips\TestServer.NetCore.zip") {
-        Remove-Item "zips\TestServer.NetCore.zip"
+    if(Test-Path "zips/TestServer.NetCore.zip") {
+        Remove-Item "zips/TestServer.NetCore.zip"
     }
     
-    $ZipPath = Resolve-Path ".\zips"
+    $ZipPath = Resolve-Path "./zips"
 
-    Push-Location bin\Release\net6.0\publish
+    Push-Location bin/Release/net6.0/publish
     try {
-        7z a -r ${ZipPath}\TestServer.NetCore.zip *
+       # 7z a -r ${ZipPath}/TestServer.NetCore.zip *
+       zip -r $zipPath *
     } finally {
         Pop-Location
     }
