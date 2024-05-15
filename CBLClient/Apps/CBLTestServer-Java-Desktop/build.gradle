@@ -33,11 +33,12 @@ repositories {
     mavenCentral()
     maven {
         url 'http://proget.build.couchbase.com/maven2/internalmaven/'
+        // Release repo
+        // url 'https://mobile.maven.couchbase.com/maven2/dev/'
     }
     maven {
         url 'https://oss.sonatype.org/content/repositories/snapshots'
     }
-    maven { url 'https://proget.sc.couchbase.com/maven2/internalmaven' }
 }
 
 java {
@@ -58,7 +59,7 @@ dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 
     implementation "com.couchbase.lite:couchbase-lite-java-ee:${COUCHBASE_LITE_JAVA_VERSION}"
-    implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-arm64:1.0.0-60000'
+    implementation 'com.couchbase.lite:couchbase-lite-java-vector-search:1.0.0-18'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'org.nanohttpd:nanohttpd:2.3.2-SNAPSHOT'
 }

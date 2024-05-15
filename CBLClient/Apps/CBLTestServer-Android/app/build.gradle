@@ -83,9 +83,9 @@ android {
         // legacy maven for build version < 3.0.0-160
         // maven { url "http://proget.build.couchbase.com/maven2/internalmaven" }
         // external maven
-        // maven { url 'https://mobile.maven.couchbase.com/maven2/dev/' }
+        maven { url 'https://mobile.maven.couchbase.com/maven2/dev/' }
         // internal maven
-        maven { url 'https://proget.sc.couchbase.com/maven2/internalmaven' }
+        //maven { url 'https://proget.sc.couchbase.com/maven2/internalmaven' }
         // where nanohttpd lives
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
         google()
@@ -103,8 +103,8 @@ android {
         implementation 'org.nanohttpd:nanohttpd:2.3.2-SNAPSHOT'
 
         // Couchbase Lite:
-        implementation 'com.couchbase.lite:couchbase-lite-android-ee:3.2.0-69'
-        implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-arm64:1.0.0-7'
+        implementation 'com.couchbase.lite:couchbase-lite-android-ee:3.2.0-79'
+        implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-arm64:1.0.0-18'
         // implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-x86_64:1.0.0-60000'
 
         // Android SDK:

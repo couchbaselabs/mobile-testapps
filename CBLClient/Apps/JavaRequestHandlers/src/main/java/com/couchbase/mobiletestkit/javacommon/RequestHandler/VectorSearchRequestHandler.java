@@ -1,184 +1,225 @@
 package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 
 import java.util.List;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.couchbase.mobiletestkit.javacommon.*;
 import com.couchbase.lite.*;
+import com.couchbase.lite.internal.utils.FileUtils;
+import com.couchbase.mobiletestkit.javacommon.util.Log;
 
 public class VectorSearchRequestHandler {
-    public Object handleRequest(String method, Args args) throws Exception {
-        switch (method) {
+    private static  Map<String, Array> wordMap;
+    private static final Boolean useInMemoryDb = true;
+    private static final String inMemoryDbName = "InMemoryDb";
+    
+    static Map<String, Array> getWordVectMap() {
+        try {
+            DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
+            Database db = preparePredefinedDatabase(inMemoryDbName);
 
-            case "vectorSearch_createIndex":
-                Database database = args.get("database");
+            String sql1 = String.format("select word, vector from auxiliaryWords");
+            Query query1 = db.createQuery(sql1);
+            ResultSet rs1 = query1.execute();
+            String sql2 = String.format("select word, vector from searchTerms");
+            Query query2 = db.createQuery(sql2);
+            ResultSet rs2 = query2.execute();
 
-                String scopeName = args.get("scopeName") != null ? args.get("scopeName") : "_default";
-                String collectionName = args.get("collectionName") != null ? args.get("collectionName") : "_default";
+            Map<String, Array> words = new HashMap<String, Array>();
+            List<Result> rl = rs1.allResults();
+            List<Result> rl2 = rs2.allResults();
+            rl.addAll(rl2);
 
-                Collection collection = database.getCollection(collectionName, scopeName);
-                if (collection == null) {
-                    throw new Exception("Could not open specified collection");
-                }
+            for (Result r : rl) {
+                String word = r.getString("word");
+                Array vector = r.getArray("vector");
+                words.put(word, vector);
+            }
+            return words;
 
-                String indexName = args.get("indexName");
+        } catch (Exception e) {
+            System.err.println(e + "retrieving vector could not be done - getWordVector query returned no results");
+            return null;
+        }
+    }
 
-                String expression = args.get("expression");
+    public String createIndex(Args args) throws CouchbaseLiteException, Exception {
+        Database database = args.get("database");
+        String scopeName = args.get("scopeName") != null ? args.get("scopeName") : "_default";
+        String collectionName = args.get("collectionName") != null ? args.get("collectionName") : "_default";
 
-                int dimensions = args.get("dimensions");
-                int centroids = args.get("centroids");
+        Collection collection = database.getCollection(collectionName, scopeName);
+        if (collection == null) {
+            throw new Exception("Could not open specified collection");
+        }
 
-                VectorEncoding.ScalarQuantizerType scalarEncoding = args.get("scalarEncoding");
+        String indexName = args.get("indexName");
 
-                Integer subquantizers = args.get("subquantizers");
-                Integer bits = args.get("bits");
+        String expression = args.get("expression");
 
-                String metric = args.get("metric");
+        int dimensions = args.get("dimensions");
+        int centroids = args.get("centroids");
 
-                Integer minTrainingSize = args.get("minTrainingSize");
-                Integer maxTrainingSize = args.get("maxTrainingSize");
+        VectorEncoding.ScalarQuantizerType scalarEncoding = args.get("scalarEncoding");
 
-                if (scalarEncoding != null && (bits != null || subquantizers != null)) {
-                    throw new Exception(
-                            "Cannot have scalar quantization and arguments for product quantization at the same time");
-                }
+        Integer subquantizers = args.get("subquantizers");
+        Integer bits = args.get("bits");
 
-                if ((bits != null && subquantizers == null) || (bits == null && subquantizers != null)) {
-                    throw new Exception("Product quantization requires both bits and subquantizers set");
-                }
+        String metric = args.get("metric");
 
-                VectorIndexConfiguration config = new VectorIndexConfiguration(expression, dimensions, centroids);
-                if (scalarEncoding != null) {
-                    config.setEncoding(VectorEncoding.scalarQuantizer(scalarEncoding));
-                }
-                if (bits != null) {
-                    config.setEncoding(VectorEncoding.productQuantizer(subquantizers, bits));
-                }
-                if (metric != null) {
-                    switch (metric) {
-                        case "euclidean":
-                            config.setMetric(VectorIndexConfiguration.DistanceMetric.EUCLIDIAN);
-                            break;
-                        case "cosine":
-                            config.setMetric(VectorIndexConfiguration.DistanceMetric.COSINE);
-                            break;
-                        default:
-                            throw new Error("Invalid distance metric");
-                    }
-                }
+        Integer minTrainingSize = args.get("minTrainingSize");
+        Integer maxTrainingSize = args.get("maxTrainingSize");
 
-                if (minTrainingSize != null) {
-                    config.setMinTrainingSize(minTrainingSize);
-                }
+        if (scalarEncoding != null && (bits != null || subquantizers != null)) {
+            throw new Exception(
+                    "Cannot have scalar quantization and arguments for product quantization at the same time");
+        }
 
-                if (maxTrainingSize != null) {
-                    config.setMaxTrainingSize(maxTrainingSize);
-                }
+        if ((bits != null && subquantizers == null) || (bits == null && subquantizers != null)) {
+            throw new Exception("Product quantization requires both bits and subquantizers set");
+        }
 
-                collection.createIndex(indexName, config);
+        VectorIndexConfiguration config = new VectorIndexConfiguration(expression, dimensions, centroids);
+        if (scalarEncoding != null) {
+            config.setEncoding(VectorEncoding.scalarQuantizer(scalarEncoding));
+        }
+        if (bits != null) {
+            config.setEncoding(VectorEncoding.productQuantizer(subquantizers, bits));
+        }
+        if (metric != null) {
+            switch (metric) {
+                case "euclidean":
+                    config.setMetric(VectorIndexConfiguration.DistanceMetric.EUCLIDEAN);
+                    break;
+                case "cosine":
+                    config.setMetric(VectorIndexConfiguration.DistanceMetric.COSINE);
+                    break;
+                default:
+                    throw new Error("Invalid distance metric");
+            }
+        }
 
-                return "???";
+        if (minTrainingSize != null) {
+            config.setMinTrainingSize(minTrainingSize);
+        }
 
-            case "vectorSearch_registerModel":
-                String key = args.get("key");
-                String name = args.get("name");
-                vectorModel model = new vectorModel(key);
-                Database.prediction.registerModel(name, model);
-                return "Registered model with name " + name;
+        if (maxTrainingSize != null) {
+            config.setMaxTrainingSize(maxTrainingSize);
+        }
 
-            case "vectorSearch_query":
-                String term = args.get("term");
+        try {
+            collection.createIndex(indexName, config);
+            return String.format("Created index with name %s on collection %s", indexName, collectionName);
+        } catch (Exception e) {
+            return "Could not create index: " + e;
+        }
+    }
 
-                Args embeddingArgs = new Args();
-                embeddingArgs.put(term, "input");
-                Object embeddedTerm = this.handleRequest("vectorSearch_getEmbedding", embeddingArgs);
+    public String registerModel(Args args) {
+        String key = args.get("key");
+        String name = args.get("name");
+        vectorModel model = new vectorModel(key, inMemoryDbName);
+        Database.prediction.registerModel(name, model);
+        return "Registered model with name " + name;
+    }
 
-                String sql = args.get("sql");
+    public List<Object> query(Args args) throws CouchbaseLiteException, IOException {
+        String term = args.get("term");
 
-                Database db = args.get("database");
+        Args embeddingArgs = new Args();
+        embeddingArgs.put("input", term);
+        Object embeddedTerm = this.getEmbedding(embeddingArgs);
 
-                Parameters params = new Parameters();
-                params.setValue("vector", embeddedTerm);
-                Query query = db.createQuery(sql);
-                query.getParameters() = params;
+        String sql = args.get("sql");
 
-                List<Object> resultArray = new ArrayList<>();
-                ResultSet queryResults = query.execute();
-                for (Result row : queryResults) {
-                    resultArray.add(row.toMap());
-                }
+        Database db = args.get("database");
 
-                return resultArray;
+        Parameters params = new Parameters();
+        params.setValue("vector", embeddedTerm);
+        Query query = db.createQuery(sql);
+        query.setParameters(params);
 
-            case "vectorSearch_loadDatabase":
-                // loads the given database vsTestDatabase
-                DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
-                Args newArgs = args;
-                newArgs.put("dbPath", "Databases/vsTestDatabase.cblite2");
-                try {
-                    String dbPath = dbHandler.getPreBuiltDb(newArgs);
-                    newArgs.put("dbPath", dbPath);
-                    newArgs.put("dbName", "vsTestDatabase");
-                    dbHandler.copy(newArgs);
-                } catch (Exception e) {
-                    // TODO: handle exception
-                }
-                Database db1 = new Database("vsTestDatabase");
-                return db1;
+        List<Object> resultArray = new ArrayList<>();
+        try (ResultSet rs = query.execute()) {
+            for (Result row : rs) {
+                resultArray.add(row.toMap());
+            }
+        }
 
-            case "vectorSearch_getEmbedding":
-                Database db3 = this.handleRequest("vectorSearch_loadDatabase", args);
-                vectorModel model1 = new vectorModel("test", db3);
-                MutableDictionary testDic = new MutableDictionary();
-                String input = args.get("input");
-                testDic.setValue(input, "test");
-                Dictionary value = model1.predict(testDic);
+        return resultArray;
+    }
 
-                return value.toArray();
+    public Object getEmbedding(Args args) throws CouchbaseLiteException, IOException {
+        vectorModel model1 = new vectorModel("word", inMemoryDbName);
+        MutableDictionary testDic = new MutableDictionary();
+        String input = args.get("input");
+        testDic.setValue("word", input);
+        Dictionary value = model1.predict(testDic);
+        return value.getValue("vector");
+    }
 
-            default:
-                throw new Exception(method);
+    public Database loadDatabase(Args args) throws CouchbaseLiteException, IOException {
+        if (useInMemoryDb) {
+            wordMap = getWordVectMap();
+            Database db = new Database(inMemoryDbName);
+            return db;
+        }
+        else {
+            Database db = preparePredefinedDatabase("dummtDBIgnoreIt");
+            return db;
         }
     }
 
     private class vectorModel implements PredictiveModel {
         String key;
-        Database db;
+        String dbName;
 
-        vectorModel(String key, Database db) {
-            this.key = key;
-            this.db = db;
-        }
-
-        vectorModel(String key) {
-            this.key = key;
-        }
-
-        List<Object> getWordVector(String word, String collection) {
-            String sql = String.format("select vector from %s where word = '%s'", collection, word);
-            Query query = this.db.createQuery(sql);
-            ResultSet rs = query.execute();
-            List<Object> resultArray = new ArrayList<>();
-            for (Object row : rs) {
-                resultArray.add(row.toMap());
+        vectorModel(String key, String name) {
+            try {
+                this.key = key;
+                this.dbName = name;
+            } catch (Exception e) {
+                System.err.println(e + "Error creating instance of vectorModel");
             }
-            return resultArray;
         }
 
         @Override
         public Dictionary predict(Dictionary input) {
-            String inputWord = input.getString("word");
-
-            List<Object> result = getWordVector(inputWord, "words");
-
+            String inputWord = input.getString(this.key);
+            Object result = new ArrayList<>();
+            result = wordMap.get(inputWord);
             MutableDictionary output = new MutableDictionary();
             output.setValue("vector", result);
             return output;
         }
 
     }
-    // Define other methods
-}
 
-// Define other helper classes and methods
+    private static Database preparePredefinedDatabase(String dbName) throws CouchbaseLiteException, IOException {
+         // loads the given database vsTestDatabase
+         DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
+         Args newArgs = new Args();
+         newArgs.put("dbPath", "vstestDatabase.cblite2");
+         String dbPath = dbHandler.getPreBuiltDb(newArgs);
+         newArgs.put("directory", "");
+         if (RequestHandlerDispatcher.context.getPlatform().equals("android")) {
+             newArgs.put("directory", new File(dbPath).getParent());
+         }
+         Database.exists("vstestDatabase.cblite2", new File(dbPath));
+         DatabaseConfigurationRequestHandler configHandler = new DatabaseConfigurationRequestHandler();
+         DatabaseConfiguration dbConfig = new DatabaseConfiguration();
+         dbConfig = configHandler.configure(newArgs);
+         newArgs.put("dbPath", dbPath);
+         newArgs.put("dbName", dbName);
+         newArgs.put("dbConfig", dbConfig);
+         dbHandler.copy(newArgs);
+         Database db1 = new Database(dbName);
+
+         return db1;
+    }
+}

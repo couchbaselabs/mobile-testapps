@@ -32,12 +32,22 @@ import com.couchbase.mobiletestkit.javacommon.util.Log;
 
 public class CollectionRequestHandler {
     private static final String TAG = "DATABASE";
-    /* _______________*/
+
+    /* _______________ */
     /* - Collection - */
-    /* _______________*/
+    /* _______________ */
     public String getCollectionName(Args args) throws CouchbaseLiteException {
         Collection object = args.get("collection");
         return object.getName();
+    }
+
+    public List<Collection> collectionInstances(Args args) throws CouchbaseLiteException {
+        String scopeName = (args.get("scopeName") != null) ? args.get("scopeName") : "_default";
+        Database db = args.get("database");
+        Set<Collection> setCollections = db.getCollections(scopeName);
+        List<Collection> returnCollections = new ArrayList<Collection>();
+        returnCollections.addAll(setCollections);
+        return returnCollections;
     }
 
     public Collection createCollection(Args args) throws CouchbaseLiteException {
@@ -46,8 +56,7 @@ public class CollectionRequestHandler {
         String scopeName = args.get("scopeName");
         if (scopeName == null) {
             return db.createCollection(collectionName);
-        }
-        else {
+        } else {
             return db.createCollection(collectionName, scopeName);
         }
     }
@@ -59,15 +68,14 @@ public class CollectionRequestHandler {
         if (scopeName == null) {
             db.deleteCollection(collectionName);
             return;
-        }
-        else {
+        } else {
             db.deleteCollection(collectionName, scopeName);
             return;
         }
     }
 
     public Collection defaultCollection(Args args) throws CouchbaseLiteException {
-        Database db =args.get("database");
+        Database db = args.get("database");
         return db.getDefaultCollection();
 
     }
@@ -75,8 +83,7 @@ public class CollectionRequestHandler {
     public static Set<Collection> collectionsInScope(Database db, String scopeName) throws CouchbaseLiteException {
         if (scopeName == null) {
             return db.getCollections();
-        }
-        else {
+        } else {
             return db.getCollections(scopeName);
         }
     }
@@ -86,7 +93,7 @@ public class CollectionRequestHandler {
         String scopeName = args.get("scopeName");
         ArrayList<String> collectionsNames = new ArrayList<String>();
         Set<Collection> collectionObjects = collectionsInScope(db, scopeName);
-        for (Collection collectionObject: collectionObjects) {
+        for (Collection collectionObject : collectionObjects) {
             collectionsNames.add(collectionObject.getName());
         }
         return collectionsNames;
@@ -133,7 +140,9 @@ public class CollectionRequestHandler {
                                 newVal.put(item.getKey().toString(), b.getProperties());
                             }
                         }
-                        if (isBlob) { doc.put(entry.getKey(), newVal); }
+                        if (isBlob) {
+                            doc.put(entry.getKey(), newVal);
+                        }
                     }
                 }
                 documents.put(id, doc);
@@ -163,8 +172,7 @@ public class CollectionRequestHandler {
         String scopeName = args.get("scopeName");
         if (scopeName == null) {
             return db.getCollection(collectionName);
-        }
-        else {
+        } else {
             return db.getCollection(collectionName, scopeName);
         }
     }
@@ -244,9 +252,9 @@ public class CollectionRequestHandler {
     }
 
     public void saveDocuments(Args args) throws CouchbaseLiteException {
-       final Collection collection = args.get("collection");
-       final Database db = args.get("database");
-       final Map<String, Map<String, Object>> documents = args.get("documents");
+        final Collection collection = args.get("collection");
+        final Database db = args.get("database");
+        final Map<String, Map<String, Object>> documents = args.get("documents");
         db.inBatch(() -> {
             for (Map.Entry<String, Map<String, Object>> entry : documents.entrySet()) {
                 String id = entry.getKey();
@@ -255,8 +263,7 @@ public class CollectionRequestHandler {
                 MutableDocument document = new MutableDocument(id, new_data);
                 try {
                     collection.save(document);
-                }
-                catch (CouchbaseLiteException e) {
+                } catch (CouchbaseLiteException e) {
                     Log.e(TAG, "DB Save failed", e);
                 }
             }
@@ -274,21 +281,20 @@ public class CollectionRequestHandler {
         for (Map.Entry<String, Object> attItem : attachment_items.entrySet()) {
             String attItemKey = attItem.getKey();
             HashMap<String, String> attItemValue = (HashMap<String, String>) attItem.getValue();
-            if (attItemValue.get("data") != null){
-                String contentType = attItemKey.endsWith(".png") ? "image/jpeg": "text/plain";
+            if (attItemValue.get("data") != null) {
+                String contentType = attItemKey.endsWith(".png") ? "image/jpeg" : "text/plain";
                 Blob blob = new Blob(contentType,
                         RequestHandlerDispatcher.context.decodeBase64(attItemValue.get("data")));
                 data.put(attItemKey, blob);
 
-            }
-            else if (attItemValue.containsKey("digest")){
+            } else if (attItemValue.containsKey("digest")) {
                 existingBlobItems.put(attItemKey, attItemValue);
             }
         }
         data.remove("_attachments");
         // deal with partial blob situation,
         // remove all elements then add back blob type only items to _attachments key
-        if (existingBlobItems.size() > 0 && existingBlobItems.size() < attachment_items.size()){
+        if (existingBlobItems.size() > 0 && existingBlobItems.size() < attachment_items.size()) {
             data.remove("_attachments");
             data.put("_attachments", existingBlobItems);
         }
