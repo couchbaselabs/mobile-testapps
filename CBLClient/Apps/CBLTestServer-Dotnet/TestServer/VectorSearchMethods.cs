@@ -248,7 +248,7 @@ namespace Couchbase.Lite.Testing
             testDic.SetValue("word", input);
             DictionaryObject value = model.Predict(testDic);
             vectorDict = value.ToDictionary();
-            embedding = vectorDict["vector"]
+            embedding = vectorDict["vector"];
             response.WriteBody(embedding);
         }
 
