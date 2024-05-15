@@ -163,9 +163,9 @@ namespace Couchbase.Lite.Testing
 
         static MutableDictionaryObject GetWordVectMap()
         {
+            Database db = new(InMemoryDbName);
             try
             {
-                Database db = new(InMemoryDbName);
                 string sql1 = string.Format("select word, vector from auxiliaryWords");
                 IQuery query1 = db.CreateQuery(sql1);
                 IResultSet rs1 = query1.Execute();
@@ -184,12 +184,14 @@ namespace Couchbase.Lite.Testing
                     ArrayObject vector = r.GetArray("vector");
                     words.SetValue(word, vector);
                 }
+                db.close(InMemoryDbName)
                 return words;
 
             }
             catch (Exception e)
             {
                 Console.WriteLine(e + "retrieving vector could not be done - getWordVector query returned no results");
+                db.close(InMemoryDbName)
                 return null;
             }
         }
@@ -219,6 +221,9 @@ namespace Couchbase.Lite.Testing
             string currDir = Directory.GetCurrentDirectory();
             string databasePath = Path.Combine(currDir, dbPath);
             Console.WriteLine("GILAD current dir= " + currDir);
+            string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath)
+            Console.WriteLine("GILAD executable dir= " + strWorkPath);
             DatabaseConfiguration dbConfig = new();
             Database.Copy(databasePath, dbName+"zhovna", dbConfig);
 
@@ -257,7 +262,6 @@ namespace Couchbase.Lite.Testing
                                   [NotNull] HttpListenerResponse response)
         {
             object term = postBody["term"];
-            //string db = postBody["database"].ToString();
 
             With<Database>(postBody, "database", db =>
             {
