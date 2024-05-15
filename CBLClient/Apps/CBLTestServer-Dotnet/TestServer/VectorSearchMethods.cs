@@ -232,7 +232,7 @@ namespace Couchbase.Lite.Testing
                     { "database", db }
                 };
                 DictionaryObject embeddedTermDic = GetEmbedding(embeddingArgs);
-                var embeddedTerm = value.GetValue("vector");
+                var embeddedTerm = embeddedTermDic.GetValue("vector");
                 string sql = postBody["sql"].ToString();
                 Console.WriteLine("QE-DEBUG Calling query string: " + sql);
 
