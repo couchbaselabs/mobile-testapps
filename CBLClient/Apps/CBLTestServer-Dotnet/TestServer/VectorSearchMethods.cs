@@ -184,14 +184,14 @@ namespace Couchbase.Lite.Testing
                     ArrayObject vector = r.GetArray("vector");
                     words.SetValue(word, vector);
                 }
-                db.close(InMemoryDbName)
+                db.close(InMemoryDbName);
                 return words;
 
             }
             catch (Exception e)
             {
                 Console.WriteLine(e + "retrieving vector could not be done - getWordVector query returned no results");
-                db.close(InMemoryDbName)
+                db.close(InMemoryDbName);
                 return null;
             }
         }
@@ -222,7 +222,7 @@ namespace Couchbase.Lite.Testing
             string databasePath = Path.Combine(currDir, dbPath);
             Console.WriteLine("GILAD current dir= " + currDir);
             string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath)
+            string strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath);
             Console.WriteLine("GILAD executable dir= " + strWorkPath);
             DatabaseConfiguration dbConfig = new();
             Database.Copy(databasePath, dbName+"zhovna", dbConfig);
