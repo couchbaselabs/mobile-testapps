@@ -207,7 +207,7 @@ namespace Couchbase.Lite.Testing
             //string input = postBody["input"].ToString();
             //testDic.SetValue("word", input);
             //DictionaryObject value = model.Predict(testDic);
-             List<object> embedding = this.GetEmbedding(ars);
+             List<object> embedding = GetEmbedding(args);
             //Dictionary<String, Object> vectorDict = value.ToDictionary();
             //List<object> embedding = (List<object>)vectorDict;
             response.WriteBody(embedding);
