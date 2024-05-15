@@ -117,21 +117,6 @@ namespace Couchbase.Lite.Testing
                     MaxTrainingSize = maxTrainingSize
                 };
 
-                // const uint xDIMENSIONS = 300;
-                // const uint xCENTROIDS = 20;
-                // const uint xMIN_TRAINING_SIZE = 100;
-                // const uint xMAX_TRAINING_SIZE = 200;
-                // const string xEXPRESSION = "vector";
-                // const DistanceMetric xMETRIC = DistanceMetric.Cosine;
-
-                // var config = new VectorIndexConfiguration(xEXPRESSION, xDIMENSIONS, xCENTROIDS)
-                // {
-                //     Encoding = VectorEncoding.None(),
-                //     DistanceMetric = xMETRIC,
-                //     MinTrainingSize = xMIN_TRAINING_SIZE,
-                //     MaxTrainingSize = xMAX_TRAINING_SIZE
-                // };
-
                 try
                 {
                     collection.CreateIndex(indexName, config);
@@ -218,14 +203,16 @@ namespace Couchbase.Lite.Testing
         {
             string dbPath = "Databases\\vsTestDatabase.cblite2\\";
 
-            string currDir = Directory.GetCurrentDirectory();
-            string databasePath = Path.Combine(currDir, dbPath);
-            Console.WriteLine("GILAD current dir= " + currDir);
+            //string currDir = Directory.GetCurrentDirectory();
             string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath);
-            Console.WriteLine("GILAD executable dir= " + strWorkPath);
+
+            // Workaround: copying the predefined database vsTestDatabase.cblite to the db current directory, so it can be copied
+
+            string databasePath = Path.Combine(strWorkPath, dbPath);
+            //string databasePath = Path.Combine(currDir, dbPath);
             DatabaseConfiguration dbConfig = new();
-            Database.Copy(databasePath, dbName+"zhovna", dbConfig);
+            Database.Copy(databasePath, dbName, dbConfig);
 
             var db = MemoryMap.New<Database>(dbName, dbConfig);
             Console.WriteLine("Succesfully loaded database " + dbName);
