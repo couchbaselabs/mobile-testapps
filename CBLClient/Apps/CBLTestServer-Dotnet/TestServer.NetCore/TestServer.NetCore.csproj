@@ -147,7 +147,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-    <ItemGroup>
+  <ItemGroup>
     <None Update="Databases\travel-sample-encrypted-2.8.0.cblite2\db.sqlite3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -157,15 +157,17 @@
     <None Update="Databases\travel-sample-encrypted-2.8.0.cblite2\db.sqlite3-wal">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
     <None Update="Databases\vsTestDatabase.cblite2\db.sqlite3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None>
     <None Update="Databases\vsTestDatabase.cblite2\db.sqlite3-shm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None>
     <None Update="Databases\vsTestDatabase.cblite2\db.sqlite3-wal">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None>
   </ItemGroup>
   <ItemGroup>
     <None Update="Files\golden_gate_large.jpg">
