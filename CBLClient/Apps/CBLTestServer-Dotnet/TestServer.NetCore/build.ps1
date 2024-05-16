@@ -1,12 +1,16 @@
 param (
     [string]$Version,
+    [string]$VectorSearchVersion,
     [switch]$Community
 )
 
 function Modify-Packages {
     $filename = $args[0]
     $ver = $args[1]
-    $community = $args[2]
+    $vsver = $args[2]
+    $community = $args[3]
+
+    $enterprisePackageString = ".Enterprise"
 
     $content = [System.IO.File]::ReadAllLines($filename)
     $checkNextLine = $false
@@ -15,15 +19,24 @@ function Modify-Packages {
         $isMatch = $line -match "^(?!.*VectorSearch).*?<PackageReference Include=`"Couchbase\.Lite(.*?)`""
         if($isMatch) {
             $oldPackageName = $matches[1]
-            $packageName = $oldPackageName.Replace(".Enterprise", "")
-            if(-Not $community) {
-                $packageName = ".Enterprise" + $packageName;
+            if ($oldPackageName -eq $enterprisePackageString) {
+                $packageName = $oldPackageName.Replace($enterprisePackageString, "")
+                if(-Not $community) {
+                    $packageName = $enterprisePackageString + $packageName;
+                }
             }
 
             $isMatch = $line -match ".*?Version=`"(.*?)`""
             if($isMatch) {
                 $oldVersion = $matches[1]
-                $line = $line.Replace("Couchbase.Lite$oldPackageName", "Couchbase.Lite$packageName").Replace($oldVersion, $ver)
+                switch ($oldPackageName) {
+                    $enterprisePackageString {
+                        $line = $line.Replace("Couchbase.Lite$oldPackageName", "Couchbase.Lite$packageName").Replace($oldVersion, $ver)
+                    }
+                    ".VectorSearch" {
+                        $line = $line.Replace($oldVersion, $vsver)
+                    }
+                }
             } else {
                 $checkNextLine = $true
             }
