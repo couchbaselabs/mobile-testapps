@@ -167,7 +167,7 @@
     <None>
     <None Update="Databases\vsTestDatabase.cblite2\db.sqlite3-wal">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    <None>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Update="Files\golden_gate_large.jpg">
