@@ -200,6 +200,17 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Update="Databases\vsTestDatabase.cblite2\db.sqlite3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None>
+    <None Update="Databases\vsTestDatabase.cblite2\db.sqlite3-shm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None>
+    <None Update="Databases\vsTestDatabase.cblite2\db.sqlite3-wal">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None>
+  </ItemGroup>
+  <ItemGroup>
     <None Update="Files\golden_gate_large.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -330,7 +341,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Databases\vsTestDatabase.cblite2\db.sqlite3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None>
     <None Include="Databases\vsTestDatabase.cblite2\db.sqlite3-shm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None>
     <None Include="Databases\vsTestDatabase.cblite2\db.sqlite3-wal">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     <None>
