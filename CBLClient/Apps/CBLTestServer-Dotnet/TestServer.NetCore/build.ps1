@@ -16,7 +16,7 @@ function Modify-Packages {
     $checkNextLine = $false
     for($i = 0; $i -lt $content.Length; $i++) {
         $line = $content[$i]
-        $isMatch = $line -match "^(?!.*VectorSearch).*?<PackageReference Include=`"Couchbase\.Lite(.*?)`""
+        $isMatch = $line -match "<PackageReference Include=`"Couchbase\.Lite(.*?)`""
         if($isMatch) {
             $oldPackageName = $matches[1]
             if ($oldPackageName -eq $enterprisePackageString) {
@@ -64,6 +64,7 @@ function Get-Vector-Search-Version {
     if($vectorSearchVersion -eq '' -or !$vectorSearchVersion) {
         throw "VectorSearchVersion not defined for this script!  Either pass it in as -VECTOR_SEARCH_VERSION or define an environment variable named VERSION"
     }
+    return $vectorSearchVersion
 }
 
 function Calculate-Version {
