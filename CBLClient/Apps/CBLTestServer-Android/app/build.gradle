@@ -104,7 +104,7 @@ dependencies {
     // Using snapshot code to validate our product is incredibly dubious...
     implementation 'org.nanohttpd:nanohttpd:2.3.2-SNAPSHOT'
     // Couchbase Lite:
-    implementation "com.couchbase.lite:couchbase-lite-android-ee:${COUCHBASE_LITE_VERSION}"
+    implementation "com.couchbase.lite:couchbase-lite-android-ee:3.2.0-83"
     implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-arm64:1.0.0-beta.2'
     
     // for build version < 3.0.0-160, use below package name
