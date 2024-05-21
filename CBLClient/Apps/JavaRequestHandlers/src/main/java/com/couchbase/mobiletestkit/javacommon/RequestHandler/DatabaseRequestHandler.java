@@ -361,11 +361,16 @@ public class DatabaseRequestHandler {
         String dbFileName = new File(dbPath).getName();
         dbFileName = dbFileName.substring(0, dbFileName.lastIndexOf("."));
         Context context = RequestHandlerDispatcher.context;
+        ZipUtils zipper = new ZipUtils();
+        zipper.unzip(context.getAsset(dbPath), context.getFilesDir());
+        return context.getFilesDir().getAbsolutePath() + "/" + dbFileName;
+    }
 
-        // ZipUtils zipper = new ZipUtils();
-        // zipper.unzip(context.getAsset(dbPath), context.getFilesDir());
-        // zipper.unzip(context.getAsset("vstestDatabase.cblite2.zip"),
-        // context.getFilesDir());
+    public String getVectorSearchDb(Args args) throws IOException {
+        String dbPath = args.get("dbPath");
+        String dbFileName = new File(dbPath).getName();
+        dbFileName = dbFileName.substring(0, dbFileName.lastIndexOf("."));
+        Context context = RequestHandlerDispatcher.context;
         String filesFolder = context.getFilesDir().getAbsolutePath() + "/vsTestDatabase.cblite2";
         InputStream dbsqlite = context.getAsset("vsTestDatabase.cblite2/db.sqlite3");
         InputStream dbsqliteshm = context.getAsset("vsTestDatabase.cblite2/db.sqlite3-shm");
@@ -374,7 +379,6 @@ public class DatabaseRequestHandler {
         copyDbFile(dbsqlite, new FileOutputStream(new File(filesFolder + "/db.sqlite3")));
         copyDbFile(dbsqliteshm, new FileOutputStream(new File(filesFolder + "/db.sqlite3-shm")));
         copyDbFile(dbsqlwal, new FileOutputStream(new File(filesFolder + "/db.sqlite3-wal")));
-        // Memory.copyFolder(preBuiltDbFolder, destFolder);
         return filesFolder;
     }
 

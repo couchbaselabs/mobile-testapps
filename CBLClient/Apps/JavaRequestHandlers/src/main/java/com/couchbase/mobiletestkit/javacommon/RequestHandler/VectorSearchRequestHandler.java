@@ -205,7 +205,7 @@ public class VectorSearchRequestHandler {
          DatabaseRequestHandler dbHandler = new DatabaseRequestHandler();
          Args newArgs = new Args();
          newArgs.put("dbPath", "vstestDatabase.cblite2");
-         String dbPath = dbHandler.getPreBuiltDb(newArgs);
+         String dbPath = dbHandler.getVectorSearchDb(newArgs);
          newArgs.put("directory", "");
          if (RequestHandlerDispatcher.context.getPlatform().equals("android")) {
              newArgs.put("directory", new File(dbPath).getParent());
