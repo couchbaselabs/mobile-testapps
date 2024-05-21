@@ -86,7 +86,7 @@ repositories {
         // legacy maven for build version < 3.0.0-160
         // maven { url "http://proget.build.couchbase.com/maven2/internalmaven" }
         // external maven
-        // maven { url 'https://mobile.maven.couchbase.com/maven2/dev/' }
+        maven { url 'https://mobile.maven.couchbase.com/maven2/dev/' }
         // internal maven
         maven { url 'https://proget.sc.couchbase.com/maven2/internalmaven' }
         // where nanohttpd lives
