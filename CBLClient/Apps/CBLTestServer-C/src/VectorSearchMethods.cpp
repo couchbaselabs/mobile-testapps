@@ -3,6 +3,7 @@
 #include "Router.h"
 #include "Defines.h"
 #include "Defer.hh"
+#include <iostream>
 
 using namespace nlohmann;
 using namespace std;
@@ -19,6 +20,7 @@ namespace vectorSearch_methods
         auto collectionName = body["collectionName"].get<string>();
         auto indexName = body["indexName"].get<string>();
         auto expression = body["expression"].get<string>();
+        auto metric = body["metric"].get<string>();
 
         auto dimensions = body["dimensions"].get<uint32_t>();
         auto centroids = body["centroids"].get<uint32_t>();
@@ -28,6 +30,9 @@ namespace vectorSearch_methods
         std::optional<uint32_t> bits;
         std::optional<uint32_t> subquantizers;
         std::optional<CBLScalarQuantizerType> scalarEncoding;
+        std::optional<CBLDistanceMetric> dMetric;
+
+        auto encoding = CBLVectorEncoding_CreateNone;
 
         try
         {
@@ -49,10 +54,59 @@ namespace vectorSearch_methods
             scalarEncoding.reset();
         }
 
+        if (scalarEncoding.has_value() && (bits.has_value() || subquantizers.has_value()))
+        {
+            throw std::invalid_argument("Cannot have scalar quantization and arguments for product quantization at the same time");
+        }
+
+        if ((bits.has_value() && !subquantizers.has_value()) || (!bits.has_value() && subquantizers.has_value()))
+        {
+            throw std::invalid_argument("Product quantization requires both bits and subquantizers set");
+        }
+
+        if (scalarEncoding.has_value())
+        {
+            encoding = CBLVectorEncoding_CreateScalarQuantizer(scalarEncoding.value());
+        }
+        if (bits.has_value() && subquantizers.has_value())
+        {
+            encoding = CBLVectorEncoding_CreateProductQuantizer(subquantizers.value(), bits.value());
+        }
+
+        if (metric == "euclidean")
+        {
+            dMetric = kCBLDistanceMetricEuclidean;
+        }
+        else if (metric == "cosine")
+        {
+            dMetric = kCBLDistanceMetricCosine;
+        }
+        else
+        {
+            throw std::invalid_argument("Invalid distance metric");
+        }
+
+        CBLVectorIndexConfiguration config{kCBLN1QLLanguage, expression, dimensions, centroids};
+        config.encoding = encoding;
+        config.metric = dMetric;
+        config.minTrainingSize = minTrainingSize;
+        config.maxTrainingSize = maxTrainingSize;
+
         with<CBLDatabase *>(body, "database", [conn](CBLDatabase *db)
                             {
                                 CBLError err = {};
-                                auto collection = CBLDatabase_Collection(db, flstr(collectionName), flstr(scopeName), &err); });
-    }
+                                auto collection = CBLDatabase_Collection(db, flstr(collectionName), flstr(scopeName), &err);
 
+                                try
+                                {
+                                    CBLCollection_CreateVectorIndex(collection, indexName, config);
+                                    std::cout << "Successfully created index" << std::endl;
+                                    write_serialized_body(conn, std::string("Created index with name " + indexName));
+                                }
+                                catch (const std::exception &e)
+                                {
+                                    std::cout << "Failed to create index" << std::endl;
+                                    write_serialized_body(conn, std::string("Could not create index: ") + e.what());
+                                } });
+    }
 }
