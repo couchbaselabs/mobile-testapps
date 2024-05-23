@@ -16,6 +16,7 @@
 #include "CollectionMethods.hpp"
 #include "ScopeMethods.hpp"
 #include "EncryptableMethods.h"
+#include "VectorSearchMethods.h"
 #include <functional>
 #include <utility>
 #include <civetweb.h>
