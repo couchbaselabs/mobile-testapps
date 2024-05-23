@@ -14,9 +14,9 @@ using namespace fleece;
 namespace vectorSearch_methods
 {
 
-    void vectorSearch_createIndex(json &body, mg_connection *conn)
+    void vectorSearch_createIndex(json& body, mg_connection* conn)
     {
-        with<CBLDatabase *>(body, "database", [conn](CBLDatabase *db)
+        with<CBLDatabase *>(body, "database", [conn](CBLDatabase* db)
                             {
                                 auto scopeName = body["scopeName"].get<string>();
                                 auto collectionName = body["collectionName"].get<string>();
