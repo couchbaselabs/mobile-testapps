@@ -67,11 +67,11 @@ namespace vectorSearch_methods
 
         if (scalarEncoding.has_value())
         {
-            encoding = static_cast<CBLVectorEncoding*>CBLVectorEncoding_CreateScalarQuantizer(scalarEncoding.value());
+            encoding = static_cast<CBLVectorEncoding*>(CBLVectorEncoding_CreateScalarQuantizer(scalarEncoding.value()));
         }
         if (bits.has_value() && subquantizers.has_value())
         {
-            encoding = static_cast<CBLVectorEncoding*>CBLVectorEncoding_CreateProductQuantizer(subquantizers.value(), bits.value());
+            encoding = static_cast<CBLVectorEncoding*>(CBLVectorEncoding_CreateProductQuantizer(subquantizers.value(), bits.value()));
         }
 
         if (metric == "euclidean")
