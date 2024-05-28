@@ -33,7 +33,7 @@ namespace vectorSearch_methods
         std::optional<CBLScalarQuantizerType> scalarEncoding;
         std::optional<CBLDistanceMetric> dMetric;
 
-        auto* encoding = CBLVectorEncoding_CreateNone;
+        auto* encoding = CBLVectorEncoding_CreateNone();
 
         try
         {
