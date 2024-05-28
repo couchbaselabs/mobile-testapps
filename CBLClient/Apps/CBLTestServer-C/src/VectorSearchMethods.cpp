@@ -4,6 +4,7 @@
 #include "Defines.h"
 #include "Defer.hh"
 #include <iostream>
+#include <vector>
 
 using namespace nlohmann;
 using namespace std;
