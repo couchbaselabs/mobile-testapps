@@ -37,8 +37,8 @@ namespace vectorSearch_methods
 
         try
         {
-            bits = <uint32_t>(body["bits"]);
-            subquantizers = <uint32_t>(body["subquantizers"]);
+            bits = static_cast<uint32_t>(body["bits"]);
+            subquantizers = static_cast<uint32_t>(body["subquantizers"]);
         }
         catch (...)
         {
@@ -48,7 +48,7 @@ namespace vectorSearch_methods
 
         try
         {
-            scalarEncoding = <CBLScalarQuantizerType>(body["scalarEncoding"]);
+            scalarEncoding = static_cast<CBLScalarQuantizerType>(body["scalarEncoding"]);
         }
         catch (...)
         {
