@@ -17,16 +17,16 @@ namespace vectorSearch_methods
 
     void vectorSearch_createIndex(json& body, mg_connection* conn)
     {
-            auto scopeName = body["scopeName"].get<string>();
-            auto collectionName = body["collectionName"].get<string>();
-            auto indexName = body["indexName"].get<string>();
-            auto expression = body["expression"].get<string>();
-            auto metric = body["metric"].get<string>();
+            const auto scopeName = body["scopeName"].get<string>();
+            const auto collectionName = body["collectionName"].get<string>();
+            const auto indexName = body["indexName"].get<string>();
+            const auto expression = body["expression"].get<string>();
+            const auto metric = body["metric"].get<string>();
 
-            auto dimensions = body["dimensions"].get<uint32_t>();
-            auto centroids = body["centroids"].get<uint32_t>();
-            auto minTrainingSize = body["minTrainingSize"].get<uint32_t>();
-            auto maxTrainingSize = body["maxTrainingSize"].get<uint32_t>();
+            const auto dimensions = body["dimensions"].get<uint32_t>();
+            const auto centroids = body["centroids"].get<uint32_t>();
+            const auto minTrainingSize = body["minTrainingSize"].get<uint32_t>();
+            const auto maxTrainingSize = body["maxTrainingSize"].get<uint32_t>();
 
             std::optional<uint32_t> bits;
             std::optional<uint32_t> subquantizers;
@@ -34,16 +34,6 @@ namespace vectorSearch_methods
             std::optional<CBLDistanceMetric> dMetric;
 
             auto* encoding = CBLVectorEncoding_CreateNone();
-            CBLCollection* collection;
-
-            with<CBLDatabase *>(body,"database", [conn, &collectionName, &scopeName](CBLDatabase* db)
-            {
-                CBLError err = {};
-                collection = CBLDatabase_CreateCollection(db, flstr(collectionName),  flstr(scopeName), &err);
-                if(err.code!=0) {
-                    write_serialized_body(conn, CBLError_Message(&err));
-                }
-            });
 
             try
             {
@@ -108,16 +98,26 @@ namespace vectorSearch_methods
             config.minTrainingSize = minTrainingSize;
             config.maxTrainingSize = maxTrainingSize;
 
-            try
+
+            with<CBLDatabase *>(body,"database", [conn, &collectionName, &scopeName, config](CBLDatabase* db)
             {
-                CBLCollection_CreateVectorIndex(collection, indexName, config);
-                std::cout << "Successfully created index" << std::endl;
-                write_serialized_body(conn, "Created index with name " + indexName);
-            }
-            catch (const std::exception &e)
-            {
-                std::cout << "Failed to create index" << std::endl;
-                write_serialized_body(conn, "Could not create index: " + e.what());
-            }    
+                CBLError err = {};
+                CBLCollection collection = CBLDatabase_CreateCollection(db, flstr(collectionName),  flstr(scopeName), &err);
+                if (err.code!=0) {
+                    write_serialized_body(conn, CBLError_Message(&err));
+                }
+
+                try
+                {
+                    CBLCollection_CreateVectorIndex(collection, indexName, config);
+                    std::cout << "Successfully created index" << std::endl;
+                    write_serialized_body(conn, "Created index with name " + indexName);
+                }
+                catch (const std::exception &e)
+                {
+                    std::cout << "Failed to create index" << std::endl;
+                    write_serialized_body(conn, "Could not create index: " + e.what());
+                }
+            });
     }
 }
