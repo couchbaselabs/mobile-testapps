@@ -127,9 +127,9 @@ namespace vectorSearch_methods
 
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
 
-        //ofstream MyFile("~/ctestserver/gilad_log.txt");
-        //MyFile << "Hello World!";
-        //MyFile.close();
+        ofstream MyFile("~/ctestserver/gilad_log.txt");
+        MyFile << "Hello World!";
+        MyFile.close();
         const auto dbPath = "Databases/vsTestDatabase.cblite2/";
         const auto dbName = flstr("vsTestDatabase");
         //string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
@@ -140,6 +140,9 @@ namespace vectorSearch_methods
         char cwd[1024];
         cbl_getcwd(cwd, 1024);
         const auto databasePath = string(cwd) + DIRECTORY_SEPARATOR + dbPath;
+        ofstream MyFile("~/ctestserver/gilad_log.txt");
+        MyFile << databasePath;
+        MyFile.close();
         //auto* databaseConfig = static_cast<CBLDatabaseConfiguration *>(calloc(1, sizeof(CBLDatabaseConfiguration)));
         CBLDatabaseConfiguration* databaseConfig = nullptr;
         CBLError err;
