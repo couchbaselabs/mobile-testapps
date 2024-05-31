@@ -225,6 +225,7 @@ static const unordered_map<string, endpoint_handler> ROUTE_MAP = {
     {"scope_collectionNames", scope_methods::scope_collectionNames},
     {"scope_defaultScope", scope_methods::scope_defaultScope},
     {"vectorSearch_createIndex", vectorSearch_methods::vectorSearch_createIndex},
+    {"vectorSearch_loadDatabase", vectorSearch_methods::vectorSearch_loadDatabase},
     {"release", releaseObject},
     {"flushMemory", flushMemory},
 };

@@ -122,8 +122,8 @@ namespace vectorSearch_methods
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
 
 
-        const auto dbpath = "Shared/Databases/vsTestDatabase.cblite2/";
-        const auto dbName = body["dbName"];
+        const auto dbPath = "Shared/Databases/vsTestDatabase.cblite2/";
+        const auto dbName = body["dbName"].get<string>();
         //string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
         //string strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath);
         //string databasePath = Path.Combine(strWorkPath, dbPath);
