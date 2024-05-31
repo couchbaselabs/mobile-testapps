@@ -90,16 +90,16 @@ namespace vectorSearch_methods
 
             // CBLVectorIndexConfiguration config{kCBLN1QLLanguage, expression, dimensions, centroids};
             CBLVectorIndexConfiguration config = {};
-            config.expression = expression;
+            config.expression = flstr(expression);
             config.dimensions = dimensions;
             config.encoding = encoding;
-            config.metric = metric;
+            config.metric = dMetric;
             config.centroids = centroids;
             config.minTrainingSize = minTrainingSize;
             config.maxTrainingSize = maxTrainingSize;
 
 
-            with<CBLDatabase *>(body,"database", [conn, &collectionName, &scopeName, config](CBLDatabase* db)
+            with<CBLDatabase *>(body,"database", [conn, &collectionName, &scopeName, &indexName, config](CBLDatabase* db)
             {
                 CBLError err = {};
                 CBLCollection collection = CBLDatabase_CreateCollection(db, flstr(collectionName),  flstr(scopeName), &err);
