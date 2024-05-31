@@ -90,9 +90,13 @@ namespace vectorSearch_methods
         with<CBLDatabase *>(body, "database", [conn](CBLDatabase* db)
                             {
 
-                                CBLVectorIndexConfiguration config{kCBLN1QLLanguage, expression, dimensions, centroids};
+                               // CBLVectorIndexConfiguration config{kCBLN1QLLanguage, expression, dimensions, centroids};
+                                CBLVectorIndexConfiguration config = {};
+                                config.expression = expression;
+                                config.dimensions = dimensions;
                                 config.encoding = encoding;
                                 config.metric = metric;
+                                config.centroids = centroids;
                                 config.minTrainingSize = minTrainingSize;
                                 config.maxTrainingSize = maxTrainingSize;
 
