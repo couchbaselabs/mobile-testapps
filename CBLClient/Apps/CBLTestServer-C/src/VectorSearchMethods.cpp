@@ -118,4 +118,30 @@ namespace vectorSearch_methods
                // }
             });
     }
+
+    void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
+
+
+        const auto dbpath = "Shared/Databases/vsTestDatabase.cblite2/";
+        const auto dbName = body["dbName"];
+        //string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+        //string strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath);
+        //string databasePath = Path.Combine(strWorkPath, dbPath);
+        //const auto dbName = body["dbName"].get<string>();
+        //const auto dbPath = body["dbPath"].get<string>();
+        char cwd[1024];
+        cbl_getcwd(cwd, 1024);
+        const auto databasePath = string(cwd) + DIRECTORY_SEPARATOR + dbPath;
+        //auto* databaseConfig = static_cast<CBLDatabaseConfiguration *>(calloc(1, sizeof(CBLDatabaseConfiguration)));
+        CBLDatabaseConfiguration* databaseConfig = nullptr;
+        CBLError err;
+        CBLDatabase* db;
+        TRY(CBL_CopyDatabase(flstr(databasePath), flstr(dbName), databaseConfig, &err), err);
+        TRY(db = CBLDatabase_Open(dbName, databaseConfig, &err), err);
+        //var db = MemoryMap.New<Database>(dbName, dbConfig);
+        //Console.WriteLine("Succesfully loaded database " + dbName);
+        write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
+        //return db;
+
+    }
 }
