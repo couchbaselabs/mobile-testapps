@@ -127,9 +127,9 @@ namespace vectorSearch_methods
 
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
 
-        ofstream MyFile("~/ctestserver/gilad_log.txt");
-        MyFile << "Hello World!";
-        MyFile.close();
+        //ofstream MyFile("~/ctestserver/gilad_log.txt");
+        //MyFile << "Hello World!";
+        //MyFile.close();
         const auto dbPath = "Databases/vsTestDatabase.cblite2/";
         const auto dbName = flstr("vsTestDatabase");
         //string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
