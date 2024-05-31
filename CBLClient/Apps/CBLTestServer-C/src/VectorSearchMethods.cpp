@@ -101,23 +101,21 @@ namespace vectorSearch_methods
 
             with<CBLDatabase *>(body,"database", [conn, &collectionName, &scopeName, &indexName, config](CBLDatabase* db)
             {
-                CBLError err = {};
-                CBLCollection* collection = CBLDatabase_CreateCollection(db, flstr(collectionName),  flstr(scopeName), &err);
-                if (err.code!=0) {
-                    write_serialized_body(conn, CBLError_Message(&err));
-                }
+                CBLError err;
+                CBLCollection* collection;
+                TRY(collection = CBLDatabase_CreateCollection(db, flstr(collectionName),  flstr(scopeName), &err), err);
 
-                try
-                {
-                    CBLCollection_CreateVectorIndex(collection, flstr(indexName), config);
-                    std::cout << "Successfully created index" << std::endl;
-                    write_serialized_body(conn, "Created index with name " + indexName);
-                }
-                catch (const std::exception &e)
-                {
-                    std::cout << "Failed to create index" << std::endl;
-                    write_serialized_body(conn, "Could not create index: " + std::string(e.what()));
-                }
+               // try
+               // {
+                TRY(CBLCollection_CreateVectorIndex(collection, flstr(indexName), config, &err), err);
+                std::cout << "Successfully created index" << std::endl;
+                write_serialized_body(conn, "Created index with name " + indexName);
+                //}
+               // catch (const std::exception &e)
+               // {
+               //     std::cout << "Failed to create index" << std::endl;
+               //     write_serialized_body(conn, "Could not create index: " + std::string(e.what()));
+               // }
             });
     }
 }
