@@ -31,7 +31,7 @@ namespace vectorSearch_methods
             std::optional<uint32_t> bits;
             std::optional<uint32_t> subquantizers;
             std::optional<CBLScalarQuantizerType> scalarEncoding;
-            std::optional<CBLDistanceMetric> dMetric;
+            CBLDistanceMetric dMetric;
 
             auto* encoding = CBLVectorEncoding_CreateNone();
 
@@ -102,7 +102,7 @@ namespace vectorSearch_methods
             with<CBLDatabase *>(body,"database", [conn, &collectionName, &scopeName, &indexName, config](CBLDatabase* db)
             {
                 CBLError err = {};
-                CBLCollection collection = CBLDatabase_CreateCollection(db, flstr(collectionName),  flstr(scopeName), &err);
+                CBLCollection* collection = CBLDatabase_CreateCollection(db, flstr(collectionName),  flstr(scopeName), &err);
                 if (err.code!=0) {
                     write_serialized_body(conn, CBLError_Message(&err));
                 }
@@ -116,7 +116,7 @@ namespace vectorSearch_methods
                 catch (const std::exception &e)
                 {
                     std::cout << "Failed to create index" << std::endl;
-                    write_serialized_body(conn, "Could not create index: " + e.what());
+                    write_serialized_body(conn, "Could not create index: " + std::string(e.what()));
                 }
             });
     }
