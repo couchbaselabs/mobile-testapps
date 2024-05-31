@@ -12,6 +12,11 @@ using namespace fleece;
 
 #include INCLUDE_CBL(CouchbaseLite.h)
 
+
+
+static void CBLDatabase_EntryDelete(void* ptr) {
+    CBLDatabase_Release(static_cast<CBLDatabase *>(ptr));
+}
 namespace vectorSearch_methods
 {
 
@@ -140,7 +145,7 @@ namespace vectorSearch_methods
         TRY(db = CBLDatabase_Open(dbName, databaseConfig, &err), err);
         //var db = MemoryMap.New<Database>(dbName, dbConfig);
         //Console.WriteLine("Succesfully loaded database " + dbName);
-        write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
+         write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
         //return db;
 
     }
