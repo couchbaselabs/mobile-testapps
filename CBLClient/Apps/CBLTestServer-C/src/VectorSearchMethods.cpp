@@ -140,7 +140,7 @@ namespace vectorSearch_methods
         char cwd[1024];
         cbl_getcwd(cwd, 1024);
         const auto databasePath = string(cwd) + DIRECTORY_SEPARATOR + dbPath;
-        ofstream MyFile("~/ctestserver/gilad_log.txt");
+        MyFile.open("~/ctestserver/gilad_log.txt");
         MyFile << databasePath;
         MyFile.close();
         //auto* databaseConfig = static_cast<CBLDatabaseConfiguration *>(calloc(1, sizeof(CBLDatabaseConfiguration)));
