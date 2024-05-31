@@ -109,7 +109,7 @@ namespace vectorSearch_methods
 
                 try
                 {
-                    CBLCollection_CreateVectorIndex(collection, indexName, config);
+                    CBLCollection_CreateVectorIndex(collection, flstr(indexName), config);
                     std::cout << "Successfully created index" << std::endl;
                     write_serialized_body(conn, "Created index with name " + indexName);
                 }
