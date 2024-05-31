@@ -131,7 +131,7 @@ namespace vectorSearch_methods
         MyFile << "Hello World!";
         MyFile.close();
         const auto dbPath = "Databases/vsTestDatabase.cblite2/";
-        const auto dbName = "vsTestDatabase"
+        const auto dbName = "vsTestDatabase";
         //string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
         //string strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath);
         //string databasePath = Path.Combine(strWorkPath, dbPath);
