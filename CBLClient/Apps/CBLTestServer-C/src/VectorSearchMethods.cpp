@@ -4,6 +4,7 @@
 #include "Defines.h"
 #include "Defer.hh"
 #include <iostream>
+#include <fstream>
 #include <vector>
 
 using namespace nlohmann;
@@ -134,6 +135,9 @@ namespace vectorSearch_methods
         //string databasePath = Path.Combine(strWorkPath, dbPath);
         //const auto dbName = body["dbName"].get<string>();
         //const auto dbPath = body["dbPath"].get<string>();
+        ofstream MyFile("gilad_log.txt");
+        MyFile << "Hello World!";
+        MyFile.close();
         char cwd[1024];
         cbl_getcwd(cwd, 1024);
         const auto databasePath = string(cwd) + DIRECTORY_SEPARATOR + dbPath;
