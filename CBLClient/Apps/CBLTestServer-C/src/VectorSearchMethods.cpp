@@ -123,7 +123,7 @@ namespace vectorSearch_methods
 
 
         const auto dbPath = "Shared/Databases/vsTestDatabase.cblite2/";
-        const auto dbName = body["dbName"].get<string>();
+        const auto dbName = flstr(body["dbName"].get<string>());
         //string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
         //string strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath);
         //string databasePath = Path.Combine(strWorkPath, dbPath);
@@ -136,7 +136,7 @@ namespace vectorSearch_methods
         CBLDatabaseConfiguration* databaseConfig = nullptr;
         CBLError err;
         CBLDatabase* db;
-        TRY(CBL_CopyDatabase(flstr(databasePath), flstr(dbName), databaseConfig, &err), err);
+        TRY(CBL_CopyDatabase(flstr(databasePath), dbName, databaseConfig, &err), err);
         TRY(db = CBLDatabase_Open(dbName, databaseConfig, &err), err);
         //var db = MemoryMap.New<Database>(dbName, dbConfig);
         //Console.WriteLine("Succesfully loaded database " + dbName);
