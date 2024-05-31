@@ -127,7 +127,7 @@ namespace vectorSearch_methods
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
 
 
-        const auto dbPath = "Shared/Databases/vsTestDatabase.cblite2/";
+        const auto dbPath = "Databases/vsTestDatabase.cblite2/";
         const auto dbName = flstr(body["dbName"].get<string>());
         //string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
         //string strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath);
@@ -145,7 +145,7 @@ namespace vectorSearch_methods
         TRY(db = CBLDatabase_Open(dbName, databaseConfig, &err), err);
         //var db = MemoryMap.New<Database>(dbName, dbConfig);
         //Console.WriteLine("Succesfully loaded database " + dbName);
-         write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
+        write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
         //return db;
 
     }
