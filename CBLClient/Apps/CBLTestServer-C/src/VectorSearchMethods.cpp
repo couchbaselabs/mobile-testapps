@@ -145,13 +145,12 @@ namespace vectorSearch_methods
         TRY(db = CBLDatabase_Open(flstr(dbName), databaseConfig, &err), err);
          write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
     }
-    void vectorSearch_resgisterModel(json& body, mg_connection* conn) {
+   /* void vectorSearch_resgisterModel(json& body, mg_connection* conn) {
         const auto name = body["name"].get<string>();
         const auto key = body["key"].get<string>();
         CBLPredictiveModel model;
-        model.
         TRY(CBL_RegisterPredictiveModel())
-    }
+    }*/
 
     /* public sealed class VectorModel : IPredictiveModel
         {
