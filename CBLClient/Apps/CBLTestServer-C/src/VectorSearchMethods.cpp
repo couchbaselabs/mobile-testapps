@@ -39,7 +39,6 @@ namespace vectorSearch_methods
             CBLDistanceMetric dMetric;
 
             auto* encoding = CBLVectorEncoding_CreateNone();
-            MyFile.close();
             try
             {
                 bits = static_cast<uint32_t>(body["bits"]);
