@@ -135,6 +135,7 @@ namespace vectorSearch_methods
         const auto dbName = "vsTestDatabase";
         char cwd[1024];
         cbl_getcwd(cwd, 1024);
+        const auto databasePath = string(cwd) + DIRECTORY_SEPARATOR + dbPath;
         CBLDatabaseConfiguration* databaseConfig = nullptr;
         CBLError err;
         CBLDatabase* db;
