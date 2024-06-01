@@ -24,56 +24,21 @@ namespace vectorSearch_methods
 
     void vectorSearch_createIndex(json& body, mg_connection* conn)
     {
-            ofstream MyFile("/root/ctestserver/gilad_log.txt");
-            MyFile << "Inside index creation";
-            MyFile.close();
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-            MyFile << "Another write";
-            MyFile.close();
             const auto scopeName = body["scopeName"].get<string>();
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-            MyFile << "After scope  name";
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             const auto collectionName = body["collectionName"].get<string>();
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-            MyFile << "After collection  name";
-            MyFile.close();
             const auto indexName = body["indexName"].get<string>();
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-            MyFile << "After Index  name";
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             const auto expression = body["expression"].get<string>();
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-            MyFile << "After Indexpression  name";
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             const auto metric = body["metric"].get<string>();
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-            MyFile << "After metric  name";
-            MyFile.close();
             const auto dimensions = body["dimensions"].get<uint32_t>();
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-            MyFile << "After dimension  name";
-            MyFile.close();
             const auto centroids = body["centroids"].get<uint32_t>();
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-            MyFile << "After centroids  name";
-            MyFile.close();
             const auto minTrainingSize = body["minTrainingSize"].get<uint32_t>();
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-            MyFile << "After mintraining  name";
-            MyFile.close();
             const auto maxTrainingSize = body["maxTrainingSize"].get<uint32_t>();
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-            MyFile << "After processing body";
-            MyFile.close();
             std::optional<uint32_t> bits;
             std::optional<uint32_t> subquantizers;
             std::optional<CBLScalarQuantizerType> scalarEncoding;
             CBLDistanceMetric dMetric;
 
             auto* encoding = CBLVectorEncoding_CreateNone();
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-            MyFile << "After encoding";
             MyFile.close();
             try
             {
@@ -127,12 +92,8 @@ namespace vectorSearch_methods
                 throw std::invalid_argument("Invalid distance metric");
             }
 
-
             // CBLVectorIndexConfiguration config{kCBLN1QLLanguage, expression, dimensions, centroids};
             CBLVectorIndexConfiguration config = {};
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-            MyFile << "Before assiging expression";
-            MyFile.close();
             config.expression = flstr(expression);
             config.dimensions = dimensions;
             config.encoding = encoding;
@@ -141,10 +102,10 @@ namespace vectorSearch_methods
             config.minTrainingSize = minTrainingSize;
             config.maxTrainingSize = maxTrainingSize;
 
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
+            ofstream MyFile("/root/ctestserver/gilad_log.txt");
             MyFile << "Before index creation";
             MyFile.close();
-            with<CBLDatabase *>(body,"database", [conn, &collectionName, &scopeName, &indexName, config](CBLDatabase* db)
+            with<CBLDatabase *>(body,"database", [conn, collectionName, scopeName, indexName, config](CBLDatabase* db)
             {
                 CBLError err;
                 CBLCollection* collection;
@@ -152,7 +113,13 @@ namespace vectorSearch_methods
 
                // try
                // {
+                MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
+                MyFile << "After create collection";
+                MyFile.close();
                 TRY(CBLCollection_CreateVectorIndex(collection, flstr(indexName), config, &err), err);
+                MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
+                MyFile << "index created successfully";
+                MyFile.close();
                 std::cout << "Successfully created index" << std::endl;
                 write_serialized_body(conn, "Created index with name " + indexName);
                 //}
