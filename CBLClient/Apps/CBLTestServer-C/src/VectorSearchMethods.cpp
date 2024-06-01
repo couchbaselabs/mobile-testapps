@@ -37,14 +37,16 @@ namespace vectorSearch_methods
             const auto centroids = body["centroids"].get<uint32_t>();
             const auto minTrainingSize = body["minTrainingSize"].get<uint32_t>();
             const auto maxTrainingSize = body["maxTrainingSize"].get<uint32_t>();
-
+            MyFile << "After processing body";
+            MyFile.close();
             std::optional<uint32_t> bits;
             std::optional<uint32_t> subquantizers;
             std::optional<CBLScalarQuantizerType> scalarEncoding;
             CBLDistanceMetric dMetric;
 
             auto* encoding = CBLVectorEncoding_CreateNone();
-
+            MyFile << "After encoding";
+            MyFile.close();
             try
             {
                 bits = static_cast<uint32_t>(body["bits"]);
@@ -100,6 +102,8 @@ namespace vectorSearch_methods
 
             // CBLVectorIndexConfiguration config{kCBLN1QLLanguage, expression, dimensions, centroids};
             CBLVectorIndexConfiguration config = {};
+            MyFile << "Before assiging expression";
+            MyFile.close();
             config.expression = flstr(expression);
             config.dimensions = dimensions;
             config.encoding = encoding;
