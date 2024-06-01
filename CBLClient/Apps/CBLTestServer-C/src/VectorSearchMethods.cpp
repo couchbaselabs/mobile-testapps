@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <cstdio>
 
 using namespace nlohmann;
 using namespace std;
@@ -148,6 +149,8 @@ namespace vectorSearch_methods
         CBLError err;
         CBLDatabase* db;
         TRY(CBL_CopyDatabase(flstr(databasePath), dbName, databaseConfig, &err), err);
+        // to rename the folder because it is copied to be under "r" for some reason
+        rename("/root/ctestserver/r", dbName);
         TRY(db = CBLDatabase_Open(dbName, databaseConfig, &err), err);
         //var db = MemoryMap.New<Database>(dbName, dbConfig);
         //Console.WriteLine("Succesfully loaded database " + dbName);
