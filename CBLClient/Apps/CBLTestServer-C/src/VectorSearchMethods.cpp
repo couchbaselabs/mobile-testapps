@@ -108,7 +108,6 @@ namespace vectorSearch_methods
             config.minTrainingSize = minTrainingSize;
             config.maxTrainingSize = maxTrainingSize;
 
-            ofstream MyFile("/root/ctestserver/gilad_log.txt");
             MyFile << "Before index creation";
             MyFile.close();
             with<CBLDatabase *>(body,"database", [conn, &collectionName, &scopeName, &indexName, config](CBLDatabase* db)
