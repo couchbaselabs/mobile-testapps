@@ -132,7 +132,7 @@ namespace vectorSearch_methods
         MyFile << "Hello World!";
         MyFile.close();
         const auto dbPath = "Databases/vsTestDatabase.cblite2/";
-        const auto dbName = flstr("vsTestDatabase");
+        const auto dbName = "vsTestDatabase";
         //string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
         //string strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath);
         //string databasePath = Path.Combine(strWorkPath, dbPath);
@@ -148,10 +148,10 @@ namespace vectorSearch_methods
         CBLDatabaseConfiguration* databaseConfig = nullptr;
         CBLError err;
         CBLDatabase* db;
-        TRY(CBL_CopyDatabase(flstr(databasePath), dbName, databaseConfig, &err), err);
+        TRY(CBL_CopyDatabase(flstr(databasePath), fltsr(dbName), databaseConfig, &err), err);
         // to rename the folder because it is copied to be under "r" for some reason
         rename("/root/ctestserver/r", dbName);
-        TRY(db = CBLDatabase_Open(dbName, databaseConfig, &err), err);
+        TRY(db = CBLDatabase_Open(fltsr(dbName), databaseConfig, &err), err);
         //var db = MemoryMap.New<Database>(dbName, dbConfig);
         //Console.WriteLine("Succesfully loaded database " + dbName);
         write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
