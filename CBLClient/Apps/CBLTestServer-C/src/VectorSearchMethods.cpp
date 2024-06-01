@@ -101,10 +101,6 @@ namespace vectorSearch_methods
             config.centroids = centroids;
             config.minTrainingSize = minTrainingSize;
             config.maxTrainingSize = maxTrainingSize;
-
-            ofstream MyFile("/root/ctestserver/gilad_log.txt");
-            MyFile << "Before index creation";
-            MyFile.close();
             with<CBLDatabase *>(body,"database", [conn, collectionName, scopeName, indexName, config](CBLDatabase* db)
             {
                 CBLError err;
@@ -113,7 +109,7 @@ namespace vectorSearch_methods
 
                // try
                // {
-                MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
+                ofstream MyFile("/root/ctestserver/gilad_log.txt");
                 MyFile << "After create collection";
                 MyFile.close();
                 TRY(CBLCollection_CreateVectorIndex(collection, flstr(indexName), config, &err), err);
