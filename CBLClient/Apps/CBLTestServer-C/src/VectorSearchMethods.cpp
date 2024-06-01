@@ -1,4 +1,5 @@
 #include "VectorSearchMethods.h"
+#include "CBLPrediction.h"
 #include "MemoryMap.h"
 #include "Router.h"
 #include "Defines.h"
@@ -24,6 +25,9 @@ namespace vectorSearch_methods
 
     void vectorSearch_createIndex(json& body, mg_connection* conn)
     {
+            ofstream MyFile("/root/ctestserver/gilad_log.txt");
+            MyFile << "Inside index creation";
+            MyFile.close();
             const auto scopeName = body["scopeName"].get<string>();
             const auto collectionName = body["collectionName"].get<string>();
             const auto indexName = body["indexName"].get<string>();
@@ -105,7 +109,9 @@ namespace vectorSearch_methods
             config.minTrainingSize = minTrainingSize;
             config.maxTrainingSize = maxTrainingSize;
 
-
+            ofstream MyFile("/root/ctestserver/gilad_log.txt");
+            MyFile << "Before index creation";
+            MyFile.close();
             with<CBLDatabase *>(body,"database", [conn, &collectionName, &scopeName, &indexName, config](CBLDatabase* db)
             {
                 CBLError err;
@@ -127,24 +133,10 @@ namespace vectorSearch_methods
     }
 
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
-
-        ofstream MyFile("/root/ctestserver/gilad_log.txt");
-        MyFile << "Hello World!";
-        MyFile.close();
         const auto dbPath = "Databases/vsTestDatabase.cblite2/";
         const auto dbName = "vsTestDatabase";
-        //string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-        //string strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath);
-        //string databasePath = Path.Combine(strWorkPath, dbPath);
-        //const auto dbName = body["dbName"].get<string>();
-        //const auto dbPath = body["dbPath"].get<string>();
         char cwd[1024];
         cbl_getcwd(cwd, 1024);
-        const auto databasePath = string(cwd) + DIRECTORY_SEPARATOR + dbPath;
-        MyFile.open("/root/ctestserver/gilad_log.txt");
-        MyFile << databasePath;
-        MyFile.close();
-        //auto* databaseConfig = static_cast<CBLDatabaseConfiguration *>(calloc(1, sizeof(CBLDatabaseConfiguration)));
         CBLDatabaseConfiguration* databaseConfig = nullptr;
         CBLError err;
         CBLDatabase* db;
@@ -152,10 +144,55 @@ namespace vectorSearch_methods
         // to rename the folder because it is copied to be under "r" for some reason
         rename("/root/ctestserver/r", dbName);
         TRY(db = CBLDatabase_Open(flstr(dbName), databaseConfig, &err), err);
-        //var db = MemoryMap.New<Database>(dbName, dbConfig);
-        //Console.WriteLine("Succesfully loaded database " + dbName);
-        write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
-        //return db;
-
+         write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
     }
+    void vectorSearch_resgisterModel(json& body, mg_connection* conn) {
+        const auto name = body["name"].get<string>();
+        const auto key = body["key"].get<string>();
+        CBLPredictiveModel model;
+        model.
+        TRY(CBL_RegisterPredictiveModel())
+    }
+
+    /* public sealed class VectorModel : IPredictiveModel
+        {
+            public string key;
+
+            public VectorModel(string key)
+            {
+                this.key = key;
+                Console.WriteLine("QE-DEBUG Vector Model object instantiated with key: " + key);
+            }
+
+            public DictionaryObject? Predict(DictionaryObject input)
+            {
+                Console.WriteLine("QE-DEBUG Calling predict function");
+                string inputWord = input.GetString(key);
+                Console.WriteLine("QE-DEBUG Predicting for word: " + inputWord);
+                object result = new();
+                result = wordMap.GetValue(inputWord);
+                if (result == null) {
+                    Console.WriteLine("QE-DEBUG Prediction gave null result");
+                } else {
+                    Console.WriteLine("QE-DEBUG Prediction gave non-null result");
+                }
+                MutableDictionaryObject output = new();
+                output.SetValue("vector", result);
+                return output;
+            }
+        }
+        */
+    /* public static void RegisterModel([NotNull] NameValueCollection args,
+                                  [NotNull] IReadOnlyDictionary<string, object> postBody,
+                                  [NotNull] HttpListenerResponse response)
+        {
+            string modelName = postBody["name"].ToString();
+            string key = postBody["key"].ToString();
+
+            VectorModel vectorModel = new(key);
+            Database.Prediction.RegisterModel(modelName, vectorModel);
+            Console.WriteLine("Successfully registered Model");
+            response.WriteBody("Successfully registered model: " + modelName);
+        }
+        */
 }
