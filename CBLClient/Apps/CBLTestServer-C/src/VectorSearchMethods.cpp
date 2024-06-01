@@ -151,7 +151,7 @@ namespace vectorSearch_methods
         TRY(CBL_CopyDatabase(flstr(databasePath), flstr(dbName), databaseConfig, &err), err);
         // to rename the folder because it is copied to be under "r" for some reason
         rename("/root/ctestserver/r", dbName);
-        TRY(db = CBLDatabase_Open(fltsr(dbName), databaseConfig, &err), err);
+        TRY(db = CBLDatabase_Open(flstr(dbName), databaseConfig, &err), err);
         //var db = MemoryMap.New<Database>(dbName, dbConfig);
         //Console.WriteLine("Succesfully loaded database " + dbName);
         write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
