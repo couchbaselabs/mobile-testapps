@@ -148,7 +148,7 @@ namespace vectorSearch_methods
         CBLDatabaseConfiguration* databaseConfig = nullptr;
         CBLError err;
         CBLDatabase* db;
-        TRY(CBL_CopyDatabase(flstr(databasePath), fltsr(dbName), databaseConfig, &err), err);
+        TRY(CBL_CopyDatabase(flstr(databasePath), flstr(dbName), databaseConfig, &err), err);
         // to rename the folder because it is copied to be under "r" for some reason
         rename("/root/ctestserver/r", dbName);
         TRY(db = CBLDatabase_Open(fltsr(dbName), databaseConfig, &err), err);
