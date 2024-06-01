@@ -27,43 +27,43 @@ namespace vectorSearch_methods
             ofstream MyFile("/root/ctestserver/gilad_log.txt");
             MyFile << "Inside index creation";
             MyFile.close();
-            MyFile.open();
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             MyFile << "Another write";
             MyFile.close();
             const auto scopeName = body["scopeName"].get<string>();
-            MyFile.open();
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             MyFile << "After scope  name";
-            MyFile.close();
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             const auto collectionName = body["collectionName"].get<string>();
-            MyFile.open();
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             MyFile << "After collection  name";
             MyFile.close();
             const auto indexName = body["indexName"].get<string>();
-            MyFile.open();
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             MyFile << "After Index  name";
-            MyFile.close();
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             const auto expression = body["expression"].get<string>();
-            MyFile.open();
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             MyFile << "After Indexpression  name";
-            MyFile.close();
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             const auto metric = body["metric"].get<string>();
-            MyFile.open();
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             MyFile << "After metric  name";
             MyFile.close();
             const auto dimensions = body["dimensions"].get<uint32_t>();
-            MyFile.open();
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             MyFile << "After dimension  name";
             MyFile.close();
             const auto centroids = body["centroids"].get<uint32_t>();
-            MyFile.open();
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             MyFile << "After centroids  name";
             MyFile.close();
             const auto minTrainingSize = body["minTrainingSize"].get<uint32_t>();
-            MyFile.open();
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             MyFile << "After mintraining  name";
             MyFile.close();
             const auto maxTrainingSize = body["maxTrainingSize"].get<uint32_t>();
-            MyFile.open();
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             MyFile << "After processing body";
             MyFile.close();
             std::optional<uint32_t> bits;
@@ -72,7 +72,7 @@ namespace vectorSearch_methods
             CBLDistanceMetric dMetric;
 
             auto* encoding = CBLVectorEncoding_CreateNone();
-            MyFile.open();
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             MyFile << "After encoding";
             MyFile.close();
             try
@@ -130,7 +130,7 @@ namespace vectorSearch_methods
 
             // CBLVectorIndexConfiguration config{kCBLN1QLLanguage, expression, dimensions, centroids};
             CBLVectorIndexConfiguration config = {};
-            MyFile.open();
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             MyFile << "Before assiging expression";
             MyFile.close();
             config.expression = flstr(expression);
@@ -141,7 +141,7 @@ namespace vectorSearch_methods
             config.minTrainingSize = minTrainingSize;
             config.maxTrainingSize = maxTrainingSize;
 
-            MyFile.open();
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
             MyFile << "Before index creation";
             MyFile.close();
             with<CBLDatabase *>(body,"database", [conn, &collectionName, &scopeName, &indexName, config](CBLDatabase* db)
