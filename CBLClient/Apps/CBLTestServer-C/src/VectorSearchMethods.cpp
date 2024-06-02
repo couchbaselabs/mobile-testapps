@@ -100,6 +100,7 @@ namespace vectorSearch_methods
             config.centroids = centroids;
             config.minTrainingSize = minTrainingSize;
             config.maxTrainingSize = maxTrainingSize;
+            config.expressionLanguage = kCBLN1QLLanguage;
             with<CBLDatabase *>(body,"database", [conn, collectionName, scopeName, indexName, config](CBLDatabase* db)
             {
                 CBLError err;
@@ -109,7 +110,7 @@ namespace vectorSearch_methods
                // try
                // {
                 ofstream MyFile("/root/ctestserver/gilad_log.txt");
-                MyFile << "After create collection";
+                MyFile << "After create collection\n";
                 MyFile.close();
                 TRY(CBLCollection_CreateVectorIndex(collection, flstr(indexName), config, &err), err);
                 MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
