@@ -37,6 +37,7 @@ namespace vectorSearch_methods
             std::optional<uint32_t> subquantizers;
             std::optional<CBLScalarQuantizerType> scalarEncoding;
             CBLDistanceMetric dMetric;
+            putenv("LD_LIBRARY_PATH=/root/ctestserver/Extensions");
             CBL_SetExtensionPath(flstr("/root/ctestserver/Extensions"));
             auto* encoding = CBLVectorEncoding_CreateNone();
             try
