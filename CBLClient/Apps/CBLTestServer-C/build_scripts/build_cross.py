@@ -181,7 +181,7 @@ if __name__ == '__main__':
     for lib_file in glob.glob(f'{DOWNLOAD_DIR}/libcblite-{args.version}/lib/**/libcblite.so*'):
         shutil.copy2(lib_file, 'out/bin')
     for lib_file in glob.glob(f'{EXTENSIONS_DIR}/lib/*.so*'):
-        shutil.copy2(lib_file, 'out/bin')
+        shutil.copy2(lib_file, 'out/bin/Extensions')
    
     print("==== Copying resources to output folder ====")
     zip_filename=f'testserver_{args.os}_{args.edition}.zip'
