@@ -115,6 +115,14 @@ def check_sysroot(name: str):
 
     os.remove("sysroot.tar.gz")
 
+def copy_vector_search_files():
+    for lib_file in glob.glob(f'{EXTENSIONS_DIR}/lib/*.so*'):
+        if lib_file == "libgomp.so.1": # libgomp.so.1 is a symblink to libgomp.so.1.0.0
+            continue
+        else:
+            shutil.copy2(lib_file, 'out/bin/Extensions', follow_symlinks=False)
+    os.symlink('out/bin/Extesions/libgomp.so.1.0.0', 'out/bin/Extesions/libgomp.so.1')
+
 if __name__ == '__main__':
     print("Downloading latest cross compilation manifest...")
     os.chdir(SCRIPT_DIR)
@@ -180,10 +188,8 @@ if __name__ == '__main__':
 
     for lib_file in glob.glob(f'{DOWNLOAD_DIR}/libcblite-{args.version}/lib/**/libcblite.so*'):
         shutil.copy2(lib_file, 'out/bin')
-    os.mkdir('out/bin/Extensions')
-    for lib_file in glob.glob(f'{EXTENSIONS_DIR}/lib/*.so*'):
-         shutil.copy2(lib_file, 'out/bin/Extensions', follow_symlinks=False)
-   
+    
+    copy_vector_search_files()
     print("==== Copying resources to output folder ====")
     zip_filename=f'testserver_{args.os}_{args.edition}.zip'
     shutil.copy2(f'{SCRIPT_DIR}/../../CBLTestServer-Dotnet/TestServer/sg_cert.pem', 'out/bin')
