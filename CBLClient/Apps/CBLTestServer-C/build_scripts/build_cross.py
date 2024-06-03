@@ -17,7 +17,7 @@ SCRIPT_DIR=os.path.dirname(os.path.realpath(__file__))
 DOWNLOAD_DIR=f'{SCRIPT_DIR}/../downloaded'
 BUILD_DIR=f'{SCRIPT_DIR}/../build'
 ZIPS_DIR=f'{SCRIPT_DIR}/../zips'
-EXTENSIONS_DIR=f'{DOWNLOAD_DIR}/extensions'
+# EXTENSIONS_DIR=f'{DOWNLOAD_DIR}/extensions'
 
 json_data={}
 def read_manifest():
@@ -111,18 +111,18 @@ def check_sysroot(name: str):
     os.makedirs(sysroot_path, 0o755, True)
     print(f'Extracting {name} sysroot to {sysroot_path}...')
     with tarfile.open("sysroot.tar.gz", 'r:gz') as tar:
-            tar.extractall(sysroot_path, members=tar_extract_callback(tar))
+        tar.extractall(sysroot_path, members=tar_extract_callback(tar))
 
     os.remove("sysroot.tar.gz")
 
-def copy_vector_search_files():
-    os.mkdir('out/bin/Extensions')
-    for lib_file in glob.glob(f'{EXTENSIONS_DIR}/lib/*.so*'):
-        if lib_file.endswith("libgomp.so.1"): # libgomp.so.1 is a symblink to libgomp.so.1.0.0
-            continue
-        else:
-            shutil.copy2(lib_file, 'out/bin/Extensions', follow_symlinks=False)
-    os.symlink('out/bin/Extensions/libgomp.so.1.0.0', 'out/bin/Extensions/libgomp.so.1')
+# def copy_vector_search_files():
+#    os.mkdir('out/bin/Extensions')
+#    for lib_file in glob.glob(f'{EXTENSIONS_DIR}/lib/*.so*'):
+#        if lib_file.endswith("libgomp.so.1"): # libgomp.so.1 is a symblink to libgomp.so.1.0.0
+#            continue
+#        else:
+#            shutil.copy2(lib_file, 'out/bin/Extensions', follow_symlinks=False)
+#    os.symlink('out/bin/Extensions/libgomp.so.1.0.0', 'out/bin/Extensions/libgomp.so.1')
 
 if __name__ == '__main__':
     print("Downloading latest cross compilation manifest...")
@@ -168,12 +168,6 @@ if __name__ == '__main__':
         tar.extractall(DOWNLOAD_DIR)
     os.remove(zip_filename)
 
-    vector_search_zip_name = f'couchbase-lite-vector-search-1.0.0-42-linux-x86_64.zip'
-    urllib.request.urlretrieve(f'https://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-vector-search/1.0.0/42/{vector_search_zip_name}', vector_search_zip_name, show_download_progress)
-    with zipfile.ZipFile(vector_search_zip_name) as zip:
-        zip.extractall(path=EXTENSIONS_DIR)
-    os.remove(vector_search_zip_name)
-
     os.makedirs(BUILD_DIR, 0o755, True)
     os.chdir(BUILD_DIR)
 
@@ -190,7 +184,13 @@ if __name__ == '__main__':
     for lib_file in glob.glob(f'{DOWNLOAD_DIR}/libcblite-{args.version}/lib/**/libcblite.so*'):
         shutil.copy2(lib_file, 'out/bin')
     
-    copy_vector_search_files()
+    vector_search_zip_name = f'couchbase-lite-vector-search-1.0.0-42-linux-x86_64.zip'
+    urllib.request.urlretrieve(f'https://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-vector-search/1.0.0/42/{vector_search_zip_name}', vector_search_zip_name, show_download_progress)
+    with zipfile.ZipFile(vector_search_zip_name) as zip:
+        zip.extractall(path='out/bin/Extensions')
+    os.remove(vector_search_zip_name)
+    
+   # copy_vector_search_files()
     print("==== Copying resources to output folder ====")
     zip_filename=f'testserver_{args.os}_{args.edition}.zip'
     shutil.copy2(f'{SCRIPT_DIR}/../../CBLTestServer-Dotnet/TestServer/sg_cert.pem', 'out/bin')
