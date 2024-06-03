@@ -143,7 +143,7 @@ namespace vectorSearch_methods
          write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
     }
    
-   void vectorSearch_resgisterModel(json& body, mg_connection* conn) {
+   void vectorSearch_registerModel(json& body, mg_connection* conn) {
         const auto name = body["name"].get<string>();
         const auto key = body["key"].get<string>();
 
