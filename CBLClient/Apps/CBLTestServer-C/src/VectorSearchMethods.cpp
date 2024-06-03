@@ -147,7 +147,8 @@ namespace vectorSearch_methods
         const auto name = body["name"].get<string>();
         const auto key = body["key"].get<string>();
         CBLPredictiveModel model;
-        TRY(CBL_RegisterPredictiveModel(name, model))
+        CBL_RegisterPredictiveModel(name, model);
+        write_serialized_body(conn, "Model registered");
     } 
 
     /* public sealed class VectorModel : IPredictiveModel
