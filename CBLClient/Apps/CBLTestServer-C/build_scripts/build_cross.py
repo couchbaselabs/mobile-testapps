@@ -122,7 +122,6 @@ def copy_vector_search_files():
             continue
         else:
             shutil.copy2(lib_file, 'out/bin/Extensions', follow_symlinks=False)
-    os.symlink('out/bin/Extensions/libgomp.so.1.0.0', 'out/bin/Extensions/libgomp.so.1')
 
 if __name__ == '__main__':
     print("Downloading latest cross compilation manifest...")

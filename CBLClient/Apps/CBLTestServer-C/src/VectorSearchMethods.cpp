@@ -40,6 +40,8 @@ namespace vectorSearch_methods
 
             //static char *var = "LD_LIBRARY_PATH=/root/ctestserver/Extensions";
             //putenv(var);
+            
+            std::filesystem::create_symlink('/root/ctestserver/Extensions/libgomp.so.1', '/root/ctestserver/Extensions/libgomp.so.1.0.0');
             CBL_SetExtensionPath(flstr("/root/ctestserver/Extensions"));
             auto* encoding = CBLVectorEncoding_CreateNone();
             try
