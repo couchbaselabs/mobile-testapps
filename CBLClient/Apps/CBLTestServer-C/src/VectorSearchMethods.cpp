@@ -146,8 +146,11 @@ namespace vectorSearch_methods
    void vectorSearch_resgisterModel(json& body, mg_connection* conn) {
         const auto name = body["name"].get<string>();
         const auto key = body["key"].get<string>();
+
+        FLString flName = FLString_FromBuf(name.c_str(), name.length());
+
         CBLPredictiveModel model;
-        CBL_RegisterPredictiveModel(name, model);
+        CBL_RegisterPredictiveModel(flName, model);
         write_serialized_body(conn, "Model registered");
     } 
 
