@@ -116,12 +116,13 @@ def check_sysroot(name: str):
     os.remove("sysroot.tar.gz")
 
 def copy_vector_search_files():
+    os.mkdir('out/bin/Extensions')
     for lib_file in glob.glob(f'{EXTENSIONS_DIR}/lib/*.so*'):
         if lib_file == "libgomp.so.1": # libgomp.so.1 is a symblink to libgomp.so.1.0.0
             continue
         else:
             shutil.copy2(lib_file, 'out/bin/Extensions', follow_symlinks=False)
-    os.symlink('out/bin/Extesions/libgomp.so.1.0.0', 'out/bin/Extesions/libgomp.so.1')
+    os.symlink('out/bin/Extensions/libgomp.so.1.0.0', 'out/bin/Extensions/libgomp.so.1')
 
 if __name__ == '__main__':
     print("Downloading latest cross compilation manifest...")
