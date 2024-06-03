@@ -37,7 +37,7 @@ namespace vectorSearch_methods
             std::optional<uint32_t> subquantizers;
             std::optional<CBLScalarQuantizerType> scalarEncoding;
             CBLDistanceMetric dMetric;
-            CBL_SetExtensionPath(flstr("CouchbaseLiteVectorSearch"));
+            CBL_SetExtensionPath(flstr("/root/ctestserver/CouchbaseLiteVectorSearch.so"));
             auto* encoding = CBLVectorEncoding_CreateNone();
             try
             {
