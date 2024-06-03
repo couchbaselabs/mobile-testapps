@@ -7,4 +7,5 @@ namespace vectorSearch_methods
 {
     void vectorSearch_createIndex(nlohmann::json &body, mg_connection *conn);
     void vectorSearch_loadDatabase(nlohmann::json &body, mg_connection *conn);
+    void vectorSearch_registerModel(nlohmann::json &body, mg_connection *conn);
 }
