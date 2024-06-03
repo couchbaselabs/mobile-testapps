@@ -15,7 +15,6 @@ int main(int argc, const char** argv) {
 
     TestServer server{};
     server.start();
-    CBL_SetExtensionPath(fltsr("CouchbaseLiteVectorSearch"));
     cout << "Using CBL C version " << CBLITE_VERSION << "-" << CBLITE_BUILD_NUMBER;
 #ifdef COUCHBASE_ENTERPRISE
     cout << " (Enterprise)";
