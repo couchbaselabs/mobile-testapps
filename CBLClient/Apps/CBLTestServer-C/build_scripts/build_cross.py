@@ -17,6 +17,7 @@ SCRIPT_DIR=os.path.dirname(os.path.realpath(__file__))
 DOWNLOAD_DIR=f'{SCRIPT_DIR}/../downloaded'
 BUILD_DIR=f'{SCRIPT_DIR}/../build'
 ZIPS_DIR=f'{SCRIPT_DIR}/../zips'
+EXTENSIONS_DIR=f'{DOWNLOAD_DIR}/extensions'
 
 json_data={}
 def read_manifest():
@@ -26,7 +27,6 @@ def read_manifest():
             data=fin.read()
         
         json_data=json.loads(data)
-
     return json_data
 
 def copy_and_overwrite(from_path, to_path):
@@ -159,6 +159,12 @@ if __name__ == '__main__':
         tar.extractall(DOWNLOAD_DIR)
     os.remove(zip_filename)
 
+    vector_search_zip_name = f'couchbase-lite-vector-search-1.0.0-42-linux-x86_64.zip'
+    urllib.request.urlretrieve(f'https://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-vector-search/1.0.0/42/{vector_search_zip_name}', vector_search_zip_name, show_download_progress)
+    with zipfile.ZipFile(vector_search_zip_name) as zip:
+        zip.extractall(path=EXTENSIONS_DIR)
+    os.remove(vector_search_zip_name)
+
     os.makedirs(BUILD_DIR, 0o755, True)
     os.chdir(BUILD_DIR)
 
@@ -173,6 +179,8 @@ if __name__ == '__main__':
     subprocess.run(['make', '-j8', 'install'])
 
     for lib_file in glob.glob(f'{DOWNLOAD_DIR}/libcblite-{args.version}/lib/**/libcblite.so*'):
+        shutil.copy2(lib_file, 'out/bin')
+    for lib_file in glob.glob(f'{EXTENSIONS_DIR}/lib/*.so*'):
         shutil.copy2(lib_file, 'out/bin')
    
     print("==== Copying resources to output folder ====")
