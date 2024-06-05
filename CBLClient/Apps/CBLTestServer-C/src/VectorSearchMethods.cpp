@@ -42,7 +42,6 @@ namespace vectorSearch_methods
             //putenv(var);
             
             //std::filesystem::create_symlink('/root/ctestserver/Extensions/libgomp.so.1', '/root/ctestserver/Extensions/libgomp.so.1.0.0');
-            CBL_SetExtensionPath(flstr("/root/ctestserver/Extensions"));
             auto* encoding = CBLVectorEncoding_CreateNone();
             try
             {
@@ -135,6 +134,8 @@ namespace vectorSearch_methods
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
         const auto dbPath = "Databases/vsTestDatabase.cblite2/";
         const auto dbName = "vsTestDatabase";
+  
+        CBL_SetExtensionPath(flstr("/root/ctestserver/Extensions"));
         char cwd[1024];
         cbl_getcwd(cwd, 1024);
         const auto databasePath = string(cwd) + DIRECTORY_SEPARATOR + dbPath;
