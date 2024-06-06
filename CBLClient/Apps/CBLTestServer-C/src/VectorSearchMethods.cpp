@@ -61,7 +61,13 @@ static FLMutableDict getWordMap() {
                 CBLQuery_Release(query2);
          };
          TRY(rs1 = CBLQuery_Execute(query1, &err), err);
+         DEFER {
+                CBLResultSet_Release(rs1);
+         };
          TRY(rs2 = CBLQuery_Execute(query2, &err), err);
+         DEFER {
+                CBLResultSet_Release(rs2);
+         };
          while(CBLResultSet_Next(rs1)) {
             FLValue word = CBLResultSet_ValueForKey(rs1, flstr("word"));
             FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
