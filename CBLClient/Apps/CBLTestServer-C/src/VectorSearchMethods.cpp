@@ -69,10 +69,10 @@ static FLMutableDict getWordMap() {
             FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
             FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
          }
-         appendLogMessage("Before release 1")
+         appendLogMessage("Before release 1");
          CBLQuery_Release(query1);
          CBLResultSet_Release(rs1);
-         appendLogMessage("After release 1")
+         appendLogMessage("After release 1");
          while(CBLResultSet_Next(rs2)) {
             FLValue word = CBLResultSet_ValueForKey(rs2, flstr("word"));
             FLValue vector = CBLResultSet_ValueForKey(rs2, flstr("vector"));
