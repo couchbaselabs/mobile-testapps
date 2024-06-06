@@ -74,7 +74,7 @@ static FLMutableDict getWordMap() {
             if (vector) {
                 FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
                 appendLogMessage("\nword is: \n");
-                appendLogMessage(to_String(word));
+                appendLogMessage(to_string(word));
             };
 
          }
@@ -88,7 +88,7 @@ static FLMutableDict getWordMap() {
             if (vector) {
                 FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
                 appendLogMessage("\nword is: \n");
-                appendLogMessage(to_String(word));
+                appendLogMessage(to_string(word));
             }
          }
          CBLQuery_Release(query2);
