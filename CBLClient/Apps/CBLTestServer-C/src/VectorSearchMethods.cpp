@@ -178,7 +178,8 @@ namespace vectorSearch_methods
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
         const auto dbPath = "Databases/vsTestDatabase.cblite2/";
         const auto dbName = "vsTestDatabase";
-  
+        CBLError err;
+
         CBL_SetExtensionPath(flstr("/root/ctestserver/Extensions"));
         char cwd[1024];
         cbl_getcwd(cwd, 1024);
@@ -218,6 +219,7 @@ namespace vectorSearch_methods
                 auto embeddedTerm = FLDict_Get(embeddedTermDic, flstr("vector"));
                 auto sql = body["sql"].get<string>();
                 json retVal = json::array();
+                CBLError err;
 
                 CBLQuery* query;
                 TRY((query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql), nullptr, &err)), err)
