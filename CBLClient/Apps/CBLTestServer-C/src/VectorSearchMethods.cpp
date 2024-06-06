@@ -39,9 +39,17 @@ static void CBLDatabase_EntryDelete(void* ptr) {
     CBLDatabase_Release(static_cast<CBLDatabase *>(ptr));
 }
 
+static void appendLogMessage(string msg) {
+    MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
+    MyFile << msg;
+    MyFile.close();
+}
 
 
 static FLMutableDict getWordMap() {
+         ofstream MyFile("/root/ctestserver/gilad_log.txt");
+         MyFile << "start\n";
+         MyFile.close();
          std::string sql1 = "select word, vector from auxiliaryWords";
          std::string sql2 = "select word, vector from searchTerms";
          CBLError err;
@@ -57,20 +65,14 @@ static FLMutableDict getWordMap() {
          TRY(rs1 = CBLQuery_Execute(query1, &err), err);
          TRY(rs2 = CBLQuery_Execute(query2, &err), err);
          while(CBLResultSet_Next(rs1)) {
-            ofstream MyFile("/root/ctestserver/gilad_log.txt");
-            MyFile << "Before word value execution\n";
-            MyFile.close();
             FLValue word = CBLResultSet_ValueForKey(rs1, flstr("word"));
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-            MyFile << "After getting word";
-            MyFile.close();
             FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
-            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-            MyFile << "After getting vector";
-            MyFile.close();
             FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
          }
+         appendLogMessage("Before release 1")
          CBLQuery_Release(query1);
+         CBLResultSet_Release(rs1);
+         appendLogMessage("After release 1")
          while(CBLResultSet_Next(rs2)) {
             FLValue word = CBLResultSet_ValueForKey(rs2, flstr("word"));
             FLValue vector = CBLResultSet_ValueForKey(rs2, flstr("vector"));
