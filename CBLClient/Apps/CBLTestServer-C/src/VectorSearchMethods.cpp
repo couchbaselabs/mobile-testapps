@@ -51,7 +51,16 @@ static FLMutableDict getWordMap() {
          CBLQuery_Release(query2);
          TRY(CBLDatabase_Close(db, &err), err);
          return words;
-      }
+}
+
+FLDict getEmbeddingDic(string term) {
+        VectorModel model = new("word");
+        FLMutableDict testDict = FLMutableDict_New();
+        FLMutableDict_SetString(testDict, flstr("word"), flstr(term));
+        FLDict value = model.Predict(testDic);
+        FLMutableDict_Release(testDict);
+        return value;
+}
 namespace vectorSearch_methods
 {
     static FLMutableDict wordMap;
@@ -216,8 +225,8 @@ namespace vectorSearch_methods
                     CBLQuery_Release(query);
                 };
 
-                map<string, FLValue> qParam = ["vector", embeddedTerm];
-                CBLQuery_SetParameters(query, fldict(qParam));
+                map<string, FLValue> qParam = {{"vector", embeddedTerm}};
+                CBLQuery_SetParameters(query, FLDict(qParam));
                 
                 CBLResultSet* results;
                 TRY(results = CBLQuery_Execute(query, &err), err);
@@ -236,16 +245,7 @@ namespace vectorSearch_methods
             });
     }
 
-    FLDict getEmbeddingDic(string term) {
-        VectorModel model = new("word");
-        TRY(FLMutableDict testDict = FLMutableDict_New());
-        DEFER {
-            FLMutableDict_Release(testDict);
-        };
-        FLMutableDict_SetString(testDict, flstr("word"), flstr(term));
-        FLDict value = model.Predict(testDic);
-        return value;
-    }
+    
 
     /* public sealed class VectorModel : IPredictiveModel
         {
