@@ -28,7 +28,7 @@ class VectorModel : CBLPredictiveModel {
     }
 
     FLMutableDict Predict(FLMutableDict input) {
-        const string inputWord = FLDict_Get(input, this -> key);
+        const string inputWord = FLDict_Get(input, flstr(this -> key));
         const auto embeddingsVector = FLMutableDict_FindValue(wordMap, inputWord, kFLArray);
         FLMutableDict predictResult =  FLMutableDict_New();
         FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
@@ -77,7 +77,7 @@ FLDict getEmbeddingDic(string term) {
         VectorModel* model = new VectorModel("word");
         FLMutableDict testDict = FLMutableDict_New();
         FLMutableDict_SetString(testDict, flstr("word"), flstr(term));
-        FLDict value = model.Predict(testDict);
+        FLDict value = model -> Predict(testDict);
         FLMutableDict_Release(testDict);
         return value;
 }
