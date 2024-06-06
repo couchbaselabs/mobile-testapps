@@ -3,6 +3,8 @@
 #include "Router.h"
 #include "Defines.h"
 #include "Defer.hh"
+#include "FleeceHelpers.h"
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -21,7 +23,6 @@ static void CBLDatabase_EntryDelete(void* ptr) {
 }
 namespace vectorSearch_methods
 {
-    public static map<string, object> wordMap;
     private static string InMemoryDbName = "vsTestDatabase";
 
 
@@ -161,76 +162,58 @@ namespace vectorSearch_methods
         CBL_RegisterPredictiveModel(flstr(name), model);
         write_serialized_body(conn, "Model registered");
     }
-
-    map<string, object> getWordMap() {
-        const auto db = new CBLDatabase(InMemoryDbName);
-        try {
-            /* string sql1 = string.Format("select word, vector from auxiliaryWords");
-            IQuery query1 = db.CreateQuery(sql1);
-            IResultSet rs1 = query1.Execute();
-            string sql2 = string.Format("select word, vector from searchTerms");
-            IQuery query2 = db.CreateQuery(sql2);
-            IResultSet rs2 = query2.Execute();
-
-            MutableDictionaryObject words = new();
-            List<Result> rl = rs1.AllResults();
-            List<Result> rl2 = rs2.AllResults();
-            rl.AddRange(rl2);
-
-            foreach (Result r in rl)
-            {
-                string word = r.GetString("word");
-                ArrayObject vector = r.GetArray("vector");
-                words.SetValue(word, vector);
-            }
-            db.Close();
-            return words; */
-        }
-        catch (exception e) {
-            /* Console.WriteLine(e + "retrieving vector could not be done - getWordVector query returned no results");
-            db.Close();
-            return null; */
-        }
-    }
     
     void vectorSearch_getEmbedding(json& body, mg_connection* conn) {
-        /* auto value = GetEmbeddingDic(postBody["input"].ToString());
-        Dictionary<String, Object> vectorDict = value.ToDictionary();
-        List<object> embedding = (List<object>)vectorDict["vector"];
-        response.WriteBody(embedding); */
+        auto vectorDict = GetEmbeddingDic(body["input"].get<string>);
+        FLValue embedding = FLDict_Get(vectorDict, flstr("vector"));
+        write_serialized_body(conn, embedding);
     }
 
 
     void vectorSearch_query(json& body, mg_connection* conn) {
-        const auto term = body["term"].get<string>();
 
         with<CBLDatabase *>(body,"database", [conn, term](CBLDatabase* db)
             {
-                /* DictionaryObject embeddedTermDic = GetEmbeddingDic(term.ToString());
-                var embeddedTerm = embeddedTermDic.GetValue("vector");
-                string sql = postBody["sql"].ToString();
-                Console.WriteLine("QE-DEBUG Calling query string: " + sql);
+                auto embeddedTermDic = GetEmbeddingDic(body["term"].get<string>);
+                auto embeddedTerm = FLDict_Get(embeddedTermDic, flstr("vector"));
+                auto sql = body["sql"].get<string>();
+                json retVal = json::array();
 
-                IQuery query = db.CreateQuery(sql);
-                query.Parameters.SetValue("vector", embeddedTerm);
+                CBLQuery* query;
+                TRY((query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql), nullptr, &err)), err)
+                DEFER {
+                    CBLQuery_Release(query);
+                };
 
-                List<object> resultArray = new();
-                int c = 0;
-                foreach (Result row in query.Execute())
-                {
-                    resultArray.Add(row.ToDictionary());
-                    c++;
+                map<string, FLValue> qParam = ["vector", embeddedTerm];
+                CBLQuery_SetParameters(query, fldict(qParam));
+                
+                CBLResultSet* results;
+                TRY(results = CBLQuery_Execute(query, &err), err);
+                DEFER {
+                    CBLResultSet_Release(results);
+                };
+
+                while(CBLResultSet_Next(results)) {
+                    FLDict nextDict = CBLResultSet_ResultDict(results);
+                    FLStringResult nextJSON = FLValue_ToJSON((FLValue)nextDict);
+                    json next = json::parse(string((const char *)nextJSON.buf, nextJSON.size));
+                    retVal.push_back(next);
                 }
-                response.WriteBody(resultArray); */
-            }
+
+                write_serialized_body(conn, retVal);
+            });
     }
 
-    map<string, object> getEmbeddingDic(string term) {
-        /* VectorModel model = new("word");
-        MutableDictionaryObject testDic = new();
-        testDic.SetValue("word", term);
-        DictionaryObject value = model.Predict(testDic);
-        return value; */
+    FLDict getEmbeddingDic(string term) {
+        VectorModel model = new("word");
+        TRY(FLMutableDict testDict = FLMutableDict_New());
+        DEFER {
+            FLMutableDict_Release(myDict);
+        };
+        FLMutableDict_SetString(testDict, flstr("word"), flstr(term));
+        FLDict value = model.Predict(testDic);
+        return value;
     }
 
     /* public sealed class VectorModel : IPredictiveModel
