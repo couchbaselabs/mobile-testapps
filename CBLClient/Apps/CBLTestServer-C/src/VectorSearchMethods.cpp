@@ -53,10 +53,10 @@ static FLMutableDict getWordMap() {
          FLMutableDict words = FLMutableDict_New();
          TRY(db = CBLDatabase_Open(flstr("vsTestDatabase"), nullptr, &err), err);
          TRY(query1 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql1), nullptr, &err), err);
-         TRY(query2 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql2), nullptr, &err), err);
          DEFER {
                 CBLQuery_Release(query1);
          };
+         TRY(query2 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql2), nullptr, &err), err);
          DEFER {
                 CBLQuery_Release(query2);
          };
