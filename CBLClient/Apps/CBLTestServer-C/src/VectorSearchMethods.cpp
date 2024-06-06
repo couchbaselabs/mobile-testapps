@@ -17,6 +17,7 @@ using namespace fleece;
 #include INCLUDE_CBL(CouchbaseLite.h)
 
 static FLMutableDict wordMap;
+ofstream MyFile("/root/ctestserver/gilad_log.txt");
 class VectorModel : CBLPredictiveModel {
     private:
     string key;
@@ -40,14 +41,13 @@ static void CBLDatabase_EntryDelete(void* ptr) {
 }
 
 static void appendLogMessage(string msg) {
-    ofstream MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
+    MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
     MyFile << msg;
     MyFile.close();
 }
 
 
 static FLMutableDict getWordMap() {
-         ofstream MyFile("/root/ctestserver/gilad_log.txt");
          MyFile << "start\n";
          MyFile.close();
          std::string sql1 = "select word, vector from auxiliaryWords";
