@@ -21,9 +21,40 @@ using namespace fleece;
 static void CBLDatabase_EntryDelete(void* ptr) {
     CBLDatabase_Release(static_cast<CBLDatabase *>(ptr));
 }
+
+static FLMutableDict getWordMap() {
+         std::string sql1 = "select word, vector from auxiliaryWords";
+         std::string sql2 = "select word, vector from searchTerms";
+         CBLError err;
+         CBLDatabase* db;
+         CBLQuery* query1;
+         CBLQuery* query2;
+         CBLResultSet* rs1; 
+         CBLResultSet* rs2;
+         FLMutableDict words = FLMutableDict_New();
+         TRY(db = CBLDatabase_Open(flstr("vsTestDatabase"), nullptr, &err), err);
+         TRY(query1 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql1), nullptr, &err), err);
+         TRY(query2 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql2), nullptr, &err), err);
+         TRY(rs1 = CBLQuery_Execute(query1, &err), err);
+         TRY(rs2 = CBLQuery_Execute(query2, &err), err);
+         while(CBLResultSet_Next(rs1)) {
+            FLValue word = CBLResultSet_ValueForKey(rs1, flstr("word"));
+            FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
+            FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
+         }
+         CBLQuery_Release(query1);
+         while(CBLResultSet_Next(rs2)) {
+            FLValue word = CBLResultSet_ValueForKey(rs1, flstr("word"));
+            FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
+            FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
+         }
+         CBLQuery_Release(query2);
+         TRY(CBLDatabase_Close(db, &err), err);
+         return words;
+      }
 namespace vectorSearch_methods
 {
-    private static string InMemoryDbName = "vsTestDatabase";
+    static string InMemoryDbName = "vsTestDatabase";
 
 
     void vectorSearch_createIndex(json& body, mg_connection* conn)
@@ -164,7 +195,7 @@ namespace vectorSearch_methods
     }
     
     void vectorSearch_getEmbedding(json& body, mg_connection* conn) {
-        auto vectorDict = GetEmbeddingDic(body["input"].get<string>);
+        auto vectorDict = GetEmbeddingDic(body["input"].get<string>());
         FLValue embedding = FLDict_Get(vectorDict, flstr("vector"));
         write_serialized_body(conn, embedding);
     }
@@ -172,9 +203,9 @@ namespace vectorSearch_methods
 
     void vectorSearch_query(json& body, mg_connection* conn) {
 
-        with<CBLDatabase *>(body,"database", [conn, term](CBLDatabase* db)
+        with<CBLDatabase *>(body,"database", [conn, body](CBLDatabase* db)
             {
-                auto embeddedTermDic = GetEmbeddingDic(body["term"].get<string>);
+                auto embeddedTermDic = getEmbeddingDic(body["term"].get<string>());
                 auto embeddedTerm = FLDict_Get(embeddedTermDic, flstr("vector"));
                 auto sql = body["sql"].get<string>();
                 json retVal = json::array();
@@ -209,7 +240,7 @@ namespace vectorSearch_methods
         VectorModel model = new("word");
         TRY(FLMutableDict testDict = FLMutableDict_New());
         DEFER {
-            FLMutableDict_Release(myDict);
+            FLMutableDict_Release(testDict);
         };
         FLMutableDict_SetString(testDict, flstr("word"), flstr(term));
         FLDict value = model.Predict(testDic);
