@@ -64,10 +64,14 @@ static FLMutableDict getWordMap() {
          TRY(query2 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql2), nullptr, &err), err);
          TRY(rs1 = CBLQuery_Execute(query1, &err), err);
          TRY(rs2 = CBLQuery_Execute(query2, &err), err);
+         appendLogMessage("Before rs1 while");
          while(CBLResultSet_Next(rs1)) {
             FLValue word = CBLResultSet_ValueForKey(rs1, flstr("word"));
+            appendLogMessage("After getting word");
             FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
+            appendLogMessage("After getting vector");
             FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
+            appendLogMessage("After setting value");
          }
          appendLogMessage("Before release 1");
          CBLQuery_Release(query1);
