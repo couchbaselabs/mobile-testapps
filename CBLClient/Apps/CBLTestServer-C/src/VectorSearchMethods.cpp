@@ -29,13 +29,13 @@ class VectorModel : CBLPredictiveModel {
     }
 
     FLMutableDict Predict(FLMutableDict input) {
+       FLMutableDict Predict(FLMutableDict input) {
         const FLValue inputWord = FLMutableDict_FindValue(input, this -> key, kFLString);
-        const Value inputWordValue = Value(inputWord);
-        const std::string word = inputWordValue.asString().asString();
-        const FLValue embeddingsVector = FLMutableDict_FindValue(wordMap, word, kFLArray);
+        const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
         FLMutableDict predictResult =  FLMutableDict_New();
         FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
         return predictResult;
+        }
     }
 };
 
