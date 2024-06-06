@@ -226,7 +226,8 @@ namespace vectorSearch_methods
                     CBLQuery_Release(query);
                 };
 
-                FLDict qParam = {{"vector", embeddedTerm}};
+                FLMutableDict qParam = FLMutableDict_New();
+                FLMutableDict_SetString(qParam, flstr("vector"), embeddedTerm);
                 CBLQuery_SetParameters(query, FLDict(qParam));
                 
                 CBLResultSet* results;
@@ -241,7 +242,7 @@ namespace vectorSearch_methods
                     json next = json::parse(string((const char *)nextJSON.buf, nextJSON.size));
                     retVal.push_back(next);
                 }
-
+                FLMutableDict_Release(dict);
                 write_serialized_body(conn, retVal);
             });
     }
