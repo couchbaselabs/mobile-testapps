@@ -4,6 +4,7 @@
 #include "Defines.h"
 #include "Defer.hh"
 #include "FleeceHelpers.h"
+#include "fleece/Fleece.h"
 
 #include <iostream>
 #include <fstream>
@@ -16,7 +17,8 @@ using namespace fleece;
 
 #include INCLUDE_CBL(CouchbaseLite.h)
 
-class VectorModel : IPredictiveModel {
+static FLMutableDict wordMap;
+class VectorModel : PredictiveModel {
     private:
     string key;
 
@@ -72,7 +74,7 @@ static FLMutableDict getWordMap() {
 }
 
 FLDict getEmbeddingDic(string term) {
-        VectorModel model = new VectorModel("word");
+        VectorModel* model = new VectorModel("word");
         FLMutableDict testDict = FLMutableDict_New();
         FLMutableDict_SetString(testDict, flstr("word"), flstr(term));
         FLDict value = model.Predict(testDict);
@@ -81,7 +83,6 @@ FLDict getEmbeddingDic(string term) {
 }
 namespace vectorSearch_methods
 {
-    static FLMutableDict wordMap;
     const string InMemoryDbName = "vsTestDatabase";
 
     void vectorSearch_createIndex(json& body, mg_connection* conn)
