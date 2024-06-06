@@ -32,10 +32,10 @@ class VectorModel : IPredictiveModel {
     }
 
     FLMutableDict Predict(FLMutableDict input) {
-        const FLValue inputWord = FLMutableDict_FindValue(input, this -> key, kFLString);
-        const FLValue embeddingsVector = FLMutableDict_FindValue(wordMap, inputWord, kFLArray);
+        const auto inputWord = FLMutableDict_FindValue(input, this -> key, kFLString);
+        const auto embeddingsVector = FLMutableDict_FindValue(wordMap, inputWord, kFLArray);
         FLMutableDict predictResult =  FLMutableDict_New();
-        FLMutableDict_SetValue(predictResult, FLValue_AsString(flstr("vector")), embeddingsVector)
+        FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
         return predictResult;
     }
 };
