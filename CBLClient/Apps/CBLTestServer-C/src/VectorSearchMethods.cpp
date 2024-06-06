@@ -22,6 +22,24 @@ static void CBLDatabase_EntryDelete(void* ptr) {
     CBLDatabase_Release(static_cast<CBLDatabase *>(ptr));
 }
 
+class VectorModel : IPredictiveModel {
+    private:
+    string key;
+
+    public:
+    VectorModel(string key) {
+        this -> key = key;
+    }
+
+    FLMutableDict Predict(FLMutableDict input) {
+        const FLValue inputWord = FLMutableDict_FindValue(input, this -> key, kFLString);
+        const FLValue embeddingsVector = FLMutableDict_FindValue(wordMap, inputWord, kFLArray);
+        FLMutableDict predictResult =  FLMutableDict_New();
+        FLMutableDict_SetValue(predictResult, FLValue_AsString(flstr("vector")), embeddingsVector)
+        return predictResult;
+    }
+}
+
 static FLMutableDict getWordMap() {
          std::string sql1 = "select word, vector from auxiliaryWords";
          std::string sql2 = "select word, vector from searchTerms";
@@ -247,47 +265,4 @@ namespace vectorSearch_methods
             });
     }
 
-    
-
-    /* public sealed class VectorModel : IPredictiveModel
-        {
-            public string key;
-
-            public VectorModel(string key)
-            {
-                this.key = key;
-                Console.WriteLine("QE-DEBUG Vector Model object instantiated with key: " + key);
-            }
-
-            public DictionaryObject? Predict(DictionaryObject input)
-            {
-                Console.WriteLine("QE-DEBUG Calling predict function");
-                string inputWord = input.GetString(key);
-                Console.WriteLine("QE-DEBUG Predicting for word: " + inputWord);
-                object result = new();
-                result = wordMap.GetValue(inputWord);
-                if (result == null) {
-                    Console.WriteLine("QE-DEBUG Prediction gave null result");
-                } else {
-                    Console.WriteLine("QE-DEBUG Prediction gave non-null result");
-                }
-                MutableDictionaryObject output = new();
-                output.SetValue("vector", result);
-                return output;
-            }
-        }
-        */
-    /* public static void RegisterModel([NotNull] NameValueCollection args,
-                                  [NotNull] IReadOnlyDictionary<string, object> postBody,
-                                  [NotNull] HttpListenerResponse response)
-        {
-            string modelName = postBody["name"].ToString();
-            string key = postBody["key"].ToString();
-
-            VectorModel vectorModel = new(key);
-            Database.Prediction.RegisterModel(modelName, vectorModel);
-            Console.WriteLine("Successfully registered Model");
-            response.WriteBody("Successfully registered model: " + modelName);
-        }
-        */
 }
