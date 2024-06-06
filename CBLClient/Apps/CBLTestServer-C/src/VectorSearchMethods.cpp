@@ -74,13 +74,17 @@ static FLMutableDict getWordMap() {
          MyFile.close();
          while(CBLResultSet_Next(rs1)) {
             FLValue word = CBLResultSet_ValueForKey(rs1, flstr("word"));
+            MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
+            MyFile << "word= " <<  FLValue_AsString(word);
             FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
+            MyFile << "vector= " <<  FLValue_AsString(vector);
             FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
          }
          MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
          MyFile << "Before reulsts2\n";
          MyFile.close();
          while(CBLResultSet_Next(rs2)) {
+            MyFile.close();
             FLValue word = CBLResultSet_ValueForKey(rs2, flstr("word"));
             FLValue vector = CBLResultSet_ValueForKey(rs2, flstr("vector"));
             FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
