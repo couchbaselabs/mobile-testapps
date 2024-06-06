@@ -178,7 +178,6 @@ namespace vectorSearch_methods
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
         const auto dbPath = "Databases/vsTestDatabase.cblite2/";
         const auto dbName = "vsTestDatabase";
-        CBLError err;
 
         CBL_SetExtensionPath(flstr("/root/ctestserver/Extensions"));
         char cwd[1024];
@@ -227,7 +226,7 @@ namespace vectorSearch_methods
                     CBLQuery_Release(query);
                 };
 
-                map<string, FLValue> qParam = {{"vector", embeddedTerm}};
+                FLDict qParam = {{"vector", embeddedTerm}};
                 CBLQuery_SetParameters(query, FLDict(qParam));
                 
                 CBLResultSet* results;
