@@ -54,8 +54,8 @@ static FLMutableDict getWordMap() {
       }
 namespace vectorSearch_methods
 {
-    static string InMemoryDbName = "vsTestDatabase";
-
+    static FLMutableDict wordMap;
+    const string InMemoryDbName = "vsTestDatabase";
 
     void vectorSearch_createIndex(json& body, mg_connection* conn)
     {
@@ -180,7 +180,7 @@ namespace vectorSearch_methods
         TRY(CBL_CopyDatabase(flstr(databasePath), flstr(dbName), databaseConfig, &err), err);
         // to rename the folder because it is copied to be under "r" for some reason
         rename("/root/ctestserver/r", dbName);
-        wordMap = vectorSearch_getWordMap();
+        wordMap = getWordMap();
         TRY(db = CBLDatabase_Open(flstr(dbName), databaseConfig, &err), err);
          write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
     }
@@ -195,7 +195,7 @@ namespace vectorSearch_methods
     }
     
     void vectorSearch_getEmbedding(json& body, mg_connection* conn) {
-        auto vectorDict = GetEmbeddingDic(body["input"].get<string>());
+        auto vectorDict = getEmbeddingDic(body["input"].get<string>());
         FLValue embedding = FLDict_Get(vectorDict, flstr("vector"));
         write_serialized_body(conn, embedding);
     }
