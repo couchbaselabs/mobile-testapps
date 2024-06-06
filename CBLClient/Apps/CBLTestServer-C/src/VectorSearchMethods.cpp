@@ -74,7 +74,9 @@ static FLMutableDict getWordMap() {
             string svector = to_string(FLValue_AsString(vector));
             appendLogMessage(sword);
             appendLogMessage(svector);
-            FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
+            if (vector) {
+                FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
+            };
             appendLogMessage("After setting value");
          }
          appendLogMessage("Before release 1");
