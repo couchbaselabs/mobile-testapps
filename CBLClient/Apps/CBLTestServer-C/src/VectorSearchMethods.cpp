@@ -40,7 +40,7 @@ static void CBLDatabase_EntryDelete(void* ptr) {
 }
 
 static void appendLogMessage(string msg) {
-    MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
+    ofstream MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
     MyFile << msg;
     MyFile.close();
 }
