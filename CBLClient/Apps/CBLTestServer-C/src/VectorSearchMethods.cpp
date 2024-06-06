@@ -64,20 +64,19 @@ static FLMutableDict getWordMap() {
          TRY(query2 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql2), nullptr, &err), err);
          TRY(rs1 = CBLQuery_Execute(query1, &err), err);
          TRY(rs2 = CBLQuery_Execute(query2, &err), err);
-         appendLogMessage("Before rs1 while\n");
          while(CBLResultSet_Next(rs1)) {
             FLValue word = CBLResultSet_ValueForKey(rs1, flstr("word"));
-            appendLogMessage("After getting word\n");
             FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
-            appendLogMessage("After getting vector\n\n");
             string sword = to_string(FLValue_AsString(word));
             string svector = to_string(FLValue_AsString(vector));
             appendLogMessage(sword);
             appendLogMessage(svector);
             if (vector) {
                 FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
+                appendLogMessage("\nword is: \n");
+                appendLogMessage(to_String(word));
             };
-            appendLogMessage("After setting value");
+
          }
          appendLogMessage("Before release 1");
          CBLQuery_Release(query1);
@@ -86,7 +85,11 @@ static FLMutableDict getWordMap() {
          while(CBLResultSet_Next(rs2)) {
             FLValue word = CBLResultSet_ValueForKey(rs2, flstr("word"));
             FLValue vector = CBLResultSet_ValueForKey(rs2, flstr("vector"));
-            FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
+            if (vector) {
+                FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
+                appendLogMessage("\nword is: \n");
+                appendLogMessage(to_String(word));
+            }
          }
          CBLQuery_Release(query2);
          TRY(CBLDatabase_Close(db, &err), err);
