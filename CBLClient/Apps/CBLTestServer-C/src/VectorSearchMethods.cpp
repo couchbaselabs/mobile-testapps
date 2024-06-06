@@ -38,7 +38,7 @@ class VectorModel : IPredictiveModel {
         FLMutableDict_SetValue(predictResult, FLValue_AsString(flstr("vector")), embeddingsVector)
         return predictResult;
     }
-}
+};
 
 static FLMutableDict getWordMap() {
          std::string sql1 = "select word, vector from auxiliaryWords";
