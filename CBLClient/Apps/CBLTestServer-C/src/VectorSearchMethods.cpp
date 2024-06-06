@@ -3,7 +3,6 @@
 #include "Router.h"
 #include "Defines.h"
 #include "Defer.hh"
-#include "FleeceHelpers.h"
 #include "fleece/Fleece.h"
 
 #include <iostream>
@@ -18,7 +17,7 @@ using namespace fleece;
 #include INCLUDE_CBL(CouchbaseLite.h)
 
 static FLMutableDict wordMap;
-class VectorModel : PredictiveModel {
+class VectorModel : CBLPredictiveModel {
     private:
     string key;
 
@@ -29,7 +28,7 @@ class VectorModel : PredictiveModel {
 
     FLMutableDict Predict(FLMutableDict input) {
         const auto inputWord = FLMutableDict_FindValue(input, this -> key, kFLString);
-        const auto embeddingsVector = FLMutableDict_FindValue(wordMap, inputWord, kFLArray);
+        const auto embeddingsVector = FLMutableDict_FindValue(wordMap, FLValue(inputWord), kFLArray);
         FLMutableDict predictResult =  FLMutableDict_New();
         FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
         return predictResult;
