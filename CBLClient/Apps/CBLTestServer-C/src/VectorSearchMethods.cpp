@@ -5,6 +5,7 @@
 #include "Defer.hh"
 #include "FleeceHelpers.h"
 #include "fleece/Fleece.h"
+#include "fleece/Value.hh"
 
 #include <iostream>
 #include <fstream>
