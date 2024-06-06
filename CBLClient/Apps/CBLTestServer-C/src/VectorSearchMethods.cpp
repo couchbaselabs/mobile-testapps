@@ -3,6 +3,7 @@
 #include "Router.h"
 #include "Defines.h"
 #include "Defer.hh"
+#include "FleeceHelpers.h"
 #include "fleece/Fleece.h"
 
 #include <iostream>
