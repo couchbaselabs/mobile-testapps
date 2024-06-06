@@ -16,12 +16,6 @@ using namespace fleece;
 
 #include INCLUDE_CBL(CouchbaseLite.h)
 
-
-
-static void CBLDatabase_EntryDelete(void* ptr) {
-    CBLDatabase_Release(static_cast<CBLDatabase *>(ptr));
-}
-
 class VectorModel : IPredictiveModel {
     private:
     string key;
@@ -39,6 +33,12 @@ class VectorModel : IPredictiveModel {
         return predictResult;
     }
 };
+
+static void CBLDatabase_EntryDelete(void* ptr) {
+    CBLDatabase_Release(static_cast<CBLDatabase *>(ptr));
+}
+
+
 
 static FLMutableDict getWordMap() {
          std::string sql1 = "select word, vector from auxiliaryWords";
@@ -72,10 +72,10 @@ static FLMutableDict getWordMap() {
 }
 
 FLDict getEmbeddingDic(string term) {
-        VectorModel model = new("word");
+        VectorModel model = new VectorModel("word");
         FLMutableDict testDict = FLMutableDict_New();
         FLMutableDict_SetString(testDict, flstr("word"), flstr(term));
-        FLDict value = model.Predict(testDic);
+        FLDict value = model.Predict(testDict);
         FLMutableDict_Release(testDict);
         return value;
 }
