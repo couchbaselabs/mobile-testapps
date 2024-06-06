@@ -53,21 +53,22 @@ static FLMutableDict getWordMap() {
          FLMutableDict words = FLMutableDict_New();
          TRY(db = CBLDatabase_Open(flstr("vsTestDatabase"), nullptr, &err), err);
          TRY(query1 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql1), nullptr, &err), err);
-         DEFER {
+        /* DEFER {
                 CBLQuery_Release(query1);
          };
+         */
          TRY(query2 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql2), nullptr, &err), err);
-         DEFER {
+         /*DEFER {
                 CBLQuery_Release(query2);
-         };
+         };*/
          TRY(rs1 = CBLQuery_Execute(query1, &err), err);
-         DEFER {
+         /*DEFER {
                 CBLResultSet_Release(rs1);
-         };
+         };*/
          TRY(rs2 = CBLQuery_Execute(query2, &err), err);
-         DEFER {
+         /*DEFER {
                 CBLResultSet_Release(rs2);
-         };
+         };*/
          ofstream MyFile("/root/ctestserver/gilad_log.txt");
          MyFile << "Before reulsts1\n";
          MyFile.close();
