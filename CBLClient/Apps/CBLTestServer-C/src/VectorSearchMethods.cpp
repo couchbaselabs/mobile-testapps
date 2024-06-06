@@ -27,13 +27,11 @@ class VectorModel : CBLPredictiveModel {
     }
 
     FLMutableDict Predict(FLMutableDict input) {
-       FLMutableDict Predict(FLMutableDict input) {
         const FLValue inputWord = FLMutableDict_FindValue(input, this -> key, kFLString);
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
         FLMutableDict predictResult =  FLMutableDict_New();
         FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
         return predictResult;
-        }
     }
 };
 
@@ -56,8 +54,17 @@ static FLMutableDict getWordMap() {
          TRY(db = CBLDatabase_Open(flstr("vsTestDatabase"), nullptr, &err), err);
          TRY(query1 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql1), nullptr, &err), err);
          TRY(query2 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql2), nullptr, &err), err);
+         ofstream MyFile("/root/ctestserver/gilad_log.txt");
+         MyFile << "Before query execution\n";
+         MyFile.close();
          TRY(rs1 = CBLQuery_Execute(query1, &err), err);
+         MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
+         MyFile << "After query execution\n";
+         MyFile.close();
          TRY(rs2 = CBLQuery_Execute(query2, &err), err);
+         MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
+         MyFile << "After query2 execution\n";
+         MyFile.close();
          while(CBLResultSet_Next(rs1)) {
             FLValue word = CBLResultSet_ValueForKey(rs1, flstr("word"));
             FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
