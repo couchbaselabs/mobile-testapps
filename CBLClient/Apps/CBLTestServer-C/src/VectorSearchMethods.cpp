@@ -27,9 +27,16 @@ class VectorModel : CBLPredictiveModel {
         this -> key = key;
     }
 
+    std::string FLStringToString(FLString flstr) {
+    if (flstr.buf)
+        return std::string(flstr.buf, flstr.size);
+    else
+        return "";
+    }
+
     FLMutableDict Predict(FLMutableDict input) {
         const FLValue inputWord = FLMutableDict_FindValue(input, this -> key, kFLString);
-        auto word = FLString_AsString(FLValue_AsString(inputWord));
+        auto word = FLStringToString(FLValue_AsString(inputWord));
         const FLValue embeddingsVector = FLMutableDict_FindValue(wordMap, word, kFLArray);
         FLMutableDict predictResult =  FLMutableDict_New();
         FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
