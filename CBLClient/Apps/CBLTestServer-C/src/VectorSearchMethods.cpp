@@ -28,10 +28,12 @@ class VectorModel : CBLPredictiveModel {
     }
 
     FLMutableDict Predict(FLMutableDict input) {
+        appendLogMessage("Inside predict model");
         const FLValue inputWord = FLMutableDict_FindValue(input, this -> key, kFLString);
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
         FLMutableDict predictResult =  FLMutableDict_New();
         FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
+        appendLogMessage("End of predict model");
         return predictResult;
     }
 };
@@ -78,10 +80,8 @@ static FLMutableDict getWordMap() {
             };
 
          }
-         appendLogMessage("Before release 1");
          CBLQuery_Release(query1);
          CBLResultSet_Release(rs1);
-         appendLogMessage("After release 1");
          while(CBLResultSet_Next(rs2)) {
             FLValue word = CBLResultSet_ValueForKey(rs2, flstr("word"));
             FLValue vector = CBLResultSet_ValueForKey(rs2, flstr("vector"));
@@ -124,9 +124,6 @@ namespace vectorSearch_methods
             std::optional<CBLScalarQuantizerType> scalarEncoding;
             CBLDistanceMetric dMetric;
 
-            //static char *var = "LD_LIBRARY_PATH=/root/ctestserver/Extensions";
-            //putenv(var);
-            
             //std::filesystem::create_symlink('/root/ctestserver/Extensions/libgomp.so.1', '/root/ctestserver/Extensions/libgomp.so.1.0.0');
             auto* encoding = CBLVectorEncoding_CreateNone();
             try
@@ -196,24 +193,10 @@ namespace vectorSearch_methods
                 CBLError err;
                 CBLCollection* collection;
                 TRY(collection = CBLDatabase_CreateCollection(db, flstr(collectionName),  flstr(scopeName), &err), err);
-
-               // try
-               // {
-                ofstream MyFile("/root/ctestserver/gilad_log.txt");
-                MyFile << "After create collection\n";
-                MyFile.close();
                 TRY(CBLCollection_CreateVectorIndex(collection, flstr(indexName), config, &err), err);
                 MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-                MyFile << "index created successfully";
-                MyFile.close();
                 std::cout << "Successfully created index" << std::endl;
                 write_serialized_body(conn, "Created index with name " + indexName);
-                //}
-               // catch (const std::exception &e)
-               // {
-               //     std::cout << "Failed to create index" << std::endl;
-               //     write_serialized_body(conn, "Could not create index: " + std::string(e.what()));
-               // }
             });
     }
 
