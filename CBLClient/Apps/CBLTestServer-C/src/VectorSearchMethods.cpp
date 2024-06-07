@@ -247,19 +247,10 @@ namespace vectorSearch_methods
         CBLDatabase* db;
         TRY(CBL_CopyDatabase(flstr(databasePath), flstr(dbName), databaseConfig, &err), err);
         // to rename the folder because it is copied to be under "r" for some reason
-        wordMap = getWordMap();
         rename("/root/ctestserver/r", dbName);
-        FLDictIterator iter;
-        FLDictIterator_Begin(wordMap, &iter);
-        FLValue value;
-        while (NULL != (value = FLDictIterator_GetValue(&iter))) {
-            FLString key = FLDictIterator_GetKeyString(&iter);
-            appendLogMessage("key= " + to_string(key) + " ");
-            appendLogMessage("value= " + to_string(FLValue_AsString(value)) + "\n");
-            FLDictIterator_Next(&iter);
-        }
+        wordMap = getWordMap();
         TRY(db = CBLDatabase_Open(flstr(dbName), databaseConfig, &err), err);
-         write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
+        write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
     }
    
    void vectorSearch_registerModel(json& body, mg_connection* conn) {
