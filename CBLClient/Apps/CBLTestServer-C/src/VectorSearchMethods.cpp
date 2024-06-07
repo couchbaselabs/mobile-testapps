@@ -197,12 +197,15 @@ namespace vectorSearch_methods
             config.minTrainingSize = minTrainingSize;
             config.maxTrainingSize = maxTrainingSize;
             config.expressionLanguage = kCBLN1QLLanguage;
+            appendLogMessage("Before creating the index");
             with<CBLDatabase *>(body,"database", [conn, collectionName, scopeName, indexName, config](CBLDatabase* db)
             {
                 CBLError err;
                 CBLCollection* collection;
                 TRY(collection = CBLDatabase_CreateCollection(db, flstr(collectionName),  flstr(scopeName), &err), err);
+                appendLogMessage("Just before creating the index");
                 TRY(CBLCollection_CreateVectorIndex(collection, flstr(indexName), config, &err), err);
+                appendLogMessage("After creating hte index");
                 write_serialized_body(conn, "Created index with name " + indexName);
             });
     }
@@ -231,20 +234,16 @@ namespace vectorSearch_methods
         const auto key = body["key"].get<string>();
 
         CBLPredictiveModel model = {};
-        //predictionVectorModel = new VectorModel(key);
-        auto prediction = [vectorModel](void* context, FLDict input) -> FLSliceResult {
-            FLMutableDict predictionResult = FLMutableDict_New();
-            predictionResult = getPrediction(input, key);
-            FLEncoder enc = FLEncoder_New();
-            FLEncoder_BeginDict(enc, 1);
-            FLEncoder_WriteValue(enc, (FLValue)predictionResult);
-            FLEncoder_EndDict(enc);
-            FLMutableDict_Release(predictionResult);
-            return FLEncoder_Finish(enc, nullptr); 
-        };
+        predictionVectorModel = new VectorModel(key);
+       // auto prediction = [vectorModel](void* context, FLDict input) -> FLSliceResult {
+        //    return vectorModel->Predict(context, input);
+        //};
+        appendLogMessage("key=" + key + "\n");
+        appendLogMessage("name=" + name + "\n");
         model.context = nullptr;
-        model.prediction = prediction;
+        model.prediction = vectorModel->prediction;
         CBL_RegisterPredictiveModel(flstr(name), model);
+        appendLogMessage("Registered the model");
         write_serialized_body(conn, "Model registered");
     }
     
