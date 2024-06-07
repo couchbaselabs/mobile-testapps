@@ -238,11 +238,11 @@ namespace vectorSearch_methods
 
         CBLPredictiveModel model = {};
         VectorModel* vectorModel = new VectorModel(key);
-        auto prediction = [vectorModel](void* context, FLDict input) -> FLSliceResult {
-            return vectorModel->Predict(context, input);
-        };
+       // auto prediction = [vectorModel](void* context, FLDict input) -> FLSliceResult {
+        //    return vectorModel->Predict(context, input);
+        //};
         //model.context = this;
-        model.prediction = prediction;
+        model.prediction = vectorModel->prediction;
         CBL_RegisterPredictiveModel(flstr(name), model);
         write_serialized_body(conn, "Model registered");
     }
