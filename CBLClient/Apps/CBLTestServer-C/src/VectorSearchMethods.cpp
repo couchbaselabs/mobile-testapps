@@ -86,7 +86,7 @@ static FLMutableDict getWordMap() {
          CBLQuery_Release(query1);
          CBLResultSet_Release(rs1);
          while(CBLResultSet_Next(rs2)) {
-            FLValue word = CBLResultSet_ValueForKey(rs2, flstr("word"));
+            FLValue regiword = CBLResultSet_ValueForKey(rs2, flstr("word"));
             FLValue vector = CBLResultSet_ValueForKey(rs2, flstr("vector"));
             if (vector) {
                 FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
@@ -226,7 +226,7 @@ namespace vectorSearch_methods
         const auto name = body["name"].get<string>();
         const auto key = body["key"].get<string>();
 
-        CBLPredictiveModel* model = new VectorModel(key);
+        CBLPredictiveModel model = new VectorModel(key);
         CBL_RegisterPredictiveModel(flstr(name), model);
         write_serialized_body(conn, "Model registered");
     }
