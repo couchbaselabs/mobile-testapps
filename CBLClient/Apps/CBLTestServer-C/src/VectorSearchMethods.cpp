@@ -52,10 +52,10 @@ class VectorModel : public CBLPredictiveModel {
       FLEncoder_BeginDict(enc, 1);
       FLEncoder_WriteValue(enc, (FLValue)predictionResult);
       FLEncoder_EndDict(enc);
-      FLMutableArray_Release(predictionResult);
+      FLMutableDict_Release(predictionResult);
       return FLEncoder_Finish(enc, nullptr); 
-    };
-}
+    }
+};
 
 static void CBLDatabase_EntryDelete(void* ptr) {
     CBLDatabase_Release(static_cast<CBLDatabase *>(ptr));
@@ -240,7 +240,7 @@ namespace vectorSearch_methods
         VectorModel* vectorModel = new VectorModel(key);
         auto prediction = [vectorModel](void* context, FLDict input) -> FLSliceResult {
             return vectorModel->Predict(context, input);
-        }
+        };
         //model.context = this;
         model.prediction = prediction;
         CBL_RegisterPredictiveModel(flstr(name), model);
