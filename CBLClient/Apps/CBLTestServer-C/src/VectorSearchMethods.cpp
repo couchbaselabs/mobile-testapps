@@ -17,7 +17,6 @@ using namespace fleece;
 #include INCLUDE_CBL(CouchbaseLite.h)
 
 static FLMutableDict wordMap;
-static VectorModel* predictionVectorModel;
 ofstream MyFile("/root/ctestserver/gilad_log.txt");
 
 
@@ -57,6 +56,8 @@ class VectorModel : public CBLPredictiveModel {
       return FLEncoder_Finish(enc, nullptr); 
     }
 };
+
+static VectorModel* predictionVectorModel;
 
 static void CBLDatabase_EntryDelete(void* ptr) {
     CBLDatabase_Release(static_cast<CBLDatabase *>(ptr));
