@@ -238,7 +238,7 @@ namespace vectorSearch_methods
         appendLogMessage("key=" + key + "\n");
         appendLogMessage("name=" + name + "\n");
         model.context = nullptr;
-        model.prediction = vectorModel->prediction;
+        model.prediction = predictionVectorModel->prediction;
         CBL_RegisterPredictiveModel(flstr(name), model);
         appendLogMessage("Registered the model");
         write_serialized_body(conn, "Model registered");
