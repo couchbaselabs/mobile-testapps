@@ -29,13 +29,10 @@ static void appendLogMessage(string msg) {
 FLMutableDict getPrediction(FLDict input, string key) {
     const FLValue inputWord = FLDict_Get(input, flstr(key));
     appendLogMessage("After getting inputWord");
+    FLMutableDict predictResult =  FLMutableDict_New();
     if (inputWord) {
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
-        FLMutableDict predictResult =  FLMutableDict_New();
         FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
-    }
-    else {
-        return FLMutableDict_New();
     }
     appendLogMessage("End of predict model");
     return predictResult;
