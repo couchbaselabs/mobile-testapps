@@ -243,12 +243,12 @@ namespace vectorSearch_methods
         rename("/root/ctestserver/r", dbName);
         wordMap = getWordMap();
         FLDictIterator iter;
-        FLDictIterator_Begin(myDict, &iter);
+        FLDictIterator_Begin(wordMap, &iter);
         FLValue value;
         while (NULL != (value = FLDictIterator_GetValue(&iter))) {
             FLString key = FLDictIterator_GetKeyString(&iter);
-            appendLogMessage("key= " + to_string(FLString) + " ");
-            appendLogMessage("value= " + to_string(FLValue_AsStrin(value)));
+            appendLogMessage("key= " + to_string(key) + " ");
+            appendLogMessage("value= " + to_string(FLValue_AsString(value)));
             FLDictIterator_Next(&iter);
         }
         TRY(db = CBLDatabase_Open(flstr(dbName), databaseConfig, &err), err);
