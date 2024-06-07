@@ -26,10 +26,9 @@ static void appendLogMessage(string msg) {
     MyFile.close();
 }
 
-
-FLMutableDict getPrediction(FLDict input) {
+FLMutableDict getPrediction(FLDict input, string key) {
     appendLogMessage("Inside predict model");
-    const FLValue inputWord = FLDict_Get(input, flstr(this->key));
+    const FLValue inputWord = FLDict_Get(input, flstr(key));
     const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
     FLMutableDict predictResult =  FLMutableDict_New();
     FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
@@ -47,7 +46,7 @@ class VectorModel : public CBLPredictiveModel {
     }
 
     FLMutableDict Predict(void* context, FLDict input) {
-       return(getPrediction(input))
+       return(getPrediction(input), this->key)
     }
 };
 
@@ -104,10 +103,10 @@ static FLMutableDict getWordMap() {
 }
 
 FLDict getEmbeddingDic(string term) {
-    VectorModel* model = new VectorModel("word");
+    //VectorModel* model = new VectorModel("word");
     FLMutableDict testDict = FLMutableDict_New();
     FLMutableDict_SetString(testDict, flstr("word"), flstr(term));
-    FLDict value = getPrediction(testDict);
+    FLDict value = getPrediction(testDict, "word");
     FLMutableDict_Release(testDict);
     return value;
 }
