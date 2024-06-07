@@ -231,16 +231,20 @@ namespace vectorSearch_methods
         const auto key = body["key"].get<string>();
 
         CBLPredictiveModel model = {};
-        predictionVectorModel = new VectorModel(key);
-       // auto prediction = [vectorModel](void* context, FLDict input) -> FLSliceResult {
-        //    return vectorModel->Predict(context, input);
-        //};
-        appendLogMessage("key=" + key + "\n");
-        appendLogMessage("name=" + name + "\n");
+        //predictionVectorModel = new VectorModel(key);
+        auto prediction = [vectorModel](void* context, FLDict input) -> FLSliceResult {
+            FLMutableDict predictionResult = FLMutableDict_New();
+            predictionResult = getPrediction(input, key);
+            FLEncoder enc = FLEncoder_New();
+            FLEncoder_BeginDict(enc, 1);
+            FLEncoder_WriteValue(enc, (FLValue)predictionResult);
+            FLEncoder_EndDict(enc);
+            FLMutableDict_Release(predictionResult);
+            return FLEncoder_Finish(enc, nullptr); 
+        };
         model.context = nullptr;
-        model.prediction = predictionVectorModel->prediction;
+        model.prediction = prediction;
         CBL_RegisterPredictiveModel(flstr(name), model);
-        appendLogMessage("Registered the model");
         write_serialized_body(conn, "Model registered");
     }
     
