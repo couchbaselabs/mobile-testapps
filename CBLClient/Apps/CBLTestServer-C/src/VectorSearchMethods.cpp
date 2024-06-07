@@ -90,7 +90,7 @@ static FLMutableDict getWordMap() {
          CBLResultSet* rs1; 
          CBLResultSet* rs2;
          FLMutableDict words = FLMutableDict_New();
-         TRY(db = CBLDatabase_Open(flstr("vsTestDatabase"), nullptr, &err), err);
+         TRY(db = CBLDatabase_Open(flstr("r"), nullptr, &err), err);
          TRY(query1 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql1), nullptr, &err), err);
          TRY(query2 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql2), nullptr, &err), err);
          TRY(rs1 = CBLQuery_Execute(query1, &err), err);
@@ -247,8 +247,8 @@ namespace vectorSearch_methods
         CBLDatabase* db;
         TRY(CBL_CopyDatabase(flstr(databasePath), flstr(dbName), databaseConfig, &err), err);
         // to rename the folder because it is copied to be under "r" for some reason
-        rename("/root/ctestserver/r", dbName);
         wordMap = getWordMap();
+        rename("/root/ctestserver/r", dbName);
         FLDictIterator iter;
         FLDictIterator_Begin(wordMap, &iter);
         FLValue value;
