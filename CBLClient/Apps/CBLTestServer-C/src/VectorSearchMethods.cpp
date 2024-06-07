@@ -46,7 +46,7 @@ class VectorModel : public CBLPredictiveModel {
     }
 
     FLMutableDict Predict(void* context, FLDict input) {
-       return(getPrediction(input), this->key)
+       return getPrediction(input, this->key);
     }
 };
 
