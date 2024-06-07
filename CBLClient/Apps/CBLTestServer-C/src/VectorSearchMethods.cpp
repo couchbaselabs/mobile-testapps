@@ -197,15 +197,20 @@ namespace vectorSearch_methods
             config.minTrainingSize = minTrainingSize;
             config.maxTrainingSize = maxTrainingSize;
             config.expressionLanguage = kCBLN1QLLanguage;
-            appendLogMessage("Before creating the index");
+            appendLogMessage("Before creating the index\n");
             with<CBLDatabase *>(body,"database", [conn, collectionName, scopeName, indexName, config](CBLDatabase* db)
             {
                 CBLError err;
                 CBLCollection* collection;
                 TRY(collection = CBLDatabase_CreateCollection(db, flstr(collectionName),  flstr(scopeName), &err), err);
-                appendLogMessage("Just before creating the index");
-                TRY(CBLCollection_CreateVectorIndex(collection, flstr(indexName), config, &err), err);
-                appendLogMessage("After creating hte index");
+                appendLogMessage("Just before creating the index\n");
+                try {
+                    CBLCollection_CreateVectorIndex(collection, flstr(indexName), config, &err);
+                }
+                catch (const exception& e) {
+                    appendLogMessage("Exception: " + e.what());
+                }
+                appendLogMessage("After creating hte index\n");
                 write_serialized_body(conn, "Created index with name " + indexName);
             });
     }
