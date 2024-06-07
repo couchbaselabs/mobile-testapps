@@ -35,7 +35,7 @@ FLMutableDict getPrediction(FLDict input, string key) {
         FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
     }
     else {
-        return FLSliceResult_CreateWith(nullptr, 0);
+        return FLMutableDict_New();
     }
     appendLogMessage("End of predict model");
     return predictResult;
