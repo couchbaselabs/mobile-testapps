@@ -27,23 +27,28 @@ static void appendLogMessage(string msg) {
 }
 
 
-class VectorModel : public CBLPredictiveModel {
-    private:
-    string key;
+struct VectorModel : CBLPredictiveModel {
+    string _key;
 
-    public:
-    VectorModel(string key) {
-        this -> key = key;
+    VectorModel(string key) : CBLPredictiveModel{this, &prediction, &unregistered} {
+         _key = key;
     }
 
-    FLMutableDict Predict(FLMutableDict input) {
+    static FLMutableDict Predict(void* context, FLDict input) {
+        VectorModel* self = (VectorModel*)context;
+        string key = self->_key;
         appendLogMessage("Inside predict model");
-        const FLValue inputWord = FLMutableDict_FindValue(input, this -> key, kFLString);
+        const FLValue inputWord = FLMutableDict_FindValue(input, key, kFLString);
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
         FLMutableDict predictResult =  FLMutableDict_New();
         FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
         appendLogMessage("End of predict model");
         return predictResult;
+    }
+
+    static void unregistered(void* context) {
+        VectorModel* self = (VectorModel*)context;
+        free(self);
     }
 };
 
