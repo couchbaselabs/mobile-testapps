@@ -33,10 +33,10 @@ class VectorModel : public CBLPredictiveModel {
 
     public:
     VectorModel(string key) {
-        this.key = key;
+        this->key=key;
     }
 
-    FLMutableDict Predict(FLMutableDict input) {
+    FLMutableDict Predict(void* context, FLDict input) {
         appendLogMessage("Inside predict model");
         const FLValue inputWord = FLMutableDict_FindValue(input, this -> key, kFLString);
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
@@ -227,7 +227,7 @@ namespace vectorSearch_methods
         const auto key = body["key"].get<string>();
 
         CBLPredictiveModel model = {};
-        VectorModel vectorModel = new VectorModel(key)
+        VectorModel* vectorModel = new VectorModel(key)
         model.context = this;
         model.prediction = vectorModel.Predict;
         CBL_RegisterPredictiveModel(flstr(name), model);
