@@ -18,6 +18,15 @@ using namespace fleece;
 
 static FLMutableDict wordMap;
 ofstream MyFile("/root/ctestserver/gilad_log.txt");
+
+
+static void appendLogMessage(string msg) {
+    MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
+    MyFile << msg;
+    MyFile.close();
+}
+
+
 class VectorModel : CBLPredictiveModel {
     private:
     string key;
@@ -40,12 +49,6 @@ class VectorModel : CBLPredictiveModel {
 
 static void CBLDatabase_EntryDelete(void* ptr) {
     CBLDatabase_Release(static_cast<CBLDatabase *>(ptr));
-}
-
-static void appendLogMessage(string msg) {
-    MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-    MyFile << msg;
-    MyFile.close();
 }
 
 
