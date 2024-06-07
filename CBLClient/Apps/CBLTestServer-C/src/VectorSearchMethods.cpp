@@ -17,6 +17,7 @@ using namespace fleece;
 #include INCLUDE_CBL(CouchbaseLite.h)
 
 static FLMutableDict wordMap;
+static VectorModel* predictionVectorModel;
 ofstream MyFile("/root/ctestserver/gilad_log.txt");
 
 
@@ -86,7 +87,6 @@ static FLMutableDict getWordMap() {
             string svector = to_string(FLValue_AsString(vector));
             if (vector) {
                 FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
-                appendLogMessage(to_string(FLValue_AsString(word)));
             };
 
          }
@@ -230,13 +230,16 @@ namespace vectorSearch_methods
         const auto key = body["key"].get<string>();
 
         CBLPredictiveModel model = {};
-        VectorModel* vectorModel = new VectorModel(key);
+        predictionVectorModel = new VectorModel(key);
        // auto prediction = [vectorModel](void* context, FLDict input) -> FLSliceResult {
         //    return vectorModel->Predict(context, input);
         //};
+        appendLogMessage("key=" + key + "\n");
+        appendLogMessage("name=" + name + "\n");
         model.context = nullptr;
         model.prediction = vectorModel->prediction;
         CBL_RegisterPredictiveModel(flstr(name), model);
+        appendLogMessage("Registered the model");
         write_serialized_body(conn, "Model registered");
     }
     
