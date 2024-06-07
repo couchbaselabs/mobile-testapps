@@ -27,28 +27,23 @@ static void appendLogMessage(string msg) {
 }
 
 
-struct VectorModel : CBLPredictiveModel {
-    string _key;
+class VectorModel : public CBLPredictiveModel {
+    private:
+    string key;
 
-    VectorModel(string key) : CBLPredictiveModel{this, &prediction, &unregistered} {
-         _key = key;
+    public:
+    VectorModel(string key) {
+        this -> key = key;
     }
 
-    static FLMutableDict Predict(void* context, FLDict input) {
-        VectorModel* self = (VectorModel*)context;
-        string key = self->_key;
+    FLMutableDict Predict(FLMutableDict input) {
         appendLogMessage("Inside predict model");
-        const FLValue inputWord = FLMutableDict_FindValue(input, key, kFLString);
+        const FLValue inputWord = FLMutableDict_FindValue(input, this -> key, kFLString);
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
         FLMutableDict predictResult =  FLMutableDict_New();
         FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
         appendLogMessage("End of predict model");
         return predictResult;
-    }
-
-    static void unregistered(void* context) {
-        VectorModel* self = (VectorModel*)context;
-        free(self);
     }
 };
 
@@ -91,7 +86,7 @@ static FLMutableDict getWordMap() {
          CBLQuery_Release(query1);
          CBLResultSet_Release(rs1);
          while(CBLResultSet_Next(rs2)) {
-            FLValue word = CBLResultSet_ValueForKey(rs2, flstr("word"));
+            FLValue regiword = CBLResultSet_ValueForKey(rs2, flstr("word"));
             FLValue vector = CBLResultSet_ValueForKey(rs2, flstr("vector"));
             if (vector) {
                 FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
@@ -231,7 +226,10 @@ namespace vectorSearch_methods
         const auto name = body["name"].get<string>();
         const auto key = body["key"].get<string>();
 
-        CBLPredictiveModel model = new VectorModel(key);
+        CBLPredictiveModel model = {};
+        VectorModel vectorModel = new VectorModel(key)
+        model.context = this;
+        model.prediction = vectorModel->Predict;
         CBL_RegisterPredictiveModel(flstr(name), model);
         write_serialized_body(conn, "Model registered");
     }
