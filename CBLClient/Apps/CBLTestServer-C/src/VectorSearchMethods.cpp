@@ -208,7 +208,7 @@ namespace vectorSearch_methods
                     CBLCollection_CreateVectorIndex(collection, flstr(indexName), config, &err);
                 }
                 catch (const exception& e) {
-                    appendLogMessage("Exception: " + e.what());
+                    appendLogMessage(e.what());
                 }
                 appendLogMessage("After creating hte index\n");
                 write_serialized_body(conn, "Created index with name " + indexName);
