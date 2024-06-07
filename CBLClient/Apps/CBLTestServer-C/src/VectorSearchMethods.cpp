@@ -248,7 +248,7 @@ namespace vectorSearch_methods
         while (NULL != (value = FLDictIterator_GetValue(&iter))) {
             FLString key = FLDictIterator_GetKeyString(&iter);
             appendLogMessage("key= " + to_string(key) + " ");
-            appendLogMessage("value= " + to_string(FLValue_AsString(value)));
+            appendLogMessage("value= " + to_string(FLValue_AsString(value)) + "\n");
             FLDictIterator_Next(&iter);
         }
         TRY(db = CBLDatabase_Open(flstr(dbName), databaseConfig, &err), err);
