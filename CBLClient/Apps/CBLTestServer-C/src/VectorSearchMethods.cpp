@@ -36,6 +36,19 @@ FLMutableDict getPrediction(FLDict input, string key) {
     return predictResult;
 }
 
+FLSliceResult predictFunction(void* context, FLDict input) {
+    FLMutableDict predictionResult = FLMutableDict_New();
+    appendLogMessage("Before get prediction");
+    predictionResult = getPrediction(input, "word");
+    appendLogMessage("After get prediction");
+    FLEncoder enc = FLEncoder_New();
+    FLEncoder_BeginDict(enc, 1);
+    FLEncoder_WriteValue(enc, (FLValue)predictionResult);
+    FLEncoder_EndDict(enc);
+    FLMutableDict_Release(predictionResult);
+    return FLEncoder_Finish(enc, nullptr); 
+}
+
 class VectorModel : public CBLPredictiveModel {
     private:
     string key;
@@ -235,21 +248,8 @@ namespace vectorSearch_methods
 
         CBLPredictiveModel model = {};
         //predictionVectorModel = new VectorModel(key);
-        auto prediction = [key](void* context, FLDict input) -> FLSliceResult {
-            //return vectorModel->Predict(context, input);
-            FLMutableDict predictionResult = FLMutableDict_New();
-            appendLogMessage("Before get prediction");
-            predictionResult = getPrediction(input, key);
-            appendLogMessage("After get prediction");
-            FLEncoder enc = FLEncoder_New();
-            FLEncoder_BeginDict(enc, 1);
-            FLEncoder_WriteValue(enc, (FLValue)predictionResult);
-            FLEncoder_EndDict(enc);
-            FLMutableDict_Release(predictionResult);
-            return FLEncoder_Finish(enc, nullptr); 
-        };
         model.context = nullptr;
-        model.prediction = prediction;
+        model.prediction = predictFunction;
         CBL_RegisterPredictiveModel(flstr(name), model);
         appendLogMessage("Registered the model");
         write_serialized_body(conn, "Model registered");
