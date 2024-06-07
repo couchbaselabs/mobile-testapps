@@ -46,10 +46,17 @@ class VectorModel : public CBLPredictiveModel {
     }
 
     FLSliceResult Predict(void* context, FLDict input) {
-       
-       return getPrediction(input, this->key);
-    }
-};
+      /*FLMutableDict predictionResult = FLMutableDict_New();
+      predictionResult = getPrediction(input, this->key);
+      FLEncoder enc = FLEncoder_New();
+      FLEncoder_BeginDict(enc, 1);
+      FLEncoder_WriteValue(enc, (FLValue)predictionResult);
+      FLEncoder_EndDict(enc);
+      FLMutableArray_Release(predictionResult);
+      return FLEncoder_Finish(enc, nullptr); */
+      return getPrediction(input, this->key);
+    };
+}
 
 static void CBLDatabase_EntryDelete(void* ptr) {
     CBLDatabase_Release(static_cast<CBLDatabase *>(ptr));
@@ -232,8 +239,11 @@ namespace vectorSearch_methods
 
         CBLPredictiveModel model = {};
         VectorModel* vectorModel = new VectorModel(key);
+        auto prediction = [](void* context, FLDict input) -> FLSliceResult {
+            return vectorModel->Predict(context, input);
+        }
         //model.context = this;
-        model.prediction = vectorModel->Predict;
+        model.prediction = prediction;
         CBL_RegisterPredictiveModel(flstr(name), model);
         write_serialized_body(conn, "Model registered");
     }
