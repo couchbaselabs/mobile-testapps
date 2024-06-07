@@ -33,7 +33,7 @@ class VectorModel : public CBLPredictiveModel {
 
     public:
     VectorModel(string key) {
-        this -> key = key;
+        this.key = key;
     }
 
     FLMutableDict Predict(FLMutableDict input) {
@@ -229,7 +229,7 @@ namespace vectorSearch_methods
         CBLPredictiveModel model = {};
         VectorModel vectorModel = new VectorModel(key)
         model.context = this;
-        model.prediction = vectorModel->Predict;
+        model.prediction = vectorModel.Predict;
         CBL_RegisterPredictiveModel(flstr(name), model);
         write_serialized_body(conn, "Model registered");
     }
