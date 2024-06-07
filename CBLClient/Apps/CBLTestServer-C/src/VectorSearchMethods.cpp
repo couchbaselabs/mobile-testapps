@@ -38,7 +38,7 @@ class VectorModel : public CBLPredictiveModel {
 
     FLMutableDict Predict(void* context, FLDict input) {
         appendLogMessage("Inside predict model");
-        const FLValue inputWord = FLDict_Get(input, this -> key);
+        const FLValue inputWord = FLDict_Get(input, flstr(this->key));
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
         FLMutableDict predictResult =  FLMutableDict_New();
         FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
