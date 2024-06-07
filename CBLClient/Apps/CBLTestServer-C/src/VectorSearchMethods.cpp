@@ -98,9 +98,13 @@ static FLMutableDict getWordMap() {
          while(CBLResultSet_Next(rs1)) {
             FLValue word = CBLResultSet_ValueForKey(rs1, flstr("word"));
             FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
-            string sword = to_string(FLValue_AsString(word));
-            string svector = to_string(FLValue_AsString(vector));
             if (vector) {
+                appendLogMessage("vector=");
+                appendLogMessage(to_string(FLValue_AsString(vector)));
+                appendLogMessage("\n");
+                appendLogMessage("word=");
+                appendLogMessage(to_string(FLValue_AsString(word)));
+                appendLogMessage("\n");
                 FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
             };
 
@@ -113,6 +117,9 @@ static FLMutableDict getWordMap() {
             if (vector) {
                 appendLogMessage("vector=");
                 appendLogMessage(to_string(FLValue_AsString(vector)));
+                appendLogMessage("\n");
+                appendLogMessage("word=");
+                appendLogMessage(to_string(FLValue_AsString(word)));
                 appendLogMessage("\n");
                 FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
             }
