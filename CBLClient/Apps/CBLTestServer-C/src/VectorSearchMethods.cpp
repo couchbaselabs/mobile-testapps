@@ -84,11 +84,8 @@ static FLMutableDict getWordMap() {
             FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
             string sword = to_string(FLValue_AsString(word));
             string svector = to_string(FLValue_AsString(vector));
-            appendLogMessage(sword);
-            appendLogMessage(svector);
             if (vector) {
                 FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
-                appendLogMessage("\nword is: \n");
                 appendLogMessage(to_string(FLValue_AsString(word)));
             };
 
@@ -100,8 +97,6 @@ static FLMutableDict getWordMap() {
             FLValue vector = CBLResultSet_ValueForKey(rs2, flstr("vector"));
             if (vector) {
                 FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
-                appendLogMessage("\nword is: \n");
-                appendLogMessage(to_string(FLValue_AsString(word)));
             }
          }
          CBLQuery_Release(query2);
@@ -207,8 +202,6 @@ namespace vectorSearch_methods
                 CBLCollection* collection;
                 TRY(collection = CBLDatabase_CreateCollection(db, flstr(collectionName),  flstr(scopeName), &err), err);
                 TRY(CBLCollection_CreateVectorIndex(collection, flstr(indexName), config, &err), err);
-                MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-                std::cout << "Successfully created index" << std::endl;
                 write_serialized_body(conn, "Created index with name " + indexName);
             });
     }
@@ -241,7 +234,7 @@ namespace vectorSearch_methods
        // auto prediction = [vectorModel](void* context, FLDict input) -> FLSliceResult {
         //    return vectorModel->Predict(context, input);
         //};
-        //model.context = this;
+        model.context = nullptr;
         model.prediction = vectorModel->prediction;
         CBL_RegisterPredictiveModel(flstr(name), model);
         write_serialized_body(conn, "Model registered");
