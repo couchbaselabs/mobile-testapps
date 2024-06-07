@@ -45,7 +45,8 @@ class VectorModel : public CBLPredictiveModel {
         this->key=key;
     }
 
-    FLMutableDict Predict(void* context, FLDict input) {
+    FLSliceResult Predict(void* context, FLDict input) {
+       
        return getPrediction(input, this->key);
     }
 };
@@ -231,7 +232,7 @@ namespace vectorSearch_methods
 
         CBLPredictiveModel model = {};
         VectorModel* vectorModel = new VectorModel(key);
-        model.context = this;
+        //model.context = this;
         model.prediction = vectorModel->Predict;
         CBL_RegisterPredictiveModel(flstr(name), model);
         write_serialized_body(conn, "Model registered");
