@@ -230,9 +230,9 @@ namespace vectorSearch_methods
         const auto key = body["key"].get<string>();
 
         CBLPredictiveModel model = {};
-        VectorModel* vectorModel = new VectorModel(key)
+        VectorModel* vectorModel = new VectorModel(key);
         model.context = this;
-        model.prediction = vectorModel.Predict;
+        model.prediction = vectorModel->Predict;
         CBL_RegisterPredictiveModel(flstr(name), model);
         write_serialized_body(conn, "Model registered");
     }
