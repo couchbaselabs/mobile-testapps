@@ -27,6 +27,16 @@ static void appendLogMessage(string msg) {
 }
 
 
+FLMutableDict getPrediction(FLDict input) {
+    appendLogMessage("Inside predict model");
+    const FLValue inputWord = FLDict_Get(input, flstr(this->key));
+    const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
+    FLMutableDict predictResult =  FLMutableDict_New();
+    FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
+    appendLogMessage("End of predict model");
+    return predictResult;
+}
+
 class VectorModel : public CBLPredictiveModel {
     private:
     string key;
@@ -37,13 +47,7 @@ class VectorModel : public CBLPredictiveModel {
     }
 
     FLMutableDict Predict(void* context, FLDict input) {
-        appendLogMessage("Inside predict model");
-        const FLValue inputWord = FLDict_Get(input, flstr(this->key));
-        const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
-        FLMutableDict predictResult =  FLMutableDict_New();
-        FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
-        appendLogMessage("End of predict model");
-        return predictResult;
+       return(getPrediction(input))
     }
 };
 
@@ -100,12 +104,12 @@ static FLMutableDict getWordMap() {
 }
 
 FLDict getEmbeddingDic(string term) {
-        VectorModel* model = new VectorModel("word");
-        FLMutableDict testDict = FLMutableDict_New();
-        FLMutableDict_SetString(testDict, flstr("word"), flstr(term));
-        FLDict value = model -> Predict(testDict);
-        FLMutableDict_Release(testDict);
-        return value;
+    VectorModel* model = new VectorModel("word");
+    FLMutableDict testDict = FLMutableDict_New();
+    FLMutableDict_SetString(testDict, flstr("word"), flstr(term));
+    FLDict value = getPrediction(testDict);
+    FLMutableDict_Release(testDict);
+    return value;
 }
 namespace vectorSearch_methods
 {
