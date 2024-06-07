@@ -32,11 +32,10 @@ FLMutableDict getPrediction(FLDict input, string key) {
     FLMutableDict predictResult =  FLMutableDict_New();
     if (inputWord) {
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
-        appendLogMessage("embeedingVector=");
+        appendLogMessage("embeedingw");
         appendLogMessage(to_string(FLValue_AsString(embeddingsVector)));
         FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
     }
-    appendLogMessage("End of predict model");
     return predictResult;
 }
 
@@ -112,6 +111,9 @@ static FLMutableDict getWordMap() {
             FLValue word = CBLResultSet_ValueForKey(rs2, flstr("word"));
             FLValue vector = CBLResultSet_ValueForKey(rs2, flstr("vector"));
             if (vector) {
+                appendLogMessage("vector=");
+                appendLogMessage(to_string(FLValue_AsString(vector)));
+                appendLogMessage("\n");
                 FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
             }
          }
@@ -240,6 +242,15 @@ namespace vectorSearch_methods
         // to rename the folder because it is copied to be under "r" for some reason
         rename("/root/ctestserver/r", dbName);
         wordMap = getWordMap();
+        FLDictIterator iter;
+        FLDictIterator_Begin(myDict, &iter);
+        FLValue value;
+        while (NULL != (value = FLDictIterator_GetValue(&iter))) {
+            FLString key = FLDictIterator_GetKeyString(&iter);
+            appendLogMessage("key= " + to_string(FLString) + " ");
+            appendLogMessage("value= " + to_string(FLValue_AsStrin(value)));
+            FLDictIterator_Next(&iter);
+        }
         TRY(db = CBLDatabase_Open(flstr(dbName), databaseConfig, &err), err);
          write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
     }
