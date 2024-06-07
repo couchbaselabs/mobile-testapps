@@ -27,20 +27,23 @@ static void appendLogMessage(string msg) {
 }
 
 FLMutableDict getPrediction(FLDict input, string key) {
-    appendLogMessage("Inside predict model");
     const FLValue inputWord = FLDict_Get(input, flstr(key));
-    const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
-    FLMutableDict predictResult =  FLMutableDict_New();
-    FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
+    appendLogMessage("After getting inputWord");
+    if (inputWord) {
+        const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
+        FLMutableDict predictResult =  FLMutableDict_New();
+        FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
+    }
+    else {
+        return FLSliceResult_CreateWith(nullptr, 0);
+    }
     appendLogMessage("End of predict model");
     return predictResult;
 }
 
 FLSliceResult predictFunction(void* context, FLDict input) {
     FLMutableDict predictionResult = FLMutableDict_New();
-    appendLogMessage("Before get prediction");
     predictionResult = getPrediction(input, "word");
-    appendLogMessage("After get prediction");
     FLEncoder enc = FLEncoder_New();
     FLEncoder_BeginDict(enc, 1);
     FLEncoder_WriteValue(enc, (FLValue)predictionResult);
