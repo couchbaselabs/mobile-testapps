@@ -262,27 +262,18 @@ namespace vectorSearch_methods
             {
                 auto embeddedTermDic = getEmbeddingDic(body["term"].get<string>());
                 FLValue embeddedTerm = FLDict_Get(embeddedTermDic, flstr("vector"));
-                FLArrayIterator iter;
-                FLArrayIterator_Begin(FLValue_AsArray(embeddedTerm), &iter);
-                FLValue value;
-                appendLogMessage("For term: " + body["term"].get<string>() + ":");
-                while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-                    appendLogMessage(to_string(FLValue_AsFloat(value)) + " ");
-                    FLArrayIterator_Next(&iter);
-                }
-                appendLogMessage("\n");
                 auto sql = body["sql"].get<string>();
                 json retVal = json::array();
                 CBLError err;
-
                 CBLQuery* query;
+
                 TRY((query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql), nullptr, &err)), err)
                 DEFER {
                     CBLQuery_Release(query);
                 };
 
                 FLMutableDict qParam = FLMutableDict_New();
-                FLMutableDict_SetValue(qParam, flstr("vector"), embeddedTerm);
+                FLMutableDict_SetArray(qParam, flstr("vector"), FLValue_AsArray(embeddedTerm));
                 CBLQuery_SetParameters(query, FLDict(qParam));
                 
                 CBLResultSet* results;
