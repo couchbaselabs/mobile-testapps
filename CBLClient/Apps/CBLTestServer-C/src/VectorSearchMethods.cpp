@@ -28,13 +28,10 @@ static void appendLogMessage(string msg) {
 
 FLMutableDict getPrediction(FLDict input, string key) {
     const FLValue inputWord = FLDict_Get(input, flstr(key));
-    appendLogMessage("After getting inputWord");
     FLMutableDict predictResult =  FLMutableDict_New();
     if (inputWord) {
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
-        appendLogMessage("embeedingw");
-        appendLogMessage(to_string(FLValue_AsString(embeddingsVector)));
-        FLMutableDict_SetValue(predictResult, flstr("vector"), embeddingsVector);
+        FLMutableDict_SetValue(predictResult, flstr("vector"), FLValue_AsArray(embeddingsVector));
     }
     return predictResult;
 }
