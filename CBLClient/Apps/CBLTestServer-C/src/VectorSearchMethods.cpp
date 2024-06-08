@@ -31,7 +31,7 @@ FLMutableDict getPrediction(FLDict input, string key) {
     FLMutableDict predictResult =  FLMutableDict_New();
     if (inputWord) {
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
-        FLMutableDict_SetValue(predictResult, flstr("vector"), FLValue_AsArray(embeddingsVector));
+        FLMutableDict_SetArray(predictResult, flstr("vector"), FLValue_AsArray(embeddingsVector));
     }
     return predictResult;
 }
