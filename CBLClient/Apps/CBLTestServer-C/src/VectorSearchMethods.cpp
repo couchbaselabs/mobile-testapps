@@ -33,10 +33,13 @@ FLMutableDict getPrediction(FLDict input, string key) {
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
         int count = FLArray_Count(FLValue_AsArray(embeddingsVector));
         appendLogMessage("Embeddings array values for words: " + to_string(FLValue_AsString(inputWord)));
-        if (count > 0) {
-            FLValue value = FLArray_Get(0);
+        FLArrayIterator iter;
+        FLArrayIterator_Begin(myArray, &iter);
+        FLValue value;
+        while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
             appendLogMessage(value);
             appendLogMessage(" ");
+            FLArrayIterator_Next(&iter);
         }
         appendLogMessage("\n\n");
         FLMutableDict_SetArray(predictResult, flstr("vector"), FLValue_AsArray(embeddingsVector));
