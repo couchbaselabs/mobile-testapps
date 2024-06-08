@@ -267,7 +267,7 @@ namespace vectorSearch_methods
                 FLValue value;
                 appendLogMessage("For term: " + body["term"].get<string>() + ":");
                 while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-                    appendLogMessage(to_string(FLValue_AsArray(value)) + " ");
+                    appendLogMessage(to_string(FLValue_AsFloat(value)) + " ");
                     FLArrayIterator_Next(&iter);
                 }
                 appendLogMessage("\n");
