@@ -99,8 +99,11 @@ static FLMutableDict getWordMap() {
             FLValue word = CBLResultSet_ValueForKey(rs1, flstr("word"));
             FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
             if (vector) {
-                appendLogMessage("vector=");
-                appendLogMessage(to_string(FLValue_AsString(vector)));
+                appendLogMessage("vector length=");
+                FLArray vectorArray = FLValue_AsArray(vector);
+                if (vectorArray) {
+                    appendLogMessage(to_string(FLArray_Count(vectorArray)));
+                }
                 appendLogMessage("\n");
                 appendLogMessage("word=");
                 appendLogMessage(to_string(FLValue_AsString(word)));
