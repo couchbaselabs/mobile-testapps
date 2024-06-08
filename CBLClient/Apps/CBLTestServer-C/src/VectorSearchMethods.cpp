@@ -280,7 +280,7 @@ namespace vectorSearch_methods
     void vectorSearch_getEmbedding(json& body, mg_connection* conn) {
         auto vectorDict = getEmbeddingDic(body["input"].get<string>());
         FLValue embedding = FLDict_Get(vectorDict, flstr("vector"));
-        write_serialized_body(conn, embedding);
+        write_serialized_body(conn, FLValue_AsArray(embedding));
     }
 
 
