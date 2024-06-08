@@ -36,7 +36,7 @@ FLMutableDict getPrediction(FLDict input, string key) {
         FLArrayIterator_Begin(FLValue_AsArray(embeddingsVector), &iter);
         FLValue value;
         while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-            appendLogMessage(to_string(FLValue_AsString(value)));
+            appendLogMessage(to_string(FLValue_AsFloat(value)));
             appendLogMessage(" ");
             FLArrayIterator_Next(&iter);
         }
@@ -112,7 +112,7 @@ static FLMutableDict getWordMap() {
                 FLValue value;
                 appendLogMessage("The word: " + to_string(FLValue_AsString(word)));
                 while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-                    appendLogMessage(to_string(FLValue_AsString(value)));
+                    appendLogMessage(to_string(FLValue_AsFloat(value)));
                     appendLogMessage(" ");
                     FLArrayIterator_Next(&iter);
                  }
@@ -131,7 +131,7 @@ static FLMutableDict getWordMap() {
                 FLValue value;
                 appendLogMessage("The word: " + to_string(FLValue_AsString(word)));
                 while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-                    appendLogMessage(to_string(FLValue_AsString(value)));
+                    appendLogMessage(to_string(FLValue_AsFloat(value)));
                     appendLogMessage(" ");
                     FLArrayIterator_Next(&iter);
                  }
