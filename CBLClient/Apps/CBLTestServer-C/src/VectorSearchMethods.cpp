@@ -99,16 +99,7 @@ static FLMutableDict getWordMap() {
             FLValue word = CBLResultSet_ValueForKey(rs1, flstr("word"));
             FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
             if (vector) {
-                appendLogMessage("vector length=");
-                FLArray vectorArray = FLValue_AsArray(vector);
-                if (vectorArray) {
-                    appendLogMessage(to_string(FLArray_Count(vectorArray)));
-                }
-                appendLogMessage("\n");
-                appendLogMessage("word=");
-                appendLogMessage(to_string(FLValue_AsString(word)));
-                appendLogMessage("\n");
-                FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
+                FLMutableDict_SetValue(words, FLValue_AsString(word), FLValue_AsArray(vector));
             };
 
          }
@@ -118,13 +109,7 @@ static FLMutableDict getWordMap() {
             FLValue word = CBLResultSet_ValueForKey(rs2, flstr("word"));
             FLValue vector = CBLResultSet_ValueForKey(rs2, flstr("vector"));
             if (vector) {
-                appendLogMessage("vector=");
-                appendLogMessage(to_string(FLValue_AsString(vector)));
-                appendLogMessage("\n");
-                appendLogMessage("word=");
-                appendLogMessage(to_string(FLValue_AsString(word)));
-                appendLogMessage("\n");
-                FLMutableDict_SetValue(words, FLValue_AsString(word), vector);
+                FLMutableDict_SetValue(words, FLValue_AsString(word), FLValue_AsArray(vector));
             }
          }
          CBLQuery_Release(query2);
@@ -230,9 +215,7 @@ namespace vectorSearch_methods
                 CBLError err;
                 CBLCollection* collection;
                 TRY(collection = CBLDatabase_CreateCollection(db, flstr(collectionName),  flstr(scopeName), &err), err);
-                appendLogMessage("Just before creating the index");
                 TRY(CBLCollection_CreateVectorIndex(collection, flstr(indexName), config, &err), err);
-                appendLogMessage("After creating hte index");
                 write_serialized_body(conn, "Created index with name " + indexName);
             });
     }
