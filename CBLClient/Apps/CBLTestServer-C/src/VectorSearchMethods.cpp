@@ -238,7 +238,7 @@ namespace vectorSearch_methods
     }
 
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
-        const auto dbPath = "Databases/vsTestDatabase.cblite2/";
+        const auto dbPath = "Databases/vsTestDatabase.cblite2";
         const auto dbName = "vsTestDatabase";
 
         CBL_SetExtensionPath(flstr("/root/ctestserver/Extensions"));
@@ -250,7 +250,7 @@ namespace vectorSearch_methods
         CBLDatabase* db;
         TRY(CBL_CopyDatabase(flstr(databasePath), flstr(dbName), databaseConfig, &err), err);
         // to rename the folder because it is copied to be under "r" for some reason
-        rename("/root/ctestserver/r", dbName);
+        //rename("/root/ctestserver/r", dbName);
         wordMap = getWordMap();
         TRY(db = CBLDatabase_Open(flstr(dbName), databaseConfig, &err), err);
         write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
