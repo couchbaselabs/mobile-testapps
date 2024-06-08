@@ -301,7 +301,7 @@ namespace vectorSearch_methods
                 };
 
                 FLMutableDict qParam = FLMutableDict_New();
-                FLMutableDict_SetValue(qParam, flstr("vector"), embeddedTerm);
+                FLMutableDict_SetValue(qParam, flstr("vector"), FLValue_AsArray(embeddedTerm));
                 CBLQuery_SetParameters(query, FLDict(qParam));
                 
                 CBLResultSet* results;
