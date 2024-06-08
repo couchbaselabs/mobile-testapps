@@ -107,6 +107,15 @@ static FLMutableDict getWordMap() {
             FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
             if (vector) {
                 FLMutableDict_SetArray(words, FLValue_AsString(word), FLValue_AsArray(vector));
+                FLArrayIterator iter;
+                FLArrayIterator_Begin(FLValue_AsArray(vector), &iter);
+                FLValue value;
+                appendLogMessage("The word: " + to_string(FLValue_AsString(word)));
+                while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
+                    appendLogMessage(to_string(FLValue_AsString(value)));
+                    appendLogMessage(" ");
+                    FLArrayIterator_Next(&iter);
+                 }
             };
 
          }
@@ -117,6 +126,15 @@ static FLMutableDict getWordMap() {
             FLValue vector = CBLResultSet_ValueForKey(rs2, flstr("vector"));
             if (vector) {
                 FLMutableDict_SetArray(words, FLValue_AsString(word), FLValue_AsArray(vector));
+                FLArrayIterator iter;
+                FLArrayIterator_Begin(FLValue_AsArray(vector), &iter);
+                FLValue value;
+                appendLogMessage("The word: " + to_string(FLValue_AsString(word)));
+                while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
+                    appendLogMessage(to_string(FLValue_AsString(value)));
+                    appendLogMessage(" ");
+                    FLArrayIterator_Next(&iter);
+                 }
             }
          }
          CBLQuery_Release(query2);
