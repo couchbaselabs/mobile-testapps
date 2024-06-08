@@ -31,16 +31,6 @@ FLMutableDict getPrediction(FLDict input, string key) {
     FLMutableDict predictResult =  FLMutableDict_New();
     if (inputWord) {
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
-        appendLogMessage("Embeddings array values for words: " + to_string(FLValue_AsString(inputWord)));
-        FLArrayIterator iter;
-        FLArrayIterator_Begin(FLValue_AsArray(embeddingsVector), &iter);
-        FLValue value;
-        while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-            appendLogMessage(to_string(FLValue_AsFloat(value)));
-            appendLogMessage(" ");
-            FLArrayIterator_Next(&iter);
-        }
-        appendLogMessage("\n\n");
         FLMutableDict_SetArray(predictResult, flstr("vector"), FLValue_AsArray(embeddingsVector));
     }
     return predictResult;
@@ -107,15 +97,6 @@ static FLMutableDict getWordMap() {
             FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
             if (vector) {
                 FLMutableDict_SetArray(words, FLValue_AsString(word), FLValue_AsArray(vector));
-                FLArrayIterator iter;
-                FLArrayIterator_Begin(FLValue_AsArray(vector), &iter);
-                FLValue value;
-                appendLogMessage("The word: " + to_string(FLValue_AsString(word)));
-                while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-                    appendLogMessage(to_string(FLValue_AsFloat(value)));
-                    appendLogMessage(" ");
-                    FLArrayIterator_Next(&iter);
-                 }
             };
 
          }
@@ -126,15 +107,6 @@ static FLMutableDict getWordMap() {
             FLValue vector = CBLResultSet_ValueForKey(rs2, flstr("vector"));
             if (vector) {
                 FLMutableDict_SetArray(words, FLValue_AsString(word), FLValue_AsArray(vector));
-                FLArrayIterator iter;
-                FLArrayIterator_Begin(FLValue_AsArray(vector), &iter);
-                FLValue value;
-                appendLogMessage("The word: " + to_string(FLValue_AsString(word)));
-                while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-                    appendLogMessage(to_string(FLValue_AsFloat(value)));
-                    appendLogMessage(" ");
-                    FLArrayIterator_Next(&iter);
-                 }
             }
          }
          CBLQuery_Release(query2);
@@ -289,7 +261,16 @@ namespace vectorSearch_methods
         with<CBLDatabase *>(body,"database", [conn, body](CBLDatabase* db)
             {
                 auto embeddedTermDic = getEmbeddingDic(body["term"].get<string>());
-                auto embeddedTerm = FLDict_Get(embeddedTermDic, flstr("vector"));
+                FLValue embeddedTerm = FLDict_Get(embeddedTermDic, flstr("vector"));
+                FLArrayIterator iter;
+                FLArrayIterator_Begin(FLValue_AsArray(embeddedTerm), &iter);
+                FLValue value;
+                appendLogMessage("For term: " + body["term"].get<string>() + ":");
+                while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
+                    appendLogMessage(to_string(FLValue_AsArray(value)) + " ");
+                    FLArrayIterator_Next(&iter);
+                }
+                appendLogMessage("\n");
                 auto sql = body["sql"].get<string>();
                 json retVal = json::array();
                 CBLError err;
@@ -301,7 +282,7 @@ namespace vectorSearch_methods
                 };
 
                 FLMutableDict qParam = FLMutableDict_New();
-                FLMutableDict_SetValue(qParam, flstr("vector"), FLValue_AsArray(embeddedTerm));
+                FLMutableDict_SetValue(qParam, flstr("vector"), embeddedTerm);
                 CBLQuery_SetParameters(query, FLDict(qParam));
                 
                 CBLResultSet* results;
