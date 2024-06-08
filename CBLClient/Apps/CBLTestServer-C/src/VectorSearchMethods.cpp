@@ -31,6 +31,14 @@ FLMutableDict getPrediction(FLDict input, string key) {
     FLMutableDict predictResult =  FLMutableDict_New();
     if (inputWord) {
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
+        int count = FLArray_Count(FLValue_AsArray(embeddingsVector));
+        appendLogMessage("Embeddings array values for words: " + to_string(FLValue_AsString(inputWord)));
+        if (count > 0) {
+            FLValue value = FLArray_Get(0);
+            appendLogMessage(value);
+            appendLogMessage(" ");
+        }
+        appendLogMessage("\n\n");
         FLMutableDict_SetArray(predictResult, flstr("vector"), FLValue_AsArray(embeddingsVector));
     }
     return predictResult;
@@ -96,7 +104,7 @@ static FLMutableDict getWordMap() {
             FLValue word = CBLResultSet_ValueForKey(rs1, flstr("word"));
             FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
             if (vector) {
-                FLMutableDict_SetArray(words, FLValue_AsString(word), FLValue_AsDict(vector));
+                FLMutableDict_SetArray(words, FLValue_AsString(word), FLValue_AsArray(vector));
             };
 
          }
@@ -106,7 +114,7 @@ static FLMutableDict getWordMap() {
             FLValue word = CBLResultSet_ValueForKey(rs2, flstr("word"));
             FLValue vector = CBLResultSet_ValueForKey(rs2, flstr("vector"));
             if (vector) {
-                FLMutableDict_SetArray(words, FLValue_AsString(word), FLValue_AsDict(vector));
+                FLMutableDict_SetArray(words, FLValue_AsString(word), FLValue_AsArray(vector));
             }
          }
          CBLQuery_Release(query2);
