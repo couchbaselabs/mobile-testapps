@@ -38,10 +38,12 @@ FLMutableDict getPrediction(FLDict input, string key) {
 
 FLSliceResult predictFunction(void* context, FLDict input) {
     FLMutableDict predictionResult = FLMutableDict_New();
+    FLValue embbedingsVector =  FLMutableArray_New();
     predictionResult = getPrediction(input, "word");
+    embbedingsVector = FLDict_Get(predictionResult, flstr("word"));
     FLEncoder enc = FLEncoder_New();
     FLEncoder_BeginDict(enc, 1);
-    FLEncoder_WriteValue(enc, (FLValue)predictionResult);
+    FLEncoder_WriteValue(enc, embbedingsVector);
     FLEncoder_EndDict(enc);
     FLMutableDict_Release(predictionResult);
     return FLEncoder_Finish(enc, nullptr); 
