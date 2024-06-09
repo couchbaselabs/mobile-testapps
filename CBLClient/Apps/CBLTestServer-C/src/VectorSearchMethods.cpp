@@ -29,11 +29,11 @@ static void appendLogMessage(string msg) {
 FLMutableDict getPrediction(FLDict input, string key) {
     const FLValue inputWord = FLDict_Get(input, flstr(key));
     FLDictIterator iter;
-    FLDictIterator_Begin(myDict, &iter);
+    FLDictIterator_Begin(input, &iter);
     FLValue value;
     while (NULL != (value = FLDictIterator_GetValue(&iter))) {
         FLString key = FLDictIterator_GetKeyString(&iter);
-        appendLogMessage("key=" + to_string(FLValue_AsString(key)));
+        appendLogMessage("key=" + to_string(key));
         appendLogMessage(",value=" + to_string(FLValue_AsString(value)) + "\n");
         FLDictIterator_Next(&iter);
     }
