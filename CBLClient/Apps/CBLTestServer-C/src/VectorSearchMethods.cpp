@@ -42,6 +42,17 @@ FLSliceResult predictFunction(void* context, FLDict input) {
     FLEncoder enc = FLEncoder_New();
     predictionResult = getPrediction(input, "word");
     embbedingsVector = FLMutableDict_GetMutableArray(predictionResult, flstr("vector"));
+    FLArrayIterator iter;
+    FLArrayIterator_Begin(embbedingsVector, &iter);
+    FLValue value;
+    appendLogMessage("Embedded vector for word " + FLValue_AsString(FLDict_Get(input, "word")) + ":\n");
+    while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
+        appendLogMessage(value);
+        appendLogMessage(" ");
+        FLArrayIterator_Next(&iter);
+    }
+    appendLogMessage("\n\n");
+    appendLogMessage(embbedingsVector)
     if (embbedingsVector) {
         FLEncoder_BeginDict(enc, 1);
         FLEncoder_WriteValue(enc, FLValue(embbedingsVector));
