@@ -32,6 +32,16 @@ FLMutableDict getPrediction(FLDict input, string key) {
     if (inputWord) {
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
         FLMutableDict_SetArray(predictResult, flstr("vector"), FLValue_AsArray(embeddingsVector));
+        FLArrayIterator iter;
+        FLArrayIterator_Begin(FLValue_AsArray(embeddingsVector), &iter);
+        FLValue value;
+        appendLogMessage("Embedded vector for word " + to_string(FLValue_AsString(inputWord)) + ":\n");
+        while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
+            appendLogMessage(to_string(FLValue_AsString(value)));
+            appendLogMessage(" ");
+            FLArrayIterator_Next(&iter);
+        }
+        appendLogMessage("\n\n");
     }
     return predictResult;
 }
@@ -42,16 +52,6 @@ FLSliceResult predictFunction(void* context, FLDict input) {
     FLEncoder enc = FLEncoder_New();
     predictionResult = getPrediction(input, "word");
     embbedingsVector = FLMutableDict_GetMutableArray(predictionResult, flstr("vector"));
-    FLArrayIterator iter;
-    FLArrayIterator_Begin(embbedingsVector, &iter);
-    FLValue value;
-    appendLogMessage("Embedded vector for word " + to_string(FLValue_AsString(FLDict_Get(input, flstr("word"))))+ ":\n");
-    while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-        appendLogMessage(to_string(FLValue_AsString(value)));
-        appendLogMessage(" ");
-        FLArrayIterator_Next(&iter);
-    }
-    appendLogMessage("\n\n");
     if (embbedingsVector) {
         FLEncoder_BeginDict(enc, 1);
         FLEncoder_WriteValue(enc, FLValue(embbedingsVector));
