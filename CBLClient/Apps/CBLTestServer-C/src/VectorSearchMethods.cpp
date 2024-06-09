@@ -45,7 +45,7 @@ FLSliceResult predictFunction(void* context, FLDict input) {
     FLArrayIterator iter;
     FLArrayIterator_Begin(embbedingsVector, &iter);
     FLValue value;
-    appendLogMessage("Embedded vector for word " + to_string(FLValue_AsString(FLDict_Get(input, flstr("word"))) + ":\n");
+    appendLogMessage("Embedded vector for word " + to_string(FLValue_AsString(FLDict_Get(input, flstr("word"))))+ ":\n");
     while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
         appendLogMessage(to_string(value));
         appendLogMessage(" ");
