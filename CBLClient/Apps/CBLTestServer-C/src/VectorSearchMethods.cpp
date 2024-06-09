@@ -40,7 +40,7 @@ FLSliceResult predictFunction(void* context, FLDict input) {
     FLMutableDict predictionResult = FLMutableDict_New();
     auto embbedingsVector =  FLMutableArray_New();
     predictionResult = getPrediction(input, "word");
-    embbedingsVector = FLMutableDict_GetMutableArray(predictionResult, flstr("word"));
+    embbedingsVector = FLMutableDict_GetMutableArray(predictionResult, flstr("vector"));
     FLEncoder enc = FLEncoder_New();
     FLEncoder_BeginDict(enc, 1);
     FLEncoder_WriteValue(enc, FLValue(embbedingsVector));
