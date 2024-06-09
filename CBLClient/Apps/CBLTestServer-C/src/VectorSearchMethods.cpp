@@ -52,7 +52,6 @@ FLSliceResult predictFunction(void* context, FLDict input) {
         FLArrayIterator_Next(&iter);
     }
     appendLogMessage("\n\n");
-    appendLogMessage(embbedingsVector)
     if (embbedingsVector) {
         FLEncoder_BeginDict(enc, 1);
         FLEncoder_WriteValue(enc, FLValue(embbedingsVector));
