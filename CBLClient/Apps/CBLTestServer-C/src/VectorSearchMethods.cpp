@@ -37,7 +37,7 @@ FLMutableDict getPrediction(FLDict input, string key) {
         FLValue value;
         appendLogMessage("Embedded vector for word " + to_string(FLValue_AsString(inputWord)) + ":\n");
         while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-            appendLogMessage(to_string(FLValue_AsString(value)));
+            appendLogMessage(to_string(FLValue_AsFloat(value)));
             appendLogMessage(" ");
             FLArrayIterator_Next(&iter);
         }
