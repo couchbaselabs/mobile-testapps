@@ -39,13 +39,15 @@ FLMutableDict getPrediction(FLDict input, string key) {
 FLSliceResult predictFunction(void* context, FLDict input) {
     FLMutableDict predictionResult = FLMutableDict_New();
     auto embbedingsVector =  FLMutableArray_New();
+    FLEncoder enc = FLEncoder_New();
     predictionResult = getPrediction(input, "word");
     embbedingsVector = FLMutableDict_GetMutableArray(predictionResult, flstr("vector"));
-    FLEncoder enc = FLEncoder_New();
-    FLEncoder_BeginDict(enc, 1);
-    FLEncoder_WriteValue(enc, FLValue(embbedingsVector));
-    FLEncoder_EndDict(enc);
-    FLMutableDict_Release(predictionResult);
+    if (embbedingsVector) {
+        FLEncoder_BeginDict(enc, 1);
+        FLEncoder_WriteValue(enc, FLValue(embbedingsVector));
+        FLEncoder_EndDict(enc);
+        FLMutableDict_Release(predictionResult);
+    }
     return FLEncoder_Finish(enc, nullptr); 
 }
 
