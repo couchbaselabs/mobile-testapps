@@ -155,7 +155,7 @@ namespace collection_methods {
     }
 
    void collection_getDocuments(json& body, mg_connection* conn) {
-        with<FLMutableArray>(body, "ids", [body, conn](FLMutableArray docIds)) {
+        with<FLMutableArray>(body, "ids", [body, conn](FLMutableArray docIds) {
          // auto docIds = static_cast<FLArray>(memory_map::get(body["ids"].get<string>()));
             FLMutableDict documents =  FLMutableDict_New();
             with<CBLCollection *>(body,"collection",[conn, docIds, documents](CBLCollection* collection) {
@@ -175,8 +175,8 @@ namespace collection_methods {
                 }
             });
             write_serialized_body(conn, memory_map::store(documents, FLMutableDict_EntryDelete));
-        };
-
+        });
+   }
 
     //save document to the collection, parameters are collection object, document object and error object
     void collection_saveDocument(json& body, mg_connection* conn) {
@@ -443,9 +443,9 @@ namespace collection_methods {
         }
 
         success = true;
-    });
-    });
+        });
+        });
 
-    write_empty_body(conn);
-}
+     write_empty_body(conn);
+    }
 }
