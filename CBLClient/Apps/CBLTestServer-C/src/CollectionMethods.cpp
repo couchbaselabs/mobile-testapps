@@ -154,24 +154,29 @@ namespace collection_methods {
         });
     }
 
-    void collection_getDocuments(json& body, mg_connection* conn) {
-         auto docIds = memory_map::get(body["ids"].get<string>());
-         FLMutableDict documents =  FLMutableDict_New();
-         with<CBLCollection *>(body,"collection",[conn, &docIds, documents](CBLCollection* collection) {
-            CBLError err = {};
-            for (auto docId : docIds) {
-                auto document = CBLCollection_GetDocument(collection, flstr(docId), &err);
-                if(err.code!=0)
-                    write_serialized_body(conn, CBLError_Message(&err));
-                else if(!document)
-                    write_serialized_body(conn, NULL);
-                else
-                    FLMutableDict_SetDict(documents, flstr(docId), document);
-                    CBLDocument_Release(document);
-            }
-             write_serialized_body(conn, memory_map::store(documents, FLMutableDict_EntryDelete));
-        });
-    }
+   void collection_getDocuments(json& body, mg_connection* conn) {
+        with<FLMutableArray>(body, "ids", [body, conn](FLMutableArray docIds)) {
+         // auto docIds = static_cast<FLArray>(memory_map::get(body["ids"].get<string>()));
+            FLMutableDict documents =  FLMutableDict_New();
+            with<CBLCollection *>(body,"collection",[conn, docIds, documents](CBLCollection* collection) {
+                CBLError err = {};
+                FLArrayIterator iter;
+                FLArrayIterator_Begin(myArray, &iter);
+                FLValue docId;
+                while (NULL != (docId = FLArrayIterator_GetValue(&iter))) {
+                    auto document = CBLCollection_GetDocument(collection, docId, &err);
+                    if(err.code!=0)
+                        write_serialized_body(conn, CBLError_Message(&err));
+                    else if(!document)
+                        write_serialized_body(conn, NULL);
+                    else
+                        FLMutableDict_SetDict(documents, docId, document);
+                        CBLDocument_Release(document);
+                }
+            });
+            write_serialized_body(conn, memory_map::store(documents, FLMutableDict_EntryDelete));
+        };
+
 
     //save document to the collection, parameters are collection object, document object and error object
     void collection_saveDocument(json& body, mg_connection* conn) {
