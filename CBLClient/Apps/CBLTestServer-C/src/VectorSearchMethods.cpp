@@ -49,7 +49,7 @@ FLSliceResult predictFunction(void* context, FLDict input) {
         FLValue value;
         while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
             FLMutableArray_AppendFloat(embbedingsVector, FLValue_AsFloat(value));
-            appendLogMessage(to_string(LValue_AsFloat(value)) + " ");
+            appendLogMessage(to_string(FLValue_AsFloat(value)) + " ");
             FLArrayIterator_Next(&iter);
         }
         appendLogMessage("\n\n\n");
