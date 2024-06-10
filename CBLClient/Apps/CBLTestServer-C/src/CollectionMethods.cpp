@@ -170,7 +170,8 @@ namespace collection_methods {
                     else if(!document)
                         write_serialized_body(conn, NULL);
                     else
-                        FLMutableDict_SetDict(documents, FLValue_AsString(docId), document);
+                        FLMutableDict docProperties = CBLDocument_MutableProperties(document);
+                        FLMutableDict_SetDict(documents, FLValue_AsString(docId), docProperties);
                         CBLDocument_Release(document);
                 }
             });
