@@ -42,9 +42,10 @@ FLSliceResult predictFunction(void* context, FLDict input) {
     if (inputWord) {
         auto tempMutableArray = FLMutableArray_New();
         const FLValue tempVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
-        FLMutableArray_AppendArray(tempMutableArray, FLValue_AsArray(tempVector));
+        //FLMutableArray_Array(tempMutableArray, FLValue_AsArray(tempVector));
+        appendLogMessage("For word: " + to_string(FLValue_AsString(inputWord)) + " ");
         FLArrayIterator iter;
-        FLArrayIterator_Begin(tempMutableArray, &iter);
+        FLArrayIterator_Begin(FLValue_AsArray(tempVector), &iter);
         FLValue value;
         while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
             appendLogMessage(to_string(FLValue_AsFloat(value)) + " ");
