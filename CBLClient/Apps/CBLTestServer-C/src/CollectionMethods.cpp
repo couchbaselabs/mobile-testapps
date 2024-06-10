@@ -259,7 +259,7 @@ namespace collection_methods {
         });
     }
 
-     void database_updateDocument(json& body, mg_connection* conn) {
+     void collection_updateDocument(json& body, mg_connection* conn) {
         const auto id = body["doc_id"].get<string>();
         const auto data = body["data"];
         with<CBLCollection *>(body, "collection", [&id, &data](CBLCollection* collection)
