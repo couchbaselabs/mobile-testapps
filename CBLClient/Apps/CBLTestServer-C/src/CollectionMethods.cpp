@@ -159,7 +159,7 @@ namespace collection_methods {
          FLMutableDict documents =  FLMutableDict_New();
          with<CBLCollection *>(body,"collection",[conn, &docIds](CBLCollection* collection) {
             CBLError err = {};
-            for docId in docIds {
+            for string docId in docIds {
                     auto document = CBLCollection_GetDocument(collection, flstr(docId), &err);
                     if(err.code!=0)
                         write_serialized_body(conn, CBLError_Message(&err));

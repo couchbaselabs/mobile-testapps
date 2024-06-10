@@ -17,6 +17,7 @@ namespace collection_methods {
     void collection_collection(nlohmann::json& body, mg_connection* conn);
     void collection_collectionScope(nlohmann::json& body, mg_connection* conn);
     void collection_getDocument(nlohmann::json& body, mg_connection* conn);
+    void collection_getDocuments(nlohmann::json& body, mg_connection* conn);
     void collection_saveDocument(nlohmann::json& body, mg_connection* conn);
     void collection_saveDocumentWithConcurrencyControl(nlohmann::json& body, mg_connection* conn);
     void collection_deleteDocument(nlohmann::json& body, mg_connection* conn);
