@@ -259,41 +259,30 @@ namespace collection_methods {
         });
     }
 
-    void collection_updateDocuments(json& body, mg_connection* conn) {
-        const auto docDict = body["documents"];
-        with<CBLCollection *>(body, "collection", [&docDict](CBLCollection* collection)
+     void database_updateDocument(json& body, mg_connection* conn) {
+        const auto id = body["doc_id"].get<string>();
+        const auto data = body["data"];
+        with<CBLDatabase *>(body, "collection", [&id, &data](CBLCollection* collection)
         {
-            CBLDatabase* db = CBLCollection_Database(collection);
+            CBLDocument* doc;
             CBLError err;
-            TRY(CBLDatabase_BeginTransaction(db, &err), err)
-            auto success = false;
+            TRY(doc = CBLCollection_GetMutableDocument(collection, flstr(id), &err), err)
             DEFER {
-                TRY(CBLDatabase_EndTransaction(db, success, &err), err)
+                CBLDocument_Release(doc);
             };
 
-            for(auto& [key, value] : docDict.items()) {
-                CBLDocument* doc;
-                TRY((doc = CBLCollection_GetMutableDocument(collection,flstr(key), &err)), err)
-                DEFER {
-                    CBLDocument_Release(doc);
-                };
-
-                FLMutableDict newContent = FLMutableDict_New();
-                for(auto& [key, value] : value.items()) {
-                    writeFleece(newContent, key, value);
-                }
-
-                CBLDocument_SetProperties(doc, newContent);
-                FLMutableDict_Release(newContent);
-                TRY(CBLCollection_SaveDocument(collection, doc, &err), err)
+            FLMutableDict newContent = FLMutableDict_New();
+            for(auto& [key, value] : data.items()) {
+                writeFleece(newContent, key, value);
             }
 
-            success = true;
+            CBLDocument_SetProperties(doc, newContent);
+            FLMutableDict_Release(newContent);
+            TRY(CBLCollection_SaveDocument(collection, doc, &err), err)
         });
 
         write_empty_body(conn);
     }
-
 
     //delete document in collection with concurrency control
     void collection_deleteDocumentWithConcurrencyControl(json& body, mg_connection* conn) {
