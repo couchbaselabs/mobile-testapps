@@ -37,6 +37,10 @@ static void CBLCollection_DummyDocumentListener(void* context, const CBLDocument
     
 }
 
+static void FLMutableDict_EntryDelete(void* ptr) {
+    FLMutableDict_Release(static_cast<FLMutableDict>(ptr));
+}
+
 namespace collection_methods {
     //default collection object
     void collection_defaultCollection(json& body, mg_connection* conn){
@@ -147,6 +151,25 @@ namespace collection_methods {
                 write_serialized_body(conn, NULL);
             else
                 write_serialized_body(conn, memory_map::store(document, CBLCollectionDocument_EntryDelete));
+        });
+    }
+
+    void collection_getDocuments(json& body, mg_connection* conn) {
+         auto docIds = body["ids"].get<string>();
+         FLMutableDict documents =  FLMutableDict_New();
+         with<CBLCollection *>(body,"collection",[conn, &docIds](CBLCollection* collection) {
+            CBLError err = {};
+            for docId in docIds {
+                    auto document = CBLCollection_GetDocument(collection, flstr(docId), &err);
+                    if(err.code!=0)
+                        write_serialized_body(conn, CBLError_Message(&err));
+                    else if(!document)
+                        write_serialized_body(conn, NULL);
+                    else
+                        documents[docId] = document;
+                        CBLDocument_Release(document);
+            }
+             write_serialized_body(conn, memory_map::store(documents, FLMutableDict_EntryDelete));
         });
     }
 
