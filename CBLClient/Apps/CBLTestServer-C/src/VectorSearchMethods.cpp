@@ -40,7 +40,6 @@ FLSliceResult predictFunction(void* context, FLDict input) {
     auto embbedingsVector =  FLMutableArray_New();
     const FLValue inputWord = FLDict_Get(input, flstr("word"));
     if (inputWord) {
-        auto tempMutableArray = FLMutableArray_New();
         const FLValue tempVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
         //FLMutableArray_SetArray(tempMutableArray, FLValue_AsArray(tempVector));
        // appendLogMessage("For word: " + to_string(FLValue_AsString(inputWord)) + " ");
