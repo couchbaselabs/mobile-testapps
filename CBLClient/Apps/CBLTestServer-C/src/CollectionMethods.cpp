@@ -158,6 +158,9 @@ namespace collection_methods {
         with<FLMutableArray>(body, "ids", [&body, conn](FLMutableArray docIds) {
          // auto docIds = static_cast<FLArray>(memory_map::get(body["ids"].get<string>()));
             FLMutableDict documents =  FLMutableDict_New();
+            //DEFER {
+            //    FLMutableDict_Release(documents);
+            //}
             with<CBLCollection *>(body,"collection",[conn, docIds, documents](CBLCollection* collection) {
                 CBLError err = {};
                 FLArrayIterator iter;
@@ -173,7 +176,7 @@ namespace collection_methods {
                     }
                     else {
                         FLDict docProperties = CBLDocument_Properties(document);
-                        FLMutableDict_SetDict(documents, FLValue_AsString(docId), docProperties);
+                        FLMutableDict_SetDict(documents, FLValue_AsString(docId), reinterpret_cast<FLValue>(docProperties));
                         CBLDocument_Release(document);
                     }
                 }
