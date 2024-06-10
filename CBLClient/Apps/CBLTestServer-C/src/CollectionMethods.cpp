@@ -155,7 +155,7 @@ namespace collection_methods {
     }
 
    void collection_getDocuments(json& body, mg_connection* conn) {
-        with<FLMutableArray>(body, "ids", [body, conn](FLMutableArray docIds) {
+        with<FLMutableArray>(body, "ids", [&body, conn](FLMutableArray docIds) {
          // auto docIds = static_cast<FLArray>(memory_map::get(body["ids"].get<string>()));
             FLMutableDict documents =  FLMutableDict_New();
             with<CBLCollection *>(body,"collection",[conn, docIds, documents](CBLCollection* collection) {
@@ -170,7 +170,7 @@ namespace collection_methods {
                     else if(!document)
                         write_serialized_body(conn, NULL);
                     else
-                        FLMutableDict_SetDict(documents, docId, document);
+                        FLMutableDict_SetDict(documents, FLValue_AsString(docId), document);
                         CBLDocument_Release(document);
                 }
             });
