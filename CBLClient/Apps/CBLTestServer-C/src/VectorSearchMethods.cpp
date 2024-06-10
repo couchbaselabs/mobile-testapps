@@ -41,7 +41,7 @@ FLSliceResult predictFunction(void* context, FLDict input) {
     const FLValue inputWord = FLDict_Get(input, flstr("word"));
     if (inputWord) {
         const FLValue wordEmbeddings = FLDict_Get(wordMap, FLValue_AsString(inputWord));
-        embbedingsVector = FLValue_AsArray(wordEmbeddings);
+        embbedingsVector = FLMutableArray_SetArray(FLValue_AsArray(wordEmbeddings));
     }
     FLEncoder enc = FLEncoder_New();
     if (embbedingsVector) {
