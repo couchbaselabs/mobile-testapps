@@ -159,7 +159,8 @@ namespace collection_methods {
          FLMutableDict documents =  FLMutableDict_New();
          with<CBLCollection *>(body,"collection",[conn, &docIds, documents](CBLCollection* collection) {
             CBLError err = {};
-            for (auto docId : docIds) {
+            memory_map::iterator it = docIds.begin();
+            while (it != docIds.end()) {
                 auto document = CBLCollection_GetDocument(collection, flstr(docId), &err);
                 if(err.code!=0)
                     write_serialized_body(conn, CBLError_Message(&err));
@@ -169,6 +170,9 @@ namespace collection_methods {
                     FLMutableDict_SetDict(documents, flstr(docId), document);
                     CBLDocument_Release(document);
             }
+            /*for (auto docId : docIds) {
+                
+            }*/
              write_serialized_body(conn, memory_map::store(documents, FLMutableDict_EntryDelete));
         });
     }
