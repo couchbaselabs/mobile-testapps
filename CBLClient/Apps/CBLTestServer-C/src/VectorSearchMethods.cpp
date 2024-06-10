@@ -50,7 +50,6 @@ FLSliceResult predictFunction(void* context, FLDict input) {
             FLMutableArray_AppendFloat(embbedingsVector, FLValue_AsFloat(value));
             FLArrayIterator_Next(&iter);
         }
-        //appendLogMessage("\n\n\n");
         //FLMutableArray_AppendArray(embbedingsVector, FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(inputWord))));
     }
     FLEncoder enc = FLEncoder_New();
@@ -267,9 +266,20 @@ namespace vectorSearch_methods
     }
     
     void vectorSearch_getEmbedding(json& body, mg_connection* conn) {
+        auto embbedingsVector =  FLMutableArray_New();
+        DEFER {
+            FLMutableArray_Release(embbedingsVector);
+        }
         auto vectorDict = getEmbeddingDic(body["input"].get<string>());
-        FLValue embedding = FLDict_Get(vectorDict, flstr("vector"));
-        write_serialized_body(conn, FLValue_AsArray(embedding));
+        FLValue embeddings = FLDict_Get(vectorDict, flstr("vector"));
+        FLArrayIterator iter;
+        FLArrayIterator_Begin(FLValue_AsArray(embeddings), &iter);
+        FLValue value;
+        while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
+            FLMutableArray_AppendFloat(embbedingsVector, FLValue_AsFloat(value));
+            FLArrayIterator_Next(&iter);
+        }
+        write_serialized_body(conn, embbedingsVector);
     }
 
 
