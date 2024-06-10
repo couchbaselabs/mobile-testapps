@@ -161,10 +161,10 @@ namespace collection_methods {
             with<CBLCollection *>(body,"collection",[conn, docIds, documents](CBLCollection* collection) {
                 CBLError err = {};
                 FLArrayIterator iter;
-                FLArrayIterator_Begin(myArray, &iter);
+                FLArrayIterator_Begin(docIds, &iter);
                 FLValue docId;
                 while (NULL != (docId = FLArrayIterator_GetValue(&iter))) {
-                    auto document = CBLCollection_GetDocument(collection, docId, &err);
+                    auto document = CBLCollection_GetDocument(collection, FLValue_AsString(docId), &err);
                     if(err.code!=0)
                         write_serialized_body(conn, CBLError_Message(&err));
                     else if(!document)
