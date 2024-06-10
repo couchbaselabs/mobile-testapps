@@ -58,7 +58,7 @@ FLSliceResult predictFunction(void* context, FLDict input) {
     FLEncoder enc = FLEncoder_New();
     if (embbedingsVector) {
         FLEncoder_BeginDict(enc, 1);
-        LEncoder_WriteKey(enc, FLStr("vector"));
+        FLEncoder_WriteKey(enc, FLStr("vector"));
         FLEncoder_WriteValue(enc, FLValue(embbedingsVector));
         FLEncoder_EndDict(enc);
     }
