@@ -165,14 +165,17 @@ namespace collection_methods {
                 FLValue docId;
                 while (NULL != (docId = FLArrayIterator_GetValue(&iter))) {
                     auto document = CBLCollection_GetDocument(collection, FLValue_AsString(docId), &err);
-                    if(err.code!=0)
+                    if(err.code!=0) {
                         write_serialized_body(conn, CBLError_Message(&err));
-                    else if(!document)
+                    }
+                    else if(!document) {
                         write_serialized_body(conn, NULL);
-                    else
+                    }
+                    else {
                         FLDict docProperties = CBLDocument_Properties(document);
                         FLMutableDict_SetDict(documents, FLValue_AsString(docId), docProperties);
                         CBLDocument_Release(document);
+                    }
                 }
             });
             write_serialized_body(conn, memory_map::store(documents, FLMutableDict_EntryDelete));
