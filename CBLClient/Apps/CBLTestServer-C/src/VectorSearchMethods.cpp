@@ -48,6 +48,14 @@ FLSliceResult predictFunction(void* context, FLDict input) {
         FLEncoder_WriteValue(enc, FLValue(embbedingsVector));
         FLEncoder_EndDict(enc);
     }
+    FLArrayIterator iter;
+    FLArrayIterator_Begin(embbedingsVector, &iter);
+    FLValue value;
+    while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
+        appendLogMessage(to_string(FLValue_AsFloat(value)) + " ");
+        FLArrayIterator_Next(&iter);
+    }
+    appendLogMessage("\n\n\n");
     FLMutableArray_Release(embbedingsVector);
     return FLEncoder_Finish(enc, nullptr); 
 }
