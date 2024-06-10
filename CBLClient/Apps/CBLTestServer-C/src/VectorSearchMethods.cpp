@@ -265,11 +265,12 @@ namespace vectorSearch_methods
         write_serialized_body(conn, "Model registered");
     }
     
-    void vectorSearch_getEmbedding(json& body, mg_connection* conn) {
+    void vectorSearch_getEmbedding(json& body, mg_connection* conn)
+    {
         auto embbedingsVector =  FLMutableArray_New();
         DEFER {
             FLMutableArray_Release(embbedingsVector);
-        }
+        };
         auto vectorDict = getEmbeddingDic(body["input"].get<string>());
         FLValue embeddings = FLDict_Get(vectorDict, flstr("vector"));
         FLArrayIterator iter;
