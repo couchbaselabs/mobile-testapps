@@ -155,7 +155,7 @@ namespace collection_methods {
     }
 
     void collection_getDocuments(json& body, mg_connection* conn) {
-         auto docIds = body["ids"].get<string>();
+         auto docIds = memory_map::get(body["ids"].get<string>());
          FLMutableDict documents =  FLMutableDict_New();
          with<CBLCollection *>(body,"collection",[conn, &docIds, documents](CBLCollection* collection) {
             CBLError err = {};
