@@ -40,6 +40,17 @@ FLSliceResult predictFunction(void* context, FLDict input) {
     auto embbedingsVector =  FLMutableArray_New();
     const FLValue inputWord = FLDict_Get(input, flstr("word"));
     if (inputWord) {
+        auto tempMutableArray = FLMutableArray_New();
+        const FLValue tempVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
+        tempMutableArray = FLMutableArray_AppendArray(FLValue_AsArray(tempVector));
+        FLArrayIterator iter;
+        FLArrayIterator_Begin(tempMutableArray, &iter);
+        FLValue value;
+        while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
+            appendLogMessage(to_string(FLValue_AsFloat(value)) + " ");
+            FLArrayIterator_Next(&iter);
+        }
+        appendLogMessage("\n\n\n");
         FLMutableArray_AppendArray(embbedingsVector, FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(inputWord))));
     }
     FLEncoder enc = FLEncoder_New();
@@ -48,14 +59,6 @@ FLSliceResult predictFunction(void* context, FLDict input) {
         FLEncoder_WriteValue(enc, FLValue(embbedingsVector));
         FLEncoder_EndDict(enc);
     }
-    FLArrayIterator iter;
-    FLArrayIterator_Begin(embbedingsVector, &iter);
-    FLValue value;
-    while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-        appendLogMessage(to_string(FLValue_AsFloat(value)) + " ");
-        FLArrayIterator_Next(&iter);
-    }
-    appendLogMessage("\n\n\n");
     FLMutableArray_Release(embbedingsVector);
     return FLEncoder_Finish(enc, nullptr); 
 }
