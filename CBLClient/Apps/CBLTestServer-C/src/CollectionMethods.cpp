@@ -159,15 +159,14 @@ namespace collection_methods {
          FLMutableDict documents =  FLMutableDict_New();
          with<CBLCollection *>(body,"collection",[conn, &docIds, documents](CBLCollection* collection) {
             CBLError err = {};
-            for (string docId : docIds) {
+            for (auto docId : docIds) {
                 auto document = CBLCollection_GetDocument(collection, flstr(docId), &err);
                 if(err.code!=0)
                     write_serialized_body(conn, CBLError_Message(&err));
                 else if(!document)
                     write_serialized_body(conn, NULL);
                 else
-                    FLMutableDict documentProperties = CBLDocument_MutableProperties(document);
-                    FLMutableDict_SetDict(documents, docId, document);
+                    FLMutableDict_SetDict(documents, flstr(docId), document);
                     CBLDocument_Release(document);
             }
              write_serialized_body(conn, memory_map::store(documents, FLMutableDict_EntryDelete));
