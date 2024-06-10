@@ -9,4 +9,5 @@ namespace vectorSearch_methods
     void vectorSearch_loadDatabase(nlohmann::json &body, mg_connection *conn);
     void vectorSearch_registerModel(nlohmann::json &body, mg_connection *conn);
     void vectorSearch_query(nlohmann::json &body, mg_connection *conn);
+    void vectorSearch_getEmbedding(nlohmann::json &body, mg_connection *conn);
 }
