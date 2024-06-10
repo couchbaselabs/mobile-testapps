@@ -155,7 +155,7 @@ namespace collection_methods {
     }
 
    void collection_getDocuments(json& body, mg_connection* conn) {
-        with<FLMutableArray>(body, "ids", [&body, conn](FLMutableArray docIds) {
+       /* with<FLMutableArray>(body, "ids", [&body, conn](FLMutableArray docIds) {
          // auto docIds = static_cast<FLArray>(memory_map::get(body["ids"].get<string>()));
             FLMutableDict documents =  FLMutableDict_New();
             //DEFER {
@@ -182,7 +182,36 @@ namespace collection_methods {
                 }
             });
             write_serialized_body(conn, memory_map::store(documents, FLMutableDict_EntryDelete));
+        });*/
+        const auto ids = body["ids"];
+        FLMutableDict retVal = FLMutableDict_New();
+
+        vector<const CBLDocument *> docs;
+        DEFER {
+            for(const auto* doc : docs) {
+                CBLDocument_Release(doc);
+            }
+
+            FLMutableDict_Release(retVal);
+        };
+        
+        with<CBLCollection *>(body, "collection", [retVal, &ids, &docs](CBLCollection* collection)
+        {
+            for(const auto& idJson : ids) {
+                const auto id = idJson.get<string>();
+                const CBLDocument* doc;
+                CBLError err;
+                TRY((doc = CBLCollection_GetDocument(collection, flstr(id), &err)), err);
+                if(!doc) {
+                    continue;
+                }
+
+                auto* slot = FLMutableDict_Set(retVal, flstr(id));
+                FLSlot_SetValue(slot, reinterpret_cast<FLValue>(CBLDocument_Properties(doc)));
+            }
         });
+
+        write_serialized_body(conn, reinterpret_cast<FLValue>(retVal));
    }
 
     //save document to the collection, parameters are collection object, document object and error object
