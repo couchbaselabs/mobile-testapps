@@ -28,15 +28,6 @@ static void appendLogMessage(string msg) {
 
 FLMutableDict getPrediction(FLDict input, string key) {
     const FLValue inputWord = FLDict_Get(input, flstr(key));
-    FLDictIterator iter;
-    FLDictIterator_Begin(input, &iter);
-    FLValue value;
-    while (NULL != (value = FLDictIterator_GetValue(&iter))) {
-        FLString key = FLDictIterator_GetKeyString(&iter);
-        appendLogMessage("key=" + to_string(key));
-        appendLogMessage(",value=" + to_string(FLValue_AsString(value)) + "\n");
-        FLDictIterator_Next(&iter);
-    }
     FLMutableDict predictResult =  FLMutableDict_New();
     if (inputWord) {
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
@@ -46,17 +37,19 @@ FLMutableDict getPrediction(FLDict input, string key) {
 }
 
 FLSliceResult predictFunction(void* context, FLDict input) {
-    FLMutableDict predictionResult = FLMutableDict_New();
     auto embbedingsVector =  FLMutableArray_New();
+    const FLValue inputWord = FLDict_Get(input, flstr("word"));
+    if (inputWord) {
+        embeddingsVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(inputWord)));
+    }
     FLEncoder enc = FLEncoder_New();
-    predictionResult = getPrediction(input, "word");
     embbedingsVector = FLMutableDict_GetMutableArray(predictionResult, flstr("vector"));
     if (embbedingsVector) {
         FLEncoder_BeginDict(enc, 1);
         FLEncoder_WriteValue(enc, FLValue(embbedingsVector));
         FLEncoder_EndDict(enc);
-        FLMutableDict_Release(predictionResult);
     }
+    FLMutableArray_Release(embbedingsVector);
     return FLEncoder_Finish(enc, nullptr); 
 }
 
