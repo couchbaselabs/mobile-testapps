@@ -280,7 +280,7 @@ namespace vectorSearch_methods
             FLMutableArray_AppendFloat(embbedingsVector, FLValue_AsFloat(value));
             FLArrayIterator_Next(&iter);
         }
-        write_serialized_body(conn, embbedingsVector);
+        write_serialized_body(conn, (FLValue)embbedingsVector);
     }
 
 
