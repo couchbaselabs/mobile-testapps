@@ -210,6 +210,7 @@ static const unordered_map<string, endpoint_handler> ROUTE_MAP = {
     {"collection_collection", collection_methods::collection_collection},
     {"collection_collectionScope", collection_methods::collection_collectionScope},
     {"collection_getDocument", collection_methods::collection_getDocument},
+    {"collection_getDocuments", collection_methods::collection_getDocuments},
     {"collection_deleteDocument", collection_methods::collection_deleteDocument},
     {"collection_purgeDocument", collection_methods::collection_purgeDocument},
     {"collection_purgeDocumentID", collection_methods::collection_purgeDocumentID},
