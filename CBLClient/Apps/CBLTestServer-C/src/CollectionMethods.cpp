@@ -157,9 +157,9 @@ namespace collection_methods {
     void collection_getDocuments(json& body, mg_connection* conn) {
          auto docIds = body["ids"].get<string>();
          FLMutableDict documents =  FLMutableDict_New();
-         with<CBLCollection *>(body,"collection",[conn, &docIds](CBLCollection* collection) {
+         with<CBLCollection *>(body,"collection",[conn, &docIds, documents](CBLCollection* collection) {
             CBLError err = {};
-            for string docId in docIds {
+            for const auto docId in docIds {
                     auto document = CBLCollection_GetDocument(collection, flstr(docId), &err);
                     if(err.code!=0)
                         write_serialized_body(conn, CBLError_Message(&err));
