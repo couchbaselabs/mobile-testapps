@@ -176,7 +176,7 @@ namespace collection_methods {
                     }
                     else {
                         FLDict docProperties = CBLDocument_Properties(document);
-                        FLMutableDict_SetDict(documents, FLValue_AsString(docId), reinterpret_cast<FLValue>(docProperties));
+                        FLMutableDict_SetValue(documents, FLValue_AsString(docId), reinterpret_cast<FLValue>(docProperties));
                         CBLDocument_Release(document);
                     }
                 }
