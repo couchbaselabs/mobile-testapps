@@ -26,10 +26,10 @@ static void appendLogMessage(string msg) {
     MyFile.close();
 }
 
-FLValue createEmbbedingFloatArray(FLValue inputWord) {
+FLMutableArray createEmbbedingFloatArray(FLValue inputWord) {
     auto embeddingsArray =  FLMutableArray_New();
     DEFER {
-        FLMutableArray_Release(embbedingsVector);
+        FLMutableArray_Release(embeddingsArray);
     };
     const FLValue wordValuesVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
     FLArrayIterator iter;
