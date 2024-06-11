@@ -26,7 +26,7 @@ static void appendLogMessage(string msg) {
     MyFile.close();
 }
 
-FValue createEmbbedingFloatArray(FLValue inputWord) {
+FLValue createEmbbedingFloatArray(FLValue inputWord) {
     auto embeddingsArray =  FLMutableArray_New();
     DEFER {
         FLMutableArray_Release(embbedingsVector);
