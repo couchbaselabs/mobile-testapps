@@ -63,29 +63,6 @@ FLSliceResult predictFunction(void* context, FLDict input) {
     return FLEncoder_Finish(enc, nullptr); 
 }
 
-class VectorModel : public CBLPredictiveModel {
-    private:
-    string key;
-
-    public:
-    VectorModel(string key) {
-        this->key=key;
-    }
-
-    FLSliceResult Predict(void* context, FLDict input) {
-      FLMutableDict predictionResult = FLMutableDict_New();
-      predictionResult = getPrediction(input, this->key);
-      FLEncoder enc = FLEncoder_New();
-      FLEncoder_BeginDict(enc, 1);
-      FLEncoder_WriteValue(enc, (FLValue)predictionResult);
-      FLEncoder_EndDict(enc);
-      FLMutableDict_Release(predictionResult);
-      return FLEncoder_Finish(enc, nullptr); 
-    }
-};
-
-static VectorModel* predictionVectorModel;
-
 static void CBLDatabase_EntryDelete(void* ptr) {
     CBLDatabase_Release(static_cast<CBLDatabase *>(ptr));
 }
@@ -131,7 +108,6 @@ static FLMutableDict getWordMap() {
 }
 
 FLDict getEmbeddingDic(string term) {
-    //VectorModel* model = new VectorModel("word");
     FLMutableDict testDict = FLMutableDict_New();
     FLMutableDict_SetString(testDict, flstr("word"), flstr(term));
     FLDict value = getPrediction(testDict, "word");
@@ -257,7 +233,6 @@ namespace vectorSearch_methods
         const auto key = body["key"].get<string>();
 
         CBLPredictiveModel model = {};
-        //predictionVectorModel = new VectorModel(key);
         model.context = nullptr;
         model.prediction = predictFunction;
         CBL_RegisterPredictiveModel(flstr(name), model);
