@@ -85,6 +85,7 @@ static FLMutableDict getEmbeddingsFromQuery(string query, string dbName) {
         };
     }
     CBLQuery_Release(cblQuery);
+    CBLResultSet_Release(cblResultSet);
     TRY(CBLDatabase_Close(db, &err), err);
     appendLogMessage("End of getEmbeddingsFromQuery\n");
     return wordEmbeddings;
