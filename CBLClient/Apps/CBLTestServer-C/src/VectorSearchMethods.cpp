@@ -92,7 +92,10 @@ static FLMutableDict getEmbeddingsFromQuery(string query, string dbName) {
 static FLMutableDict appendDictToDict(FLMutableDict dictToAppend, FLMutableDict dictToAppendTo){
     FLDictIterator iter;
     FLDictIterator_Begin(dictToAppend, &iter);
-    FLValue embeddingsVector;
+    auto embbedingsVector =  FLMutableArray_New();
+    DEFER {
+        FLMutableArray_Release(embbedingsVector);
+    };
     while (NULL != (embeddingsVector = FLDictIterator_GetValue(&iter))) {
         FLString key = FLDictIterator_GetKeyString(&iter);
         FLMutableDict_SetArray(dictToAppendTo, key, FLValue_AsArray(embeddingsVector));
@@ -104,20 +107,21 @@ static FLMutableDict appendDictToDict(FLMutableDict dictToAppend, FLMutableDict 
 static FLMutableDict getWordMap() {
         std::string sql1 = "select word, vector from auxiliaryWords";
         std::string sql2 = "select word, vector from searchTerms";
-        auto embeddingsVector;
+        auto embbedingsVector =  FLMutableArray_New();
         FLMutableDict words = FLMutableDict_New();
         FLMutableDict debugDict = FLMutableDict_New();
         DEFER {
+            FLMutableArray_Release(embbedingsVector);
             FLMutableDict_Release(words);
             FLMutableDict_Release(debugDict);
         };
         debugDict = getEmbeddingsFromQuery(sql1, "vsTestDatabase");
         FLDictIterator dictIter;
         FLDictIterator_Begin(debugDict, &dictIter);
-        while (NULL != (embeddingsVector = FLDictIterator_GetValue(&dictIter))) {
+        while (NULL != (embbedingsVector = FLDictIterator_GetValue(&dictIter))) {
             FLString key = FLDictIterator_GetKeyString(&dictIter);
             FLArrayIterator iter;
-            FLArrayIterator_Begin(FLValue_AsArray(embeddingsVector), &iter);
+            FLArrayIterator_Begin(FLValue_AsArray(embbedingsVector), &iter);
             FLValue value;
             appendLogMessage("key: " + to_string(key) + ":  ");
             while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
