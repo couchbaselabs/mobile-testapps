@@ -29,7 +29,7 @@ static void appendLogMessage(string msg) {
 FLValue createEmbbedingFloatArray(FLValue inputWord) {
     auto embeddingsArray =  FLMutableArray_New();
     DEFER {
-        FLMutableArray_Release(embbedingsVector);
+        FLMutableArray_Release(embeddingsArray);
     };
     const FLValue wordValuesVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
     FLArrayIterator iter;
@@ -58,7 +58,7 @@ FLSliceResult predictFunction(void* context, FLDict input) {
     auto embbedingsVector =  FLMutableArray_New();
     const FLValue inputWord = FLDict_Get(input, flstr("word"));
     if (inputWord) {
-       createEmbbedingFloatArray(inputWord, embbedingsVector);
+       embbedingsVector = FValue_AsArray(createEmbbedingFloatArray(inputWord));
     }
     FLEncoder enc = FLEncoder_New();
     if (embbedingsVector) {
