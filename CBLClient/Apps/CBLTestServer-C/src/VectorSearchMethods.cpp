@@ -78,7 +78,7 @@ static FLMutableDict getEmbeddingsFromQuery(string query, string dbName) {
     TRY(cblResultSet = CBLQuery_Execute(cblQuery, &err), err);
     while(CBLResultSet_Next(cblResultSet)) {
         FLValue word = CBLResultSet_ValueForKey(cblResultSet, flstr("word"));
-        appendLogMessage("Another word=" + to_String(word) + "\n");
+        appendLogMessage("Another word=" + to_string(word) + "\n");
         FLValue vector = CBLResultSet_ValueForKey(cblResultSet, flstr("vector"));
         if (vector) {
             FLMutableDict_SetArray(wordEmbeddings, FLValue_AsString(word), FLValue_AsArray(vector));
