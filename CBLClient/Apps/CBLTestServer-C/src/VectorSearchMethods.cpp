@@ -100,7 +100,7 @@ static FLMutableDict appendDictToDict(FLMutableDict dictToAppend, FLMutableDict 
         FLArrayIterator arrayIter;
         FLArrayIterator_Begin(FLValue_AsArray(embbedingsVector), &arrayIter);
         FLValue value;
-        appendLogMessage("key: " + to_string(key) + ":  ");
+        appendLogMessage("key: " + to_string(FLValue_AsString(key) + ":  "));
         while (NULL != (value = FLArrayIterator_GetValue(&arrayIter))) {
             appendLogMessage(to_string(FLValue_AsFloat(value)) + " ");
             FLArrayIterator_Next(&arrayIter);
