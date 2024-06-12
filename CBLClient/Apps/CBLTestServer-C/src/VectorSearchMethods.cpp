@@ -95,7 +95,7 @@ static FLMutableDict appendDictToDict(FLMutableDict dictToAppend, FLMutableDict 
     FLDictIterator_Begin(dictToAppend, &iter);
     FLValue embbedingsVector;
     while (NULL != (embbedingsVector = FLDictIterator_GetValue(&iter))) {
-        FLString key = FLDictIterator_GetKeyString(&iter);
+        FLValue key = FLDictIterator_GetKey(&iter);
         FLMutableDict_SetArray(dictToAppendTo, key, FLValue_AsArray(embbedingsVector));
         FLArrayIterator arrayIter;
         FLArrayIterator_Begin(FLValue_AsArray(embbedingsVector), &arrayIter);
