@@ -26,6 +26,24 @@ static void appendLogMessage(string msg) {
     MyFile.close();
 }
 
+FValue createEmbbedingFloatArray(FLValue inputWord) {
+    auto embeddingsArray =  FLMutableArray_New();
+    DEFER {
+        FLMutableArray_Release(embbedingsVector);
+    };
+    const FLValue wordValuesVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
+    FLArrayIterator iter;
+    FLArrayIterator_Begin(FLValue_AsArray(wordValuesVector), &iter);
+    FLValue value;
+    while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
+        FLMutableArray_AppendFloat(embeddingsArray, FLValue_AsFloat(value));
+        FLArrayIterator_Next(&iter);
+    }
+    return embeddingsArray;
+}
+
+
+
 FLMutableDict getPrediction(FLDict input, string key) {
     const FLValue inputWord = FLDict_Get(input, flstr(key));
     FLMutableDict predictResult =  FLMutableDict_New();
@@ -40,14 +58,7 @@ FLSliceResult predictFunction(void* context, FLDict input) {
     auto embbedingsVector =  FLMutableArray_New();
     const FLValue inputWord = FLDict_Get(input, flstr("word"));
     if (inputWord) {
-        const FLValue tempVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
-        FLArrayIterator iter;
-        FLArrayIterator_Begin(FLValue_AsArray(tempVector), &iter);
-        FLValue value;
-        while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-            FLMutableArray_AppendFloat(embbedingsVector, FLValue_AsFloat(value));
-            FLArrayIterator_Next(&iter);
-        }
+       createEmbbedingFloatArray(inputWord, embbedingsVector);
     }
     FLEncoder enc = FLEncoder_New();
     if (embbedingsVector) {
@@ -64,91 +75,20 @@ static void CBLDatabase_EntryDelete(void* ptr) {
     CBLDatabase_Release(static_cast<CBLDatabase *>(ptr));
 }
 
-static FLMutableDict getEmbeddingsFromQuery(string query, string dbName) {
-    CBLError err;
-    CBLQuery* cblQuery;
-    CBLResultSet* cblResultSet;
-    CBLDatabase* db;
-    TRY(db = CBLDatabase_Open(flstr(dbName), nullptr, &err), err);
-    FLMutableDict wordEmbeddings = FLMutableDict_New();
-    DEFER {
-        FLMutableDict_Release(wordEmbeddings);
-    };
-    TRY(cblQuery = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(query), nullptr, &err), err);
-    TRY(cblResultSet = CBLQuery_Execute(cblQuery, &err), err);
-    while(CBLResultSet_Next(cblResultSet)) {
-        FLValue word = CBLResultSet_ValueForKey(cblResultSet, flstr("word"));
-        FLValue vector = CBLResultSet_ValueForKey(cblResultSet, flstr("vector"));
-        if (vector) {
-            FLMutableDict_SetArray(wordEmbeddings, FLValue_AsString(word), FLValue_AsArray(vector));
-        };
-    }
-    CBLQuery_Release(cblQuery);
-    CBLResultSet_Release(cblResultSet);
-    TRY(CBLDatabase_Close(db, &err), err);
-    appendLogMessage("End of getEmbeddingsFromQuery\n");
-    return wordEmbeddings;
-}
-
-
-static FLMutableDict appendDictToDict(FLMutableDict dictToAppend, FLMutableDict dictToAppendTo){
-    FLDictIterator iter;
-    FLDictIterator_Begin(dictToAppend, &iter);
-    FLValue embbedingsVector;
-    appendLogMessage("Inside appendDict\n");
-    while (NULL != (embbedingsVector = FLDictIterator_GetValue(&iter))) {
-        appendLogMessage("Inside loop\n");
-        FLString key = FLDictIterator_GetKeyString(&iter);
-        appendLogMessage("word=" + to_string(key) + "\n");
-        FLMutableDict_SetArray(dictToAppendTo, key, FLValue_AsArray(embbedingsVector));
-        /*FLString key = FLDictIterator_GetKeyString(&iter);
-        FLMutableDict_SetArray(dictToAppendTo, key, FLValue_AsArray(embbedingsVector));
-        FLArrayIterator arrayIter;
-        FLArrayIterator_Begin(FLValue_AsArray(embbedingsVector), &arrayIter);
-        FLValue value;
-        appendLogMessage("key: " + to_string(key) + ":  ");
-        while (NULL != (value = FLArrayIterator_GetValue(&arrayIter))) {
-            appendLogMessage(to_string(FLValue_AsFloat(value)) + " ");
-            FLArrayIterator_Next(&arrayIter);
-        }
-        appendLogMessage("\n\n\n");*/
-        FLDictIterator_Next(&iter);
-    }
-    appendLogMessage("End of dict append\n");
-    return dictToAppendTo;
-}
 
 static FLMutableDict getWordMap() {
-        std::string sql1 = "select word, vector from auxiliaryWords";
-        std::string sql2 = "select word, vector from searchTerms";
-        FLMutableDict words = FLMutableDict_New();
-        FLMutableDict tempVectorDict = FLMutableDict_New();
-        DEFER {
-            FLMutableDict_Release(tempVectorDict);
-            FLMutableDict_Release(words);
-        };
-        //debugDict = getEmbeddingsFromQuery(sql1, "vsTestDatabase");
-        //appendDictToDict(debugDict, words);
-        /*FLDictIterator dictIter;
-        FLDictIterator_Begin(debugDict, &dictIter);
-        FLValue embbedingsVector;
-        while (NULL != (embbedingsVector = FLDictIterator_GetValue(&dictIter))) {
-            FLString key = FLDictIterator_GetKeyString(&dictIter);
-            FLArrayIterator iter;
-            FLArrayIterator_Begin(FLValue_AsArray(embbedingsVector), &iter);
-            FLValue value;
-            appendLogMessage("key: " + to_string(key) + ":  ");
-            while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-                appendLogMessage(to_string(FLValue_AsFloat(value)) + " ");
-                FLArrayIterator_Next(&iter);
-            }
-            appendLogMessage("\n\n\n");
-            FLDictIterator_Next(&dictIter);
-        }*/
-        appendLogMessage("Before words embeddings");
-        FLMutableDict_SetDict(tempVectorDict, flstr("dict"), getEmbeddingsFromQuery(sql1, "vsTestDatabase"));
-        FLMutableDict_SetDict(words, flstr("result"), appendDictToDict(getEmbeddingsFromQuery(sql2, "vsTestDatabase"), FLDict_AsMutable(FLValue_AsDict(FLDict_Get(tempVectorDict, flstr("dict"))))));
-         /*TRY(db = CBLDatabase_Open(flstr("vsTestDatabase"), nullptr, &err), err);
+         MyFile << "start\n";
+         MyFile.close();
+         std::string sql1 = "select word, vector from auxiliaryWords";
+         std::string sql2 = "select word, vector from searchTerms";
+         CBLError err;
+         CBLDatabase* db;
+         CBLQuery* query1;
+         CBLQuery* query2;
+         CBLResultSet* rs1; 
+         CBLResultSet* rs2;
+         FLMutableDict words = FLMutableDict_New();
+         TRY(db = CBLDatabase_Open(flstr("vsTestDatabase"), nullptr, &err), err);
          TRY(query1 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql1), nullptr, &err), err);
          TRY(query2 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql2), nullptr, &err), err);
          TRY(rs1 = CBLQuery_Execute(query1, &err), err);
@@ -159,6 +99,7 @@ static FLMutableDict getWordMap() {
             if (vector) {
                 FLMutableDict_SetArray(words, FLValue_AsString(word), FLValue_AsArray(vector));
             };
+
          }
          CBLQuery_Release(query1);
          CBLResultSet_Release(rs1);
@@ -169,8 +110,9 @@ static FLMutableDict getWordMap() {
                 FLMutableDict_SetArray(words, FLValue_AsString(word), FLValue_AsArray(vector));
             }
          }
-         CBLQuery_Release(query2);*/
-         return FLDict_AsMutable(FLValue_AsDict(FLDict_Get(words, flstr("results"))));
+         CBLQuery_Release(query2);
+         TRY(CBLDatabase_Close(db, &err), err);
+         return words;
 }
 
 FLDict getEmbeddingDic(string term) {
@@ -287,6 +229,8 @@ namespace vectorSearch_methods
         CBLError err;
         CBLDatabase* db;
         TRY(CBL_CopyDatabase(flstr(databasePath), flstr(dbName), databaseConfig, &err), err);
+        // to rename the folder because it is copied to be under "r" for some reason
+        //rename("/root/ctestserver/r", dbName);
         wordMap = getWordMap();
         TRY(db = CBLDatabase_Open(flstr(dbName), databaseConfig, &err), err);
         write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
