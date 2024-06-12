@@ -122,7 +122,9 @@ static FLMutableDict getWordMap() {
         std::string sql1 = "select word, vector from auxiliaryWords";
         std::string sql2 = "select word, vector from searchTerms";
         FLMutableDict words = FLMutableDict_New();
+        FLMutableDict tempVectorDict = FLMutableDict_New();
         DEFER {
+            FLMutableDict_Release(tempVectorDict);
             FLMutableDict_Release(words);
         };
         //debugDict = getEmbeddingsFromQuery(sql1, "vsTestDatabase");
@@ -144,8 +146,10 @@ static FLMutableDict getWordMap() {
             FLDictIterator_Next(&dictIter);
         }*/
         appendLogMessage("Before words embeddings");
-        appendDictToDict(getEmbeddingsFromQuery(sql1, "vsTestDatabase"), words);
-        appendDictToDict(getEmbeddingsFromQuery(sql2, "vsTestDatabase"), words);
+        tempVectorDict = getEmbeddingsFromQuery(sql1, "vsTestDatabase");
+        appendDictToDict(tempVectorDict, words);
+        tempVectorDict = getEmbeddingsFromQuery(sql2, "vsTestDatabase");
+        appendDictToDict(tempVectorDict, words);
          /*TRY(db = CBLDatabase_Open(flstr("vsTestDatabase"), nullptr, &err), err);
          TRY(query1 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql1), nullptr, &err), err);
          TRY(query2 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql2), nullptr, &err), err);
