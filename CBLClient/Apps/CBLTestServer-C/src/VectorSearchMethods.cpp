@@ -73,7 +73,7 @@ static FLMutableDict getEmbeddingsFromQuery(string query, string dbName) {
     FLMutableDict wordEmbeddings = FLMutableDict_New();
     DEFER {
         FLMutableDict_Release(wordEmbeddings);
-    }
+    };
     TRY(cblQuery = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(query), nullptr, &err), err);
     TRY(cblResultSet = CBLQuery_Execute(cblQuery, &err), err);
     while(CBLResultSet_Next(cblResultSet)) {
@@ -107,7 +107,7 @@ static FLMutableDict getWordMap() {
         FLMutableDict words = FLMutableDict_New();
         DEFER {
             FLMutableDict_Release(words)
-        }
+        };
         appendDictToDict(words, getEmbeddingsFromQuery(sql1, "vsTestDatabase"));
         appendDictToDict(words, getEmbeddingsFromQuery(sql2, "vsTestDatabase"));
        
