@@ -146,8 +146,8 @@ static FLMutableDict getWordMap() {
             FLDictIterator_Next(&dictIter);
         }*/
         appendLogMessage("Before words embeddings");
-        tempVectorDict = FLMutableDict_setDict(getEmbeddingsFromQuery(sql1, "vsTestDatabase"));
-        words = FLMutableDict_setDict(appendDictToDict(getEmbeddingsFromQuery(sql2, "vsTestDatabase"), tempVectorDict));
+        FLMutableDict_SetDict(tempVectorDict, flstr("dict"), getEmbeddingsFromQuery(sql1, "vsTestDatabase"));
+        FLMutableDict_SetDict(words, flstr("result"), appendDictToDict(getEmbeddingsFromQuery(sql2, "vsTestDatabase"), FLDict_Get(tempVectorDict, flstr("dict"))));
          /*TRY(db = CBLDatabase_Open(flstr("vsTestDatabase"), nullptr, &err), err);
          TRY(query1 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql1), nullptr, &err), err);
          TRY(query2 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql2), nullptr, &err), err);
@@ -170,7 +170,7 @@ static FLMutableDict getWordMap() {
             }
          }
          CBLQuery_Release(query2);*/
-         return words;
+         return FLDict_Get(words, "results");
 }
 
 FLDict getEmbeddingDic(string term) {
