@@ -92,10 +92,7 @@ static FLMutableDict getEmbeddingsFromQuery(string query, string dbName) {
 static FLMutableDict appendDictToDict(FLMutableDict dictToAppend, FLMutableDict dictToAppendTo){
     FLDictIterator iter;
     FLDictIterator_Begin(dictToAppend, &iter);
-    auto embbedingsVector =  FLMutableArray_New();
-    DEFER {
-        FLMutableArray_Release(embbedingsVector);
-    };
+    FLValue embbedingsVector;
     while (NULL != (embbedingsVector = FLDictIterator_GetValue(&iter))) {
         FLString key = FLDictIterator_GetKeyString(&iter);
         FLMutableDict_SetArray(dictToAppendTo, key, FLValue_AsArray(embbedingsVector));
