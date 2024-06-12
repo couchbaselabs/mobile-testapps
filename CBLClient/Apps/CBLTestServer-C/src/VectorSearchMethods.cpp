@@ -64,20 +64,54 @@ static void CBLDatabase_EntryDelete(void* ptr) {
     CBLDatabase_Release(static_cast<CBLDatabase *>(ptr));
 }
 
+static FLMutableDict getEmbeddingsFromQuery(string query, string dbName) {
+    CBLError err;
+    CBLQuery* cblQuery;
+    CBLResultSet* cblResultSet;
+    CBLDatabase* db;
+    TRY(db = CBLDatabase_Open(flstr(dbName), nullptr, &err), err);
+    FLMutableDict wordEmbeddings = FLMutableDict_New();
+    DEFER {
+        FLMutableDict_Release(wordEmbeddings);
+    }
+    TRY(cblQuery = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(query), nullptr, &err), err);
+    TRY(cblResultSet = CBLQuery_Execute(cblQuery, &err), err);
+    while(CBLResultSet_Next(cblResultSet)) {
+        FLValue word = CBLResultSet_ValueForKey(cblResultSet, flstr("word"));
+        FLValue vector = CBLResultSet_ValueForKey(cblResultSet, flstr("vector"));
+        if (vector) {
+            FLMutableDict_SetArray(wordEmbeddings, FLValue_AsString(word), FLValue_AsArray(vector));
+        };
+    }
+    CBLQuery_Release(cblQuery);
+    TRY(CBLDatabase_Close(db, &err), err);
+    return wordEmbeddings;
+}
+
+
+static FLMutableDict appendDictToDict(FLMutableDict dictToAppend, FLMutableDict dictToAppendTo){
+    FLDictIterator iter;
+    FLDictIterator_Begin(dictToAppend, &iter);
+    FLValue embeddingsVector;
+    while (NULL != (embeddingsVector = FLDictIterator_GetValue(&iter))) {
+        FLString key = FLDictIterator_GetKeyString(&iter);
+        FLMutableDict_SetArray(dictToAppendTo, key, FLValue_AsArray(embeddingsVector));
+        FLDictIterator_Next(&iter);
+    }
+    return dictToAppendTo;
+}
 
 static FLMutableDict getWordMap() {
-         MyFile << "start\n";
-         MyFile.close();
-         std::string sql1 = "select word, vector from auxiliaryWords";
-         std::string sql2 = "select word, vector from searchTerms";
-         CBLError err;
-         CBLDatabase* db;
-         CBLQuery* query1;
-         CBLQuery* query2;
-         CBLResultSet* rs1; 
-         CBLResultSet* rs2;
-         FLMutableDict words = FLMutableDict_New();
-         TRY(db = CBLDatabase_Open(flstr("vsTestDatabase"), nullptr, &err), err);
+        std::string sql1 = "select word, vector from auxiliaryWords";
+        std::string sql2 = "select word, vector from searchTerms";
+        FLMutableDict words = FLMutableDict_New();
+        DEFER {
+            FLMutableDict_Release(words)
+        }
+        appendDictToDict(words, getEmbeddingsFromQuery(sql1, "vsTestDatabase"));
+        appendDictToDict(words, getEmbeddingsFromQuery(sql2, "vsTestDatabase"));
+       
+         /*TRY(db = CBLDatabase_Open(flstr("vsTestDatabase"), nullptr, &err), err);
          TRY(query1 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql1), nullptr, &err), err);
          TRY(query2 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql2), nullptr, &err), err);
          TRY(rs1 = CBLQuery_Execute(query1, &err), err);
@@ -88,7 +122,6 @@ static FLMutableDict getWordMap() {
             if (vector) {
                 FLMutableDict_SetArray(words, FLValue_AsString(word), FLValue_AsArray(vector));
             };
-
          }
          CBLQuery_Release(query1);
          CBLResultSet_Release(rs1);
@@ -99,8 +132,7 @@ static FLMutableDict getWordMap() {
                 FLMutableDict_SetArray(words, FLValue_AsString(word), FLValue_AsArray(vector));
             }
          }
-         CBLQuery_Release(query2);
-         TRY(CBLDatabase_Close(db, &err), err);
+         CBLQuery_Release(query2);*/
          return words;
 }
 
@@ -218,8 +250,6 @@ namespace vectorSearch_methods
         CBLError err;
         CBLDatabase* db;
         TRY(CBL_CopyDatabase(flstr(databasePath), flstr(dbName), databaseConfig, &err), err);
-        // to rename the folder because it is copied to be under "r" for some reason
-        //rename("/root/ctestserver/r", dbName);
         wordMap = getWordMap();
         TRY(db = CBLDatabase_Open(flstr(dbName), databaseConfig, &err), err);
         write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
