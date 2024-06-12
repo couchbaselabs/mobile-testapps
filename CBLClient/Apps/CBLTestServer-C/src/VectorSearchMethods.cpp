@@ -78,7 +78,6 @@ static FLMutableDict getEmbeddingsFromQuery(string query, string dbName) {
     TRY(cblResultSet = CBLQuery_Execute(cblQuery, &err), err);
     while(CBLResultSet_Next(cblResultSet)) {
         FLValue word = CBLResultSet_ValueForKey(cblResultSet, flstr("word"));
-        appendLogMessage("Another word=" + to_string(FLValue_AsString(word)) + "\n");
         FLValue vector = CBLResultSet_ValueForKey(cblResultSet, flstr("vector"));
         if (vector) {
             FLMutableDict_SetArray(wordEmbeddings, FLValue_AsString(word), FLValue_AsArray(vector));
@@ -96,7 +95,9 @@ static FLMutableDict appendDictToDict(FLMutableDict dictToAppend, FLMutableDict 
     FLDictIterator iter;
     FLDictIterator_Begin(dictToAppend, &iter);
     FLValue embbedingsVector;
+    appendLogMessage("Inside appendDict\n");
     while (NULL != (embbedingsVector = FLDictIterator_GetValue(&iter))) {
+        appendLogMessage("Inside loop\n");
         FLString key = FLDictIterator_GetKeyString(&iter);
         appendLogMessage("word=" + to_string(key) + "\n");
         FLMutableDict_SetArray(dictToAppendTo, key, FLValue_AsArray(embbedingsVector));
@@ -113,6 +114,7 @@ static FLMutableDict appendDictToDict(FLMutableDict dictToAppend, FLMutableDict 
         appendLogMessage("\n\n\n");*/
         FLDictIterator_Next(&iter);
     }
+    appendLogMessage("End of dict append\n");
     return dictToAppendTo;
 }
 
