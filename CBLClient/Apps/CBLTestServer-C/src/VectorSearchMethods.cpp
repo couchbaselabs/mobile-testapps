@@ -104,13 +104,32 @@ static FLMutableDict appendDictToDict(FLMutableDict dictToAppend, FLMutableDict 
 static FLMutableDict getWordMap() {
         std::string sql1 = "select word, vector from auxiliaryWords";
         std::string sql2 = "select word, vector from searchTerms";
+        auto embeddingsVector;
         FLMutableDict words = FLMutableDict_New();
+        FLMutableDict debugDict = FLMutableDict_New();
         DEFER {
             FLMutableDict_Release(words);
+            FLMutableDict_Release(debugDict);
         };
+        debugDict = getEmbeddingsFromQuery(sql1, "vsTestDatabase");
+        FLDictIterator dictIter;
+        FLDictIterator_Begin(debugDict, &dictIter);
+        while (NULL != (embeddingsVector = FLDictIterator_GetValue(&dictIter))) {
+            FLString key = FLDictIterator_GetKeyString(&dictIter);
+            FLArrayIterator iter;
+            FLArrayIterator_Begin(FLValue_AsArray(embeddingsVector), &iter);
+            FLValue value;
+            appendLogMessage("key: " + to_string(key) + ":  ");
+            while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
+                appendLogMessage(to_string(FLValue_AsString(value)) + " ");
+                FLArrayIterator_Next(&iter);
+            }
+            appendLogMessage("\n\n\n");
+            FLDictIterator_Next(&dictIter);
+        }
+
         appendDictToDict(words, getEmbeddingsFromQuery(sql1, "vsTestDatabase"));
         appendDictToDict(words, getEmbeddingsFromQuery(sql2, "vsTestDatabase"));
-       
          /*TRY(db = CBLDatabase_Open(flstr("vsTestDatabase"), nullptr, &err), err);
          TRY(query1 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql1), nullptr, &err), err);
          TRY(query2 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql2), nullptr, &err), err);
