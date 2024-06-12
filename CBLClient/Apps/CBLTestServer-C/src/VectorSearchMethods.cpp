@@ -94,7 +94,7 @@ static FLMutableDict appendDictToDict(FLMutableDict dictToAppend, FLMutableDict 
     FLDictIterator iter;
     FLDictIterator_Begin(dictToAppend, &iter);
     FLValue embbedingsVector;
-    while (NULL != (dictToAppend = FLDictIterator_GetValue(&iter))) {
+    while (NULL != (embbedingsVector = FLDictIterator_GetValue(&iter))) {
         FLString key = FLDictIterator_GetKeyString(&iter);
         FLMutableDict_SetArray(dictToAppendTo, key, FLValue_AsArray(embbedingsVector));
         FLArrayIterator arrayIter;
@@ -121,6 +121,7 @@ static FLMutableDict getWordMap() {
             FLMutableDict_Release(debugDict);
         };
         debugDict = getEmbeddingsFromQuery(sql1, "vsTestDatabase");
+        appendDictToDict(debugDict, words);
         /*FLDictIterator dictIter;
         FLDictIterator_Begin(debugDict, &dictIter);
         FLValue embbedingsVector;
