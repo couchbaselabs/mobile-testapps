@@ -96,6 +96,15 @@ static FLMutableDict appendDictToDict(FLMutableDict dictToAppend, FLMutableDict 
     while (NULL != (embbedingsVector = FLDictIterator_GetValue(&iter))) {
         FLString key = FLDictIterator_GetKeyString(&iter);
         FLMutableDict_SetArray(dictToAppendTo, key, FLValue_AsArray(embbedingsVector));
+        FLArrayIterator arrayIter;
+        FLArrayIterator_Begin(FLValue_AsArray(embbedingsVector), &arrayIter);
+        FLValue value;
+        appendLogMessage("key: " + to_string(key) + ":  ");
+        while (NULL != (value = FLArrayIterator_GetValue(&arrayIter))) {
+            appendLogMessage(to_string(FLValue_AsFloat(value)) + " ");
+            FLArrayIterator_Next(&arrayIter);
+        }
+        appendLogMessage("\n\n\n");
         FLDictIterator_Next(&iter);
     }
     return dictToAppendTo;
@@ -121,7 +130,7 @@ static FLMutableDict getWordMap() {
             FLValue value;
             appendLogMessage("key: " + to_string(key) + ":  ");
             while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-                appendLogMessage(to_string(FLValue_AsString(value)) + " ");
+                appendLogMessage(to_string(FLValue_AsFloat(value)) + " ");
                 FLArrayIterator_Next(&iter);
             }
             appendLogMessage("\n\n\n");
