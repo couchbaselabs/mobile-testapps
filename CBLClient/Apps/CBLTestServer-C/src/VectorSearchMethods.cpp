@@ -106,7 +106,7 @@ static FLMutableDict getWordMap() {
         std::string sql2 = "select word, vector from searchTerms";
         FLMutableDict words = FLMutableDict_New();
         DEFER {
-            FLMutableDict_Release(words)
+            FLMutableDict_Release(words);
         };
         appendDictToDict(words, getEmbeddingsFromQuery(sql1, "vsTestDatabase"));
         appendDictToDict(words, getEmbeddingsFromQuery(sql2, "vsTestDatabase"));
