@@ -170,7 +170,7 @@ static FLMutableDict getWordMap() {
             }
          }
          CBLQuery_Release(query2);*/
-         return FLDict_Get(words, "results");
+         return FLDict_Get(words, flstr("results"));
 }
 
 FLDict getEmbeddingDic(string term) {
