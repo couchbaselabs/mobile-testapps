@@ -73,7 +73,7 @@ static FLMutableDict getWordMap() {
          CBLQuery* query;
          CBLResultSet* rs; 
          FLMutableDict words = FLMutableDict_New();
-         TRY(db = CBLDatabase_Open(flstr("vsTestDatabase"), nullptr, &err), err);
+         TRY(db = CBLDatabase_Open(flstr(), nullptr, &err), err);
          TRY(query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql1), nullptr, &err), err);
          TRY(rs = CBLQuery_Execute(query, &err), err);
          while(CBLResultSet_Next(rs)) {
@@ -204,8 +204,8 @@ namespace vectorSearch_methods
     }
 
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
-        const auto dbPath = "Databases/vsTestDatabase.cblite2";
-        const auto dbName = "vsTestDatabase";
+        const auto dbPath = "Databases/" + InMemoryDbName  + ".cblite2";
+        const auto dbName = InMemoryDbName;
 
         CBL_SetExtensionPath(flstr("/root/ctestserver/Extensions"));
         char cwd[1024];
