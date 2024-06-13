@@ -17,6 +17,7 @@ using namespace fleece;
 #include INCLUDE_CBL(CouchbaseLite.h)
 
 static FLMutableDict wordMap;
+const string InMemoryDbName = "vsTestDatabase";
 ofstream MyFile("/root/ctestserver/gilad_log.txt");
 
 
@@ -73,7 +74,7 @@ static FLMutableDict getWordMap() {
          CBLQuery* query;
          CBLResultSet* rs; 
          FLMutableDict words = FLMutableDict_New();
-         TRY(db = CBLDatabase_Open(flstr(), nullptr, &err), err);
+         TRY(db = CBLDatabase_Open(flstr(InMemoryDbName), nullptr, &err), err);
          TRY(query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql1), nullptr, &err), err);
          TRY(rs = CBLQuery_Execute(query, &err), err);
          while(CBLResultSet_Next(rs)) {
@@ -110,8 +111,6 @@ FLDict getEmbeddingDic(string term) {
 }
 namespace vectorSearch_methods
 {
-    const string InMemoryDbName = "vsTestDatabase";
-
     void vectorSearch_createIndex(json& body, mg_connection* conn)
     {
             const auto scopeName = body["scopeName"].get<string>();
