@@ -66,40 +66,37 @@ static void CBLDatabase_EntryDelete(void* ptr) {
 
 
 static FLMutableDict getWordMap() {
-         MyFile << "start\n";
-         MyFile.close();
          std::string sql1 = "select word, vector from auxiliaryWords";
          std::string sql2 = "select word, vector from searchTerms";
          CBLError err;
          CBLDatabase* db;
-         CBLQuery* query1;
-         CBLQuery* query2;
-         CBLResultSet* rs1; 
-         CBLResultSet* rs2;
+         CBLQuery* query;
+         CBLResultSet* rs; 
          FLMutableDict words = FLMutableDict_New();
          TRY(db = CBLDatabase_Open(flstr("vsTestDatabase"), nullptr, &err), err);
-         TRY(query1 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql1), nullptr, &err), err);
-         TRY(query2 = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql2), nullptr, &err), err);
-         TRY(rs1 = CBLQuery_Execute(query1, &err), err);
-         TRY(rs2 = CBLQuery_Execute(query2, &err), err);
-         while(CBLResultSet_Next(rs1)) {
-            FLValue word = CBLResultSet_ValueForKey(rs1, flstr("word"));
-            FLValue vector = CBLResultSet_ValueForKey(rs1, flstr("vector"));
+         TRY(query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql1), nullptr, &err), err);
+         TRY(rs = CBLQuery_Execute(query, &err), err);
+         while(CBLResultSet_Next(rs)) {
+            FLValue word = CBLResultSet_ValueForKey(rs, flstr("word"));
+            FLValue vector = CBLResultSet_ValueForKey(rs, flstr("vector"));
             if (vector) {
                 FLMutableDict_SetArray(words, FLValue_AsString(word), FLValue_AsArray(vector));
             };
 
          }
-         CBLQuery_Release(query1);
-         CBLResultSet_Release(rs1);
-         while(CBLResultSet_Next(rs2)) {
-            FLValue word = CBLResultSet_ValueForKey(rs2, flstr("word"));
-            FLValue vector = CBLResultSet_ValueForKey(rs2, flstr("vector"));
+         CBLQuery_Release(query);
+         CBLResultSet_Release(rs);
+         TRY(query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(sql2), nullptr, &err), err);
+         TRY(rs = CBLQuery_Execute(query, &err), err);
+         while(CBLResultSet_Next(rs)) {
+            FLValue word = CBLResultSet_ValueForKey(rs, flstr("word"));
+            FLValue vector = CBLResultSet_ValueForKey(rs, flstr("vector"));
             if (vector) {
                 FLMutableDict_SetArray(words, FLValue_AsString(word), FLValue_AsArray(vector));
             }
          }
-         CBLQuery_Release(query2);
+         CBLQuery_Release(query);
+         CBLResultSet_Release(rs);
          TRY(CBLDatabase_Close(db, &err), err);
          return words;
 }
@@ -218,8 +215,6 @@ namespace vectorSearch_methods
         CBLError err;
         CBLDatabase* db;
         TRY(CBL_CopyDatabase(flstr(databasePath), flstr(dbName), databaseConfig, &err), err);
-        // to rename the folder because it is copied to be under "r" for some reason
-        //rename("/root/ctestserver/r", dbName);
         wordMap = getWordMap();
         TRY(db = CBLDatabase_Open(flstr(dbName), databaseConfig, &err), err);
         write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
