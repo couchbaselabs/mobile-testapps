@@ -31,7 +31,12 @@ static int handle_request(mg_connection* connection, void* context) {
 void TestServer::start() {
     string port_str = to_string(PORT);
     const char* options[3] = {"listening_ports", port_str.c_str(), nullptr};
-    symlink("/root/ctestserver/Extensions/libgomp.so.1.0.0", "/root/ctestserver/Extensions/libgomp.so.1");
+    
+    char cwd[1024];
+    string currentDir = string(getcwd(cwd, sizeof(cwd)));
+    string symbolicLinkName = currentDir + DIRECTORY_SEPARATOR + "Extensions" + DIRECTORY_SEPARATOR + "libgomp.so.1";
+    string symbolicLinkOrigin = currentDir + DIRECTORY_SEPARATOR + "Extensions" + DIRECTORY_SEPARATOR + "libgomp.so.1.0.0";
+    symlink(symbolicLinkOrigin, symbolicLinkName);
     memory_map::init();
     _httpContext = mg_start(nullptr, nullptr, options);
     mg_set_request_handler(_httpContext, "/*", handle_request, nullptr);
