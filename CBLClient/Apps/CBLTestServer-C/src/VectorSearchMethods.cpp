@@ -202,16 +202,13 @@ namespace vectorSearch_methods
     }
 
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
-        const auto dbPath = "Databases" + DIRECTORY_SEPARATOR + InMemoryDbName  + ".cblite2";
+        const auto dbPath = "Databases/" + InMemoryDbName  + ".cblite2";
         const auto dbName = InMemoryDbName;
         char cwd[1024];
         cbl_getcwd(cwd, 1024);
         const auto databasePath = string(cwd) + DIRECTORY_SEPARATOR + dbPath;
         const auto extensionsPath = string(cwd) + DIRECTORY_SEPARATOR + APP_EXTENSIONS_DIR;
-        appendLogMessage("dbPath: " + dbPath + "\n");
-        appendLogMessage("dbPath: " + dbPath + "\n");
         CBL_SetExtensionPath(flstr(extensionsPath));
-        appendLogMessage("dbPath: " + dbPath + "\n");
         CBLDatabaseConfiguration* databaseConfig = nullptr;
         CBLError err;
         CBLDatabase* db;
