@@ -207,7 +207,7 @@ namespace vectorSearch_methods
         const auto dbName = InMemoryDbName;
         char cwd[1024];
         cbl_getcwd(cwd, 1024);
-        CBL_SetExtensionPath(flstr(cwd) + DIRECTORY_SEPARATOR + flstr(APP_EXTENSIONS_DIR));
+        CBL_SetExtensionPath(flstr(cwd) + flstr(DIRECTORY_SEPARATOR) + flstr(APP_EXTENSIONS_DIR));
         const auto databasePath = string(cwd) + DIRECTORY_SEPARATOR + dbPath;
         CBLDatabaseConfiguration* databaseConfig = nullptr;
         CBLError err;
