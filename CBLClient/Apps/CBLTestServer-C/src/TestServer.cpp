@@ -36,7 +36,7 @@ void TestServer::start() {
     string currentDir = string(getcwd(cwd, sizeof(cwd)));
     string symbolicLinkName = currentDir + DIRECTORY_SEPARATOR + "Extensions" + DIRECTORY_SEPARATOR + "libgomp.so.1";
     string symbolicLinkOrigin = currentDir + DIRECTORY_SEPARATOR + "Extensions" + DIRECTORY_SEPARATOR + "libgomp.so.1.0.0";
-    symlink(symbolicLinkOrigin, symbolicLinkName);
+    symlink(symbolicLinkOrigin.c_str(), symbolicLinkName.c_str());
     memory_map::init();
     _httpContext = mg_start(nullptr, nullptr, options);
     mg_set_request_handler(_httpContext, "/*", handle_request, nullptr);
