@@ -202,12 +202,16 @@ namespace vectorSearch_methods
     }
 
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
-        const auto dbPath = "Databases" +  DIRECTORY_SEPARATOR  + InMemoryDbName  + ".cblite2";
+        const auto dbPath = "Databases" + DIRECTORY_SEPARATOR + InMemoryDbName  + ".cblite2";
         const auto dbName = InMemoryDbName;
-        CBL_SetExtensionPath(flstr("/root/ctestserver/Extensions"));
         char cwd[1024];
         cbl_getcwd(cwd, 1024);
         const auto databasePath = string(cwd) + DIRECTORY_SEPARATOR + dbPath;
+        const auto extensionsPath = string(cwd) + DIRECTORY_SEPARATOR + APP_EXTENSIONS_DIR;
+        appendLogMessage("dbPath: " + dbPath + "\n");
+        appendLogMessage("dbPath: " + dbPath + "\n");
+        CBL_SetExtensionPath(flstr(extensionsPath));
+        appendLogMessage("dbPath: " + dbPath + "\n");
         CBLDatabaseConfiguration* databaseConfig = nullptr;
         CBLError err;
         CBLDatabase* db;
@@ -215,6 +219,7 @@ namespace vectorSearch_methods
         wordMap = getWordMap();
         TRY(db = CBLDatabase_Open(flstr(dbName), databaseConfig, &err), err);
         write_serialized_body(conn, memory_map::store(db, CBLDatabase_EntryDelete));
+
     }
    
    void vectorSearch_registerModel(json& body, mg_connection* conn) {
