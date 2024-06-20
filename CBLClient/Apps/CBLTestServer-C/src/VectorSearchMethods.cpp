@@ -19,6 +19,8 @@ using namespace fleece;
 static FLMutableDict wordMap;
 const string InMemoryDbName = "vsTestDatabase";
 ofstream MyFile("/root/ctestserver/gilad_log.txt");
+MyFile.open("/root/ctestserver/gilad_log.txt");
+MyFile.close();
 
 
 static void appendLogMessage(string msg) {
@@ -209,6 +211,7 @@ namespace vectorSearch_methods
         cbl_getcwd(cwd, 1024);
         const auto databasePath = string(cwd) + DIRECTORY_SEPARATOR + dbPath;
         const auto extensionsPath = string(cwd) + DIRECTORY_SEPARATOR + APP_EXTENSIONS_DIR;
+        appendLogMessage("Extension path: " + to_string(extensionsPath) + "\n");
         CBL_SetExtensionPath(flstr(extensionsPath));
         CBLDatabaseConfiguration* databaseConfig = nullptr;
         CBLError err;
