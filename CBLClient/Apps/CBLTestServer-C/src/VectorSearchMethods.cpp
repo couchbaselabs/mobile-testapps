@@ -21,7 +21,7 @@ const string InMemoryDbName = "vsTestDatabase";
 ofstream MyFile("/root/ctestserver/gilad_log.txt");
 
 static void appendLogMessage(string msg) {
-    MyFile.open("/root/ctestserver/gilad_log.txt", std::fstream::in | std::fstream::out | std::ios_base::app);
+    MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
     MyFile << msg;
     MyFile.close();
 }
@@ -202,6 +202,8 @@ namespace vectorSearch_methods
     }
 
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
+        MyFile.open("/root/ctestserver/gilad_log.txt");
+        MyFile.close();
         const auto dbPath = "Databases" + DIRECTORY_SEPARATOR + InMemoryDbName  + ".cblite2";
         const auto dbName = InMemoryDbName;
         char cwd[1024];
