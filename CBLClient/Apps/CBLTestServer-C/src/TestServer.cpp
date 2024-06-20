@@ -32,10 +32,12 @@ void TestServer::start() {
     string port_str = to_string(PORT);
     const char* options[3] = {"listening_ports", port_str.c_str(), nullptr};
     
+    // Creating symbolic link to be able to load vector search, as the test app is archived without it.
     char cwd[1024];
     string currentDir = string(getcwd(cwd, sizeof(cwd)));
-    string symbolicLinkName = currentDir + DIRECTORY_SEPARATOR + "Extensions" + DIRECTORY_SEPARATOR + "libgomp.so.1";
-    string symbolicLinkOrigin = currentDir + DIRECTORY_SEPARATOR + "Extensions" + DIRECTORY_SEPARATOR + "libgomp.so.1.0.0";
+    string extensionsDir = currentDir + DIRECTORY_SEPARATOR + APP_EXTENSIONS_DIR;
+    string symbolicLinkName = extensionsDir + DIRECTORY_SEPARATOR + "libgomp.so.1";
+    string symbolicLinkOrigin = extensionsDir + DIRECTORY_SEPARATOR + "libgomp.so.1.0.0";
     symlink(symbolicLinkOrigin.c_str(), symbolicLinkName.c_str());
     memory_map::init();
     _httpContext = mg_start(nullptr, nullptr, options);

@@ -109,6 +109,7 @@ FLDict getEmbeddingDic(string term) {
     FLMutableDict_Release(testDict);
     return value;
 }
+
 namespace vectorSearch_methods
 {
     void vectorSearch_createIndex(json& body, mg_connection* conn)
@@ -127,7 +128,6 @@ namespace vectorSearch_methods
             std::optional<CBLScalarQuantizerType> scalarEncoding;
             CBLDistanceMetric dMetric;
 
-            //std::filesystem::create_symlink('/root/ctestserver/Extensions/libgomp.so.1', '/root/ctestserver/Extensions/libgomp.so.1.0.0');
             auto* encoding = CBLVectorEncoding_CreateNone();
             try
             {
@@ -203,12 +203,11 @@ namespace vectorSearch_methods
     }
 
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
-        const auto dbPath = "Databases/" + InMemoryDbName  + ".cblite2";
+        const auto dbPath = "Databases" + DIRECTORY_SEPARATOR + InMemoryDbName  + ".cblite2";
         const auto dbName = InMemoryDbName;
-
-        CBL_SetExtensionPath(flstr("/root/ctestserver/Extensions"));
         char cwd[1024];
         cbl_getcwd(cwd, 1024);
+        CBL_SetExtensionPath(flstr(cwd) + DIRECTORY_SEPARATOR + flstr(APP_EXTENSIONS_DIR));
         const auto databasePath = string(cwd) + DIRECTORY_SEPARATOR + dbPath;
         CBLDatabaseConfiguration* databaseConfig = nullptr;
         CBLError err;
