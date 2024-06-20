@@ -18,13 +18,6 @@ using namespace fleece;
 
 static FLMutableDict wordMap;
 const string InMemoryDbName = "vsTestDatabase";
-ofstream MyFile("/root/ctestserver/gilad_log.txt");
-
-static void appendLogMessage(string msg) {
-    MyFile.open("/root/ctestserver/gilad_log.txt", std::ios_base::app);
-    MyFile << msg;
-    MyFile.close();
-}
 
 FLMutableDict getPrediction(FLDict input, string key) {
     const FLValue inputWord = FLDict_Get(input, flstr(key));
@@ -202,7 +195,7 @@ namespace vectorSearch_methods
     }
 
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
-        const auto dbPath = "Databases/" + InMemoryDbName  + ".cblite2";
+        const auto dbPath = "Databases" + string(DIRECTORY_SEPARATOR) + InMemoryDbName  + ".cblite2";
         const auto dbName = InMemoryDbName;
         char cwd[1024];
         cbl_getcwd(cwd, 1024);
