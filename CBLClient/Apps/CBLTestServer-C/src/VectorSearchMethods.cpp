@@ -209,6 +209,7 @@ namespace vectorSearch_methods
         const auto databasePath = string(cwd) + DIRECTORY_SEPARATOR + dbPath;
         const auto extensionsPath = string(cwd) + DIRECTORY_SEPARATOR + APP_EXTENSIONS_DIR;
         appendLogMessage("Extension path: " + extensionsPath + "\n");
+        appendLogMessage("Extension path: " + extensionsPath + "\n");
         CBL_SetExtensionPath(flstr(extensionsPath));
         CBLDatabaseConfiguration* databaseConfig = nullptr;
         CBLError err;
