@@ -194,7 +194,7 @@ namespace vectorSearch_methods
     }
 
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
-        const auto dbPath = "Databases" + to_string(DIRECTORY_SEPARATOR) + InMemoryDbName  + ".cblite2";
+        const auto dbPath = 'Databases' + DIRECTORY_SEPARATOR + InMemoryDbName  + '.cblite2';
         const auto dbName = InMemoryDbName;
         char cwd[1024];
         cbl_getcwd(cwd, 1024);
