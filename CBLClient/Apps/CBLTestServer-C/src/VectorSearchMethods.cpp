@@ -202,17 +202,12 @@ namespace vectorSearch_methods
     }
 
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
-        MyFile.open("/root/ctestserver/gilad_log.txt");
-        MyFile.close();
-        const auto dbPath = "Databases" + DIRECTORY_SEPARATOR + InMemoryDbName  + ".cblite2";
+        const auto dbPath = "Databases/" + InMemoryDbName  + ".cblite2";
         const auto dbName = InMemoryDbName;
+        CBL_SetExtensionPath(flstr("/root/ctestserver/Extensions"));
         char cwd[1024];
         cbl_getcwd(cwd, 1024);
         const auto databasePath = string(cwd) + DIRECTORY_SEPARATOR + dbPath;
-        const auto extensionsPath = string(cwd) + DIRECTORY_SEPARATOR + APP_EXTENSIONS_DIR;
-        appendLogMessage("Extension path: " + extensionsPath + "\n");
-        appendLogMessage("Extension path: " + extensionsPath + "\n");
-        CBL_SetExtensionPath(flstr(extensionsPath));
         CBLDatabaseConfiguration* databaseConfig = nullptr;
         CBLError err;
         CBLDatabase* db;
