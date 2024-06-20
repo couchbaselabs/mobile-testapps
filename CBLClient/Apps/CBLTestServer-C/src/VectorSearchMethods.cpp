@@ -183,7 +183,6 @@ namespace vectorSearch_methods
             config.minTrainingSize = minTrainingSize;
             config.maxTrainingSize = maxTrainingSize;
             config.expressionLanguage = kCBLN1QLLanguage;
-            appendLogMessage("Before creating the index");
             with<CBLDatabase *>(body,"database", [conn, collectionName, scopeName, indexName, config](CBLDatabase* db)
             {
                 CBLError err;
@@ -195,7 +194,7 @@ namespace vectorSearch_methods
     }
 
     void vectorSearch_loadDatabase(json& body, mg_connection* conn) {
-        const auto dbPath = "Databases" + string(DIRECTORY_SEPARATOR) + InMemoryDbName  + ".cblite2";
+        const auto dbPath = "Databases" + to_string(DIRECTORY_SEPARATOR) + InMemoryDbName  + ".cblite2";
         const auto dbName = InMemoryDbName;
         char cwd[1024];
         cbl_getcwd(cwd, 1024);
@@ -220,7 +219,6 @@ namespace vectorSearch_methods
         model.context = nullptr;
         model.prediction = predictFunction;
         CBL_RegisterPredictiveModel(flstr(name), model);
-        appendLogMessage("Registered the model");
         write_serialized_body(conn, "Model registered");
     }
     
