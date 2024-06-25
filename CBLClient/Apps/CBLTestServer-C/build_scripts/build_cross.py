@@ -170,7 +170,7 @@ if __name__ == '__main__':
     os.remove(zip_filename)
 
     vector_search_zip_name = f'couchbase-lite-vector-search-{args.vs_version}-{args.vs_bld_num}-linux-x86_64.zip'
-    urllib.request.urlretrieve(f'https://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-vector-search/{args.vs_version}/{args.vs_build}/{vector_search_zip_name}', vector_search_zip_name, show_download_progress)
+    urllib.request.urlretrieve(f'https://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-vector-search/{args.vs_version}/{args.vs_bld_num}/{vector_search_zip_name}', vector_search_zip_name, show_download_progress)
     with zipfile.ZipFile(vector_search_zip_name) as zip:
         zip.extractall(path=EXTENSIONS_DIR)
     os.remove(vector_search_zip_name)
