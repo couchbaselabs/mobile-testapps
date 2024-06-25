@@ -20,7 +20,7 @@ public class ProxyAuthenticatorRequestHandler {
 
     public char[] getPassword(Args args) {
         ProxyAuthenticator authenticator = args.get("authenticator");
-        return authenticator.getPasswordChars();
+        return authenticator.getPassword();
     }
 
     public String getUsername(Args args) {
