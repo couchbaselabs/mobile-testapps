@@ -173,7 +173,6 @@ namespace vectorSearch_methods
                 throw std::invalid_argument("Invalid distance metric");
             }
 
-            // CBLVectorIndexConfiguration config{kCBLN1QLLanguage, expression, dimensions, centroids};
             CBLVectorIndexConfiguration config = {};
             config.expression = flstr(expression);
             config.dimensions = dimensions;

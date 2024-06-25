@@ -134,6 +134,8 @@ if __name__ == '__main__':
     parser.add_argument('edition', type=str, choices=["community", "enterprise"], help='The edition to build (community or enterprise)')
     parser.add_argument('os', type=str, help="The target OS to compile for")
     parser.add_argument('toolchain', type=str, help='The CMake toolchain file to use for building')
+    parser.add_argument('vs_version', type=str, help='The vector search versrion')
+    parser.add_argument('vs_bld_num', type=int, help='The vector search build')
     args = parser.parse_args()
     
     toolchain_path = check_toolchain(args.os)
@@ -167,8 +169,8 @@ if __name__ == '__main__':
         tar.extractall(DOWNLOAD_DIR)
     os.remove(zip_filename)
 
-    vector_search_zip_name = f'couchbase-lite-vector-search-1.0.0-42-linux-x86_64.zip'
-    urllib.request.urlretrieve(f'https://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-vector-search/1.0.0/42/{vector_search_zip_name}', vector_search_zip_name, show_download_progress)
+    vector_search_zip_name = f'couchbase-lite-vector-search-{args.vs_version}-{args.vs_bld_num}-linux-x86_64.zip'
+    urllib.request.urlretrieve(f'https://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-vector-search/{args.vs_version}/{args.vs_build}/{vector_search_zip_name}', vector_search_zip_name, show_download_progress)
     with zipfile.ZipFile(vector_search_zip_name) as zip:
         zip.extractall(path=EXTENSIONS_DIR)
     os.remove(vector_search_zip_name)
