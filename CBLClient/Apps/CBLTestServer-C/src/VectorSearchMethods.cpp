@@ -188,10 +188,10 @@ namespace vectorSearch_methods
                 CBLCollection* collection;
                 TRY(collection = CBLDatabase_CreateCollection(db, flstr(collectionName),  flstr(scopeName), &err), err);
                 TRY(CBLCollection_CreateVectorIndex(collection, flstr(indexName), config, &err), err);
-                DEFER{
-                    if (config.encoding) {
+                if (config.encoding) {
+                    DEFER {   
                         CBLVectorEncoding_Free(config.encoding);
-                    }
+                    };
                 }
                 write_serialized_body(conn, "Created index with name " + indexName);
             });
@@ -235,7 +235,7 @@ namespace vectorSearch_methods
         auto vectorDict = getEmbeddingDict(body["input"].get<string>());
         DEFER {
             FLDict_Release(vectorDict);
-        }
+        };
         FLValue embeddings = FLDict_Get(vectorDict, flstr("vector"));
         FLArrayIterator iter;
         FLArrayIterator_Begin(FLValue_AsArray(embeddings), &iter);
@@ -255,7 +255,7 @@ namespace vectorSearch_methods
                 auto embeddedTermDic = getEmbeddingDict(body["term"].get<string>());
                 DEFER {
                    FLDict_Release(embeddedTermDic);
-                }
+                };
                 FLValue embeddedTerm = FLDict_Get(embeddedTermDic, flstr("vector"));
                 auto sql = body["sql"].get<string>();
                 json retVal = json::array();
