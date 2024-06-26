@@ -94,7 +94,7 @@ static FLMutableDict getWordMap() {
          return words;
 }
 
-FLDict getEmbeddingDic(string term) {
+FLDict getEmbeddingDict(string term) {
     FLMutableDict testDict = FLMutableDict_New();
     FLMutableDict_SetString(testDict, flstr("word"), flstr(term));
     FLDict value = getPrediction(testDict, "word");
@@ -188,6 +188,11 @@ namespace vectorSearch_methods
                 CBLCollection* collection;
                 TRY(collection = CBLDatabase_CreateCollection(db, flstr(collectionName),  flstr(scopeName), &err), err);
                 TRY(CBLCollection_CreateVectorIndex(collection, flstr(indexName), config, &err), err);
+                DEFER{
+                    if (config.encoding) {
+                        CBLVectorEncoding_Free(config.encoding);
+                    }
+                }
                 write_serialized_body(conn, "Created index with name " + indexName);
             });
     }
@@ -227,7 +232,10 @@ namespace vectorSearch_methods
         DEFER {
             FLMutableArray_Release(embbedingsVector);
         };
-        auto vectorDict = getEmbeddingDic(body["input"].get<string>());
+        auto vectorDict = getEmbeddingDict(body["input"].get<string>());
+        DEFER {
+            FLDict_Release(vectorDict);
+        }
         FLValue embeddings = FLDict_Get(vectorDict, flstr("vector"));
         FLArrayIterator iter;
         FLArrayIterator_Begin(FLValue_AsArray(embeddings), &iter);
@@ -244,7 +252,10 @@ namespace vectorSearch_methods
 
         with<CBLDatabase *>(body,"database", [conn, body](CBLDatabase* db)
             {
-                auto embeddedTermDic = getEmbeddingDic(body["term"].get<string>());
+                auto embeddedTermDic = getEmbeddingDict(body["term"].get<string>());
+                DEFER {
+                   FLDict_Release(embeddedTermDic);
+                }
                 FLValue embeddedTerm = FLDict_Get(embeddedTermDic, flstr("vector"));
                 auto sql = body["sql"].get<string>();
                 json retVal = json::array();
