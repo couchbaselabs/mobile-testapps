@@ -35,7 +35,7 @@ FLMutableDict predictFunction(void* context, FLDict input) {
     DEFER {
         FLMutableArray_Release(embbedingsVector);
         FLMutableDict_Release(predictDict);
-    }
+    };
     const FLValue inputWord = FLDict_Get(input, flstr("word"));
     if (inputWord) {
         const FLValue tempVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
