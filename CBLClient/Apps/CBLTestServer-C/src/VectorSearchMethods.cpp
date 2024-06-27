@@ -54,17 +54,30 @@ FLMutableDict predictFunction(void* context, FLDict input) {
     return FLEncoder_Finish(enc, nullptr); 
 
     //return FLEncoder_Finish(enc, nullptr); */
-   const FLValue inputWord = FLDict_Get(input, flstr("word"));
+    ofstream myfile;
+    const FLValue inputWord = FLDict_Get(input, flstr("word"));
+    myfile.open("~/ctestserver/gilad_log.txt");
+    myfile << "After getting vector.\n";
+    myfile.close();
     FLMutableDict predictResult =  FLMutableDict_New();
     DEFER {
         FLMutableDict_Release(predictResult);
     };
     if (inputWord) {
+        myfile.open("~/ctestserver/gilad_log.txt", std::ios_base::app);
+        myfile << "inside input word.\n";
+        myfile.close();
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
         if (embeddingsVector) {
+            myfile.open("~/ctestserver/gilad_log.txt", std::ios_base::app);
+            myfile << "inside embedded vector.\n";
+            myfile.close();
             FLMutableDict_SetArray(predictResult, flstr("vector"), FLValue_AsArray(embeddingsVector));
         }
     }
+    myfile.open("~/ctestserver/gilad_log.txt", std::ios_base::app);
+    myfile << "end of predict function.\n";
+    myfile.close();
     return predictResult;
 }
 
