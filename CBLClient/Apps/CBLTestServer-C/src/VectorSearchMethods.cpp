@@ -61,7 +61,7 @@ FLMutableDict predictFunction(void* context, FLDict input) {
     };
     if (inputWord) {
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
-        if (embbedingsVector) {
+        if (embeddingsVector) {
             FLMutableDict_SetArray(predictResult, flstr("vector"), FLValue_AsArray(embeddingsVector));
         }
     }
