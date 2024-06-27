@@ -30,9 +30,12 @@ FLMutableDict getPrediction(FLDict input, string key) {
 }
 
 FLMutableDict predictFunction(void* context, FLDict input) {
-    /*
     const FLValue inputWord = FLDict_Get(input, flstr("word"));
     auto embbedingsVector =  FLMutableArray_New();
+    FLMutableDict predictResult =  FLMutableDict_New();
+    DEFER {
+        FLMutableDict_Release(predictResult);
+    };
     if (inputWord) {
         const FLValue tempVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
         FLArrayIterator iter;
@@ -43,18 +46,21 @@ FLMutableDict predictFunction(void* context, FLDict input) {
             FLArrayIterator_Next(&iter);
         }
     }
-    FLEncoder enc = FLEncoder_New();
+    if (embbedingsVector) {
+        FLMutableDict_SetArray(predictResult, flstr("vector"), FLValue_AsArray(FLValue(embbedingsVector)));
+    }
+   /* FLEncoder enc = FLEncoder_New();
     if (embbedingsVector) {
         FLEncoder_BeginDict(enc, 1);
         FLEncoder_WriteKey(enc, FLStr("vector"));
         FLEncoder_WriteValue(enc, FLValue(embbedingsVector));
         FLEncoder_EndDict(enc);
-    }
+    }*/
     FLMutableArray_Release(embbedingsVector);
-    return FLEncoder_Finish(enc, nullptr); 
+    return predictResult; 
 
-    //return FLEncoder_Finish(enc, nullptr); */
-    ofstream myfile;
+    //return FLEncoder_Finish(enc, nullptr); 
+    /*ofstream myfile;
     const FLValue inputWord = FLDict_Get(input, flstr("word"));
     myfile.open("~/ctestserver/gilad_log.txt");
     myfile << "After getting vector.\n";
@@ -77,8 +83,8 @@ FLMutableDict predictFunction(void* context, FLDict input) {
     }
     myfile.open("~/ctestserver/gilad_log.txt", std::ios_base::app);
     myfile << "end of predict function.\n";
-    myfile.close();
-    return predictResult;
+    myfile.close();*/
+    //return predictResult;
 }
 
 static void CBLDatabase_EntryDelete(void* ptr) {
