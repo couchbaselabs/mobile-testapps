@@ -48,7 +48,7 @@ FLMutableDict predictFunction(void* context, FLDict input) {
         }
     }
     if (embbedingsVector) {
-        FLMutableDict_SetArray(predictDict, FLValue_AsString("vector"), FLValue_AsArray(embbedingsVector));
+        FLMutableDict_SetArray(predictDict, FLValue_AsString(flstr("vector")), FLValue_AsArray(embbedingsVector));
     }
     /*FLEncoder enc = FLEncoder_New();
     if (embbedingsVector) {
