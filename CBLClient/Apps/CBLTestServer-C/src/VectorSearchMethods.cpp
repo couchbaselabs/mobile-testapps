@@ -58,7 +58,7 @@ FLMutableDict predictFunction(void* context, FLDict input) {
         FLEncoder_EndDict(enc);
     }*/
     //return FLEncoder_Finish(enc, nullptr); 
-    const FLValue inputWord = FLDict_Get(input, flstr(key));
+    const FLValue inputWord = FLDict_Get(input, flstr("word"));
     FLMutableDict predictResult =  FLMutableDict_New();
     DEFER {
         FLMutableDict_Release(predictDict);
