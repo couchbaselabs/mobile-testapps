@@ -50,42 +50,7 @@ FLMutableDict predictFunction(void* context, FLDict input) {
     if (embbedingsVector) {
         FLMutableDict_SetArray(predictResult, flstr("vector"), embbedingsVector);
     }
-   /* FLEncoder enc = FLEncoder_New();
-    if (embbedingsVector) {
-        FLEncoder_BeginDict(enc, 1);
-        FLEncoder_WriteKey(enc, FLStr("vector"));
-        FLEncoder_WriteValue(enc, FLValue(embbedingsVector));
-        FLEncoder_EndDict(enc);
-    }*/
-    
     return predictResult; 
-
-    //return FLEncoder_Finish(enc, nullptr); 
-    /*ofstream myfile;
-    const FLValue inputWord = FLDict_Get(input, flstr("word"));
-    myfile.open("~/ctestserver/gilad_log.txt");
-    myfile << "After getting vector.\n";
-    myfile.close();
-    FLMutableDict predictResult =  FLMutableDict_New();
-    DEFER {
-        FLMutableDict_Release(predictResult);
-    };
-    if (inputWord) {
-        myfile.open("~/ctestserver/gilad_log.txt", std::ios_base::app);
-        myfile << "inside input word.\n";
-        myfile.close();
-        const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
-        if (embeddingsVector) {
-            myfile.open("~/ctestserver/gilad_log.txt", std::ios_base::app);
-            myfile << "inside embedded vector.\n";
-            myfile.close();
-            FLMutableDict_SetArray(predictResult, flstr("vector"), FLValue_AsArray(embeddingsVector));
-        }
-    }
-    myfile.open("~/ctestserver/gilad_log.txt", std::ios_base::app);
-    myfile << "end of predict function.\n";
-    myfile.close();*/
-    //return predictResult;
 }
 
 static void CBLDatabase_EntryDelete(void* ptr) {
@@ -239,7 +204,7 @@ namespace vectorSearch_methods
         cbl_getcwd(cwd, 1024);
         const auto databasePath = string(cwd) + DIRECTORY_SEPARATOR + dbPath;
         const auto extensionsPath = string(cwd) + DIRECTORY_SEPARATOR + APP_EXTENSIONS_DIR;
-        CBL_SetExtensionPath(flstr(extensionsPath));
+        CBL_EnableVectorSearch(flstr(extensionsPath));
         CBLDatabaseConfiguration* databaseConfig = nullptr;
         CBLError err;
         CBLDatabase* db;
