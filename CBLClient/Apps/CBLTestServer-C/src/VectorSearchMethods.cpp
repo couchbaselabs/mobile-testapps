@@ -30,13 +30,9 @@ FLMutableDict getPrediction(FLDict input, string key) {
 }
 
 FLMutableDict predictFunction(void* context, FLDict input) {
-   /* auto embbedingsVector =  FLMutableArray_New();
-    auto predictDict = FLMutableDict_New();
-    DEFER {
-        FLMutableArray_Release(embbedingsVector);
-        FLMutableDict_Release(predictDict);
-    };
+    /*
     const FLValue inputWord = FLDict_Get(input, flstr("word"));
+    auto embbedingsVector =  FLMutableArray_New();
     if (inputWord) {
         const FLValue tempVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
         FLArrayIterator iter;
@@ -46,26 +42,28 @@ FLMutableDict predictFunction(void* context, FLDict input) {
             FLMutableArray_AppendFloat(embbedingsVector, FLValue_AsFloat(value));
             FLArrayIterator_Next(&iter);
         }
-        if (embbedingsVector) {
-            FLMutableDict_SetArray(predictDict, flstr("vector"), FLValue_AsArray(FLValue(embbedingsVector)));
-        }
-    }*/
-    /*FLEncoder enc = FLEncoder_New();
+    }
+    FLEncoder enc = FLEncoder_New();
     if (embbedingsVector) {
         FLEncoder_BeginDict(enc, 1);
         FLEncoder_WriteKey(enc, FLStr("vector"));
         FLEncoder_WriteValue(enc, FLValue(embbedingsVector));
         FLEncoder_EndDict(enc);
-    }*/
-    //return FLEncoder_Finish(enc, nullptr); 
-    const FLValue inputWord = FLDict_Get(input, flstr("word"));
+    }
+    FLMutableArray_Release(embbedingsVector);
+    return FLEncoder_Finish(enc, nullptr); 
+
+    //return FLEncoder_Finish(enc, nullptr); */
+   const FLValue inputWord = FLDict_Get(input, flstr("word"));
     FLMutableDict predictResult =  FLMutableDict_New();
     DEFER {
         FLMutableDict_Release(predictResult);
     };
     if (inputWord) {
         const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
-        FLMutableDict_SetArray(predictResult, flstr("vector"), FLValue_AsArray(embeddingsVector));
+        if (embbedingsVector) {
+            FLMutableDict_SetArray(predictResult, flstr("vector"), FLValue_AsArray(embeddingsVector));
+        }
     }
     return predictResult;
 }
