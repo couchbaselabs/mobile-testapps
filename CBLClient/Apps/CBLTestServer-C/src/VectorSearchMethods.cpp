@@ -30,28 +30,26 @@ FLMutableDict getPrediction(FLDict input, string key) {
 }
 
 FLMutableDict predictFunction(void* context, FLDict input) {
-    //auto embbedingsVector =  FLMutableArray_New();
+    auto embbedingsVector =  FLMutableArray_New();
     auto predictDict = FLMutableDict_New();
     DEFER {
-      //  FLMutableArray_Release(embbedingsVector);
+        FLMutableArray_Release(embbedingsVector);
         FLMutableDict_Release(predictDict);
     };
     const FLValue inputWord = FLDict_Get(input, flstr("word"));
     if (inputWord) {
         const FLValue embbedingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
-       /* FLArrayIterator iter;
+        FLArrayIterator iter;
         FLArrayIterator_Begin(FLValue_AsArray(tempVector), &iter);
         FLValue value;
         while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
             FLMutableArray_AppendFloat(embbedingsVector, FLValue_AsFloat(value));
             FLArrayIterator_Next(&iter);
         }
-    }*/
-        FLMutableDict_SetArray(predictDict, flstr("vector"), FLValue_AsArray(embbedingsVector));
     }
-    //if (embbedingsVector) {
-    //    FLMutableDict_SetArray(predictDict, flstr("vector"), FLValue_AsArray(embbedingsVector));
-    //}
+    if (embbedingsVector) {
+        FLMutableDict_SetArray(predictDict, flstr("vector"), FLValue_AsArray(FLValue(embbedingsVector)));
+    }
     /*FLEncoder enc = FLEncoder_New();
     if (embbedingsVector) {
         FLEncoder_BeginDict(enc, 1);
