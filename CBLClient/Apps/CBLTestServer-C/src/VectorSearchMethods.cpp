@@ -30,7 +30,7 @@ FLMutableDict getPrediction(FLDict input, string key) {
 }
 
 FLMutableDict predictFunction(void* context, FLDict input) {
-    auto embbedingsVector =  FLMutableArray_New();
+   /* auto embbedingsVector =  FLMutableArray_New();
     auto predictDict = FLMutableDict_New();
     DEFER {
         FLMutableArray_Release(embbedingsVector);
@@ -49,7 +49,7 @@ FLMutableDict predictFunction(void* context, FLDict input) {
         if (embbedingsVector) {
             FLMutableDict_SetArray(predictDict, flstr("vector"), FLValue_AsArray(FLValue(embbedingsVector)));
         }
-    }
+    }*/
     /*FLEncoder enc = FLEncoder_New();
     if (embbedingsVector) {
         FLEncoder_BeginDict(enc, 1);
@@ -58,7 +58,16 @@ FLMutableDict predictFunction(void* context, FLDict input) {
         FLEncoder_EndDict(enc);
     }*/
     //return FLEncoder_Finish(enc, nullptr); 
-    return predictDict;
+    const FLValue inputWord = FLDict_Get(input, flstr(key));
+    FLMutableDict predictResult =  FLMutableDict_New();
+    DEFER {
+        FLMutableDict_Release(predictDict);
+    };
+    if (inputWord) {
+        const FLValue embeddingsVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
+        FLMutableDict_SetArray(predictResult, flstr("vector"), FLValue_AsArray(embeddingsVector));
+    }
+    return predictResult;
 }
 
 static void CBLDatabase_EntryDelete(void* ptr) {
