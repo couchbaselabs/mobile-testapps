@@ -31,6 +31,11 @@ FLMutableDict getPrediction(FLDict input, string key) {
 
 FLMutableDict predictFunction(void* context, FLDict input) {
     auto embbedingsVector =  FLMutableArray_New();
+    auto predictDict = FLMutableDict_New();
+    DEFER {
+        FLMutableArray_Release(embbedingsVector);
+        FLMutableDict_Release(predictDict);
+    }
     const FLValue inputWord = FLDict_Get(input, flstr("word"));
     if (inputWord) {
         const FLValue tempVector = FLDict_Get(wordMap, FLValue_AsString(inputWord));
@@ -42,14 +47,16 @@ FLMutableDict predictFunction(void* context, FLDict input) {
             FLArrayIterator_Next(&iter);
         }
     }
-    FLEncoder enc = FLEncoder_New();
+    if (embbedingsVector) {
+        FLMutableDict_SetArray(predictDict, FLValue_AsString("vector"), FLValue_AsArray(embbedingsVector));
+    }
+    /*FLEncoder enc = FLEncoder_New();
     if (embbedingsVector) {
         FLEncoder_BeginDict(enc, 1);
         FLEncoder_WriteKey(enc, FLStr("vector"));
         FLEncoder_WriteValue(enc, FLValue(embbedingsVector));
         FLEncoder_EndDict(enc);
-    }
-    FLMutableArray_Release(embbedingsVector);
+    }*/
     return FLEncoder_Finish(enc, nullptr); 
 }
 
