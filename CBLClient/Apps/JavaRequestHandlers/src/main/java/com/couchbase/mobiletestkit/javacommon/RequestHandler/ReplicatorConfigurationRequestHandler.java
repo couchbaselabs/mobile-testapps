@@ -525,6 +525,12 @@ public class ReplicatorConfigurationRequestHandler {
         replicatorConfiguration.setAutoPurgeEnabled(auto_purge);
     }
 
+    public ReplicatorConfiguration setProxyAuthenticator(Args args) {
+        ReplicatorConfiguration replicatorConfiguration = args.get("configuration");
+        ProxyAuthenticator proxyAuth = args.get("authenticator");
+        return replicatorConfiguration.setProxyAuthenticator(proxyAuth);
+    }
+
     private byte[] getPinnedCertFile() {
         InputStream is = null;
         try {
