@@ -5,6 +5,7 @@ ext {
     // When manually build in Android studio, replace System.getenv("MAVEN_UPLOAD_VERSION") with build version you want to build
     // ex: DEF_VERSION = "3.1.0-353"
     COUCHBASE_LITE_VERSION = System.getProperty('version', DEF_VERSION)
+    VECTOR_SEARCH_VERSION = System.getProperty('vs_version', VS_VERSION)
 
     PROJECT_DIR = "${projectDir}"
     ROOT_DIR = "${PROJECT_DIR}/../../"
@@ -14,6 +15,7 @@ ext {
 }
 
 println "BUILDING TEST SERVER WITH CBL VERSION ${COUCHBASE_LITE_VERSION}"
+println "BUILDING TEST SERVER WITH VS VERSION ${VECTOR_SEARCH_VERSION}"
 
 android {
     namespace 'com.couchbase.CouchbaseLiteServ'
@@ -105,7 +107,7 @@ dependencies {
     implementation 'org.nanohttpd:nanohttpd:2.3.2-SNAPSHOT'
     // Couchbase Lite:
     implementation "com.couchbase.lite:couchbase-lite-android-ee:${COUCHBASE_LITE_VERSION}"
-    implementation 'com.couchbase.lite:couchbase-lite-android-vector-search-arm64:1.0.0-beta.2'
+    implementation "com.couchbase.lite:couchbase-lite-android-vector-search-arm64:${VECTOR_SEARCH_VERSION}"
     
     // for build version < 3.0.0-160, use below package name
     // implementation "com.couchbase.lite:couchbase-lite-android-ee:${COUCHBASE_LITE_VERSION}"

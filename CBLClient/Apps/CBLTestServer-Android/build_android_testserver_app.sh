@@ -3,6 +3,7 @@
 EDITION=$1
 VERSION=$2
 BUILD_NUM=$3
+VECTOR_SEARCH_VERSION=$4
 
 FAIL=0
 if [ -z "${ANDROID_HOME}" ] || [ ! -d "${ANDROID_HOME}" ]; then
@@ -37,6 +38,12 @@ fi
 
 export MAVEN_UPLOAD_VERSION=${VERSION}-${BUILD_NUM}
 echo "Building version ${MAVEN_UPLOAD_VERSION}"
+if [ -z "$VECTOR_SEARCH_VERSION" ]; then
+    echo "Not build with vector search"
+else
+    export VECTOR_SEARCH_VERSION=$VECTOR_SEARCH_VERSION
+    echo "Build vector search version ${VECTOR_SEARCH_VERSION}"
+fi
 
 export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
 
