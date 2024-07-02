@@ -64,6 +64,7 @@ public class VectorSearchRequestHandler {
 
         int dimensions = args.get("dimensions");
         int centroids = args.get("centroids");
+        Boolean isLazy = args.get("isLazy");
 
         VectorEncoding.ScalarQuantizerType scalarEncoding = args.get("scalarEncoding");
 
@@ -111,13 +112,21 @@ public class VectorSearchRequestHandler {
         if (maxTrainingSize != null) {
             config.setMaxTrainingSize(maxTrainingSize);
         }
-
+        if (isLazy != null) {
+            config.isLazy = isLazy;
+        }
         try {
             collection.createIndex(indexName, config);
             return String.format("Created index with name %s on collection %s", indexName, collectionName);
         } catch (Exception e) {
             return "Could not create index: " + e;
         }
+    }
+
+    public updateIndex(Args args) {
+        String collection = args.get("collection");
+        String indexName = args.get("indexName");
+        QueryIndex config = new QueryIndex(collection, indexName);
     }
 
     public String registerModel(Args args) {
