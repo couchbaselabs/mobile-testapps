@@ -123,10 +123,11 @@ public class VectorSearchRequestHandler {
         }
     }
 
-    public updateIndex(Args args) {
+    public String updateIndex(Args args) {
         String collection = args.get("collection");
         String indexName = args.get("indexName");
         QueryIndex config = new QueryIndex(collection, indexName);
+        return "Temp dummy return";
     }
 
     public String registerModel(Args args) {
