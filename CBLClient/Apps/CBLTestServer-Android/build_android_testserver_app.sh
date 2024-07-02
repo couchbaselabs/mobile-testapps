@@ -41,8 +41,8 @@ echo "Building version ${MAVEN_UPLOAD_VERSION}"
 if [ -z "$VECTOR_SEARCH_VERSION" ]; then
     echo "Not build with vector search"
 else
-    export VECTOR_SEARCH_VERSION=$VECTOR_SEARCH_VERSION
-    echo "Build vector search version ${VECTOR_SEARCH_VERSION}"
+    export VS_VERSION=$VECTOR_SEARCH_VERSION
+    echo "Build vector search version ${VS_VERSION}"
 fi
 
 export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
