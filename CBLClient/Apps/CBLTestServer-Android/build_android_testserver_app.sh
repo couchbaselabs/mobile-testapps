@@ -39,17 +39,17 @@ fi
 export MAVEN_UPLOAD_VERSION=${VERSION}-${BUILD_NUM}
 echo "Building version ${MAVEN_UPLOAD_VERSION}"
 if [ -z "$VECTOR_SEARCH_VERSION" ]; then
-    echo "Not build with vector search"
+    echo "Not building with vector search"
 else
     export VS_VERSION=$VECTOR_SEARCH_VERSION
-    echo "Build vector search version ${VS_VERSION}"
+    echo "Building with vector search version ${VS_VERSION}"
 fi
 
 export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
 
 # Build TestServer
-echo ./gradlew clean -Dversion=${MAVEN_UPLOAD_VERSION} assemble
-./gradlew clean -Dversion=${MAVEN_UPLOAD_VERSION} assemble
+echo ./gradlew clean -Dversion=${MAVEN_UPLOAD_VERSION} -Dvs_version=${VS_VERSION} -assemble
+./gradlew clean -Dversion=${MAVEN_UPLOAD_VERSION} -Dvs_version=${VS_VERSION} assemble
 
 TESTSERVER_DEBUG_APK=app/build/outputs/apk/debug/app-debug.apk
 cp -f ${TESTSERVER_DEBUG_APK} ${ARTIFACTS_DIR}/CBLTestServer-Android-${MAVEN_UPLOAD_VERSION}-${EDITION}-debug.apk
