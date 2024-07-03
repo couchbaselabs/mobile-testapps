@@ -1,4 +1,3 @@
-#ifdef COUCHBASE_ENTERPRISE
 #include "VectorSearchMethods.h"
 #include "MemoryMap.h"
 #include "Router.h"
@@ -289,4 +288,3 @@ namespace vectorSearch_methods
     }
 
 }
-#endif
