@@ -82,6 +82,7 @@ FetchContent_Declare(
 )
 
 if(BUILD_ENTERPRISE)
+    message("**************************************Inside if")
     add_definitions(
         -DCOUCHBASE_ENTERPRISE      # Tells LiteCore it's an EE build
     )
