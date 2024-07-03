@@ -70,12 +70,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     endif()
 endif()
 
-if(BUILD_ENTERPRISE)
-    message("**************************************Inside if")
-    add_definitions(
-        -DCOUCHBASE_ENTERPRISE      # Tells LiteCore it's an EE build
-    )
-endif()
 
 set(
     TESTSERVER_COMMON_SRC
@@ -104,6 +98,14 @@ set(
     src/VectorSearchMethods.cpp
     src/cdecode.c
 )
+
+if(BUILD_ENTERPRISE)
+   # message("**************************************Inside if")
+   # add_definitions(
+   #     -DCOUCHBASE_ENTERPRISE      # Tells LiteCore it's an EE build
+   # )
+   unset(src/VectorSearchMethods.cpp)
+endif()
 
 if(ANDROID)
     add_library(testserver SHARED ${TESTSERVER_COMMON_SRC})
