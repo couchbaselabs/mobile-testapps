@@ -70,7 +70,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     endif()
 endif()
 
-
 set(
     TESTSERVER_COMMON_SRC
     src/TestServer.cpp
