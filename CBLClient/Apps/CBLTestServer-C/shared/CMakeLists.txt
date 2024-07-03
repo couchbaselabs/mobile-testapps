@@ -81,6 +81,12 @@ FetchContent_Declare(
     GIT_SHALLOW TRUE
 )
 
+if(BUILD_ENTERPRISE)
+    add_definitions(
+        -DCOUCHBASE_ENTERPRISE      # Tells LiteCore it's an EE build
+    )
+endif()
+
 option(BUILD_TOOLS "" OFF)
 option(BUILD_DOC "" OFF)
 option(BUILD_REGRESS "" OFF)
