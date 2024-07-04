@@ -115,6 +115,7 @@ namespace vectorSearch_methods
             const auto centroids = body["centroids"].get<uint32_t>();
             const auto minTrainingSize = body["minTrainingSize"].get<uint32_t>();
             const auto maxTrainingSize = body["maxTrainingSize"].get<uint32_t>();
+            const auto isLazy = body["isLazy"].get<bool>();
             std::optional<uint32_t> bits;
             std::optional<uint32_t> subquantizers;
             std::optional<CBLScalarQuantizerType> scalarEncoding;
@@ -173,6 +174,7 @@ namespace vectorSearch_methods
                 throw std::invalid_argument("Invalid distance metric");
             }
 
+
             CBLVectorIndexConfiguration config = {};
             config.expression = flstr(expression);
             config.dimensions = dimensions;
@@ -182,6 +184,9 @@ namespace vectorSearch_methods
             config.minTrainingSize = minTrainingSize;
             config.maxTrainingSize = maxTrainingSize;
             config.expressionLanguage = kCBLN1QLLanguage;
+            if (isLazy.has_value()) {
+                config.isLazy = isLazy;
+            }
             with<CBLDatabase *>(body,"database", [conn, collectionName, scopeName, indexName, config](CBLDatabase* db)
             {
                 CBLError err;
