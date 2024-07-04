@@ -188,7 +188,7 @@ namespace vectorSearch_methods
             config.maxTrainingSize = maxTrainingSize;
             config.expressionLanguage = kCBLN1QLLanguage;
             if (isLazy.has_value()) {
-                config.isLazy = isLazy;
+                config.isLazy = isLazy.value();
             }
             with<CBLDatabase *>(body,"database", [conn, collectionName, scopeName, indexName, config](CBLDatabase* db)
             {
