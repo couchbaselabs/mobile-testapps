@@ -160,7 +160,7 @@ namespace collection_methods {
             CBLError err = {};
             CBLQueryIndex*  queryIndex;
             TRY(queryIndex = CBLCollection_GetIndex(collection, flstr(indexName), &err), err);
-            write_serialized_body(conn, memory_map::store(queryIndex, CBLQueryIndex_EntryDelete));
+            write_serialized_body(conn, memory_map::store(queryIndex));
         });
     }
 
