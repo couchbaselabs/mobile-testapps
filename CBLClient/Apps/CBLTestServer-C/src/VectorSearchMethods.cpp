@@ -115,10 +115,11 @@ namespace vectorSearch_methods
             const auto centroids = body["centroids"].get<uint32_t>();
             const auto minTrainingSize = body["minTrainingSize"].get<uint32_t>();
             const auto maxTrainingSize = body["maxTrainingSize"].get<uint32_t>();
-            const auto isLazy = body["isLazy"].get<bool>();
+
             std::optional<uint32_t> bits;
             std::optional<uint32_t> subquantizers;
             std::optional<CBLScalarQuantizerType> scalarEncoding;
+            std::optional<bool> isLazy;
             CBLDistanceMetric dMetric;
 
             auto* encoding = CBLVectorEncoding_CreateNone();
@@ -126,11 +127,13 @@ namespace vectorSearch_methods
             {
                 bits = static_cast<uint32_t>(body["bits"]);
                 subquantizers = static_cast<uint32_t>(body["subquantizers"]);
+                isLazy = static_cast<bool>(body["isLazy"]);
             }
             catch (...)
             {
                 bits.reset();
                 subquantizers.reset();
+                isLazy.reset();
             }
 
             try
