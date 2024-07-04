@@ -4,7 +4,6 @@
 #include <civetweb.h>
 #include <string>
 #include <iostream>
-#include <unistd.h>
 using namespace std;
 
 static int handle_request(mg_connection* connection, void* context) {
