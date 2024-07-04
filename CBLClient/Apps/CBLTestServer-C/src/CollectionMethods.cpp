@@ -156,7 +156,7 @@ namespace collection_methods {
 
     void collection_getIndex(json& body, mg_connection* conn) {
         auto indexName = body["indexName"].get<string>();
-        with<CBLCollection *>(body,"collection",[conn](CBLCollection* collection) {
+        with<CBLCollection *>(body,"collection",[conn, indexName](CBLCollection* collection) {
             write_serialized_body(conn, memory_map::store(CBLCollection_GetIndex(collection, indexName)));
         });
     }
