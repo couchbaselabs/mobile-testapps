@@ -34,4 +34,5 @@ namespace collection_methods {
     void collection_getIndexNames(nlohmann::json& body, mg_connection* conn);
     void collection_addChangeListener(nlohmann::json& body, mg_connection* conn);
     void collection_addDocumentChangeListener(nlohmann::json& body, mg_connection* conn);
+    void collection_getIndex(nlohmann::json& body, mg_connection* conn);
 }
