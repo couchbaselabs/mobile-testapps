@@ -61,7 +61,7 @@ static void CBLDatabase_EntryDelete(void* ptr) {
 vector<float> vectorForWord(FLArray embeddingVector) {
         vector<float> embeddingFloatArray {};
         FLArrayIterator iter;
-        FLArrayIterator_Begin(embeddingFloatArray, &iter);
+        FLArrayIterator_Begin(embeddingVector, &iter);
         FLValue value;
         while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
             embeddingFloatArray.push_back(value.toFloat());
@@ -318,7 +318,7 @@ namespace vectorSearch_methods
         TRY(updater = CBLQueryIndex_BeginUpdate(index, documentUpdateLimit, &err), err);
         for (int i=0; i<CBLIndexUpdater_Count(updater); i++) {
             const FLArray embeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
-            TRY(CBLIndexUpdater_SetVector(updater, i, vectorForWord(embeddingVector), FLArray_Count(wordEmbeddingVector), &err), err);
+            TRY(CBLIndexUpdater_SetVector(updater, i, vectorForWord(embeddingVector), FLArray_Count(embeddingVector), &err), err);
         }
         TRY(CBLIndexUpdater_Finish(updater, &err), err);
     }
