@@ -61,7 +61,7 @@ static void CBLDatabase_EntryDelete(void* ptr) {
 vector<float> vectorForWord(FLArray embeddingVector) {
         vector<float> embeddingFloatArray {};
         FLArrayIterator iter;
-        FLArrayIterator_Begin(myArray, &iter);
+        FLArrayIterator_Begin(embeddingFloatArray, &iter);
         FLValue value;
         while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
             embeddingFloatArray.push_back(value.toFloat());
