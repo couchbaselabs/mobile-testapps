@@ -310,7 +310,7 @@ namespace vectorSearch_methods
     }
 
     // Has to be used with lazyVector set to true
-    void vectorSearch_c(json& body, mg_connection* conn) {
+    void vectorSearch_updateQueryIndex(json& body, mg_connection* conn) {
         const auto index = static_cast<CBLQueryIndex*>(memory_map::get(body["index"].get<string>()));
         const auto documentUpdateLimit = 5;
         CBLError err;
