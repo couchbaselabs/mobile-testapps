@@ -59,15 +59,15 @@ static void CBLDatabase_EntryDelete(void* ptr) {
 
 // Converts FLArray to float*
 vector<float> vectorForWord(FLArray embeddingVector) {
-        vector<float> result {};
-        if (embeddingVector) {
-            auto array = Array(embeddingVector);
-            for (Array::iterator i(array); i; ++i) {
-                auto val = i.value().asFloat();
-                result.push_back(val);
-            }
+        vector<float> embeddingFloatArray {};
+        FLArrayIterator iter;
+        FLArrayIterator_Begin(myArray, &iter);
+        FLValue value;
+        while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
+            embeddingFloatArray.push_back(value.toFloat());
+            FLArrayIterator_Next(&iter);
         }
-        return result;
+        return embeddingFloatArray;
     }
 
 
