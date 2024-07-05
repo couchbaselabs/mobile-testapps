@@ -64,7 +64,7 @@ vector<float> vectorForWord(FLArray embeddingVector) {
         FLArrayIterator_Begin(embeddingVector, &iter);
         FLValue value;
         while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-            embeddingFloatArray.push_back(value.toFloat());
+            embeddingFloatArray.push_back(static_cast<float>value);
             FLArrayIterator_Next(&iter);
         }
         return embeddingFloatArray;
