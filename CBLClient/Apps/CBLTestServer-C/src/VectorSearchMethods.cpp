@@ -57,6 +57,19 @@ static void CBLDatabase_EntryDelete(void* ptr) {
     CBLDatabase_Release(static_cast<CBLDatabase *>(ptr));
 }
 
+// Converts FLArray to float*
+vector<float> vectorForWord(FLArray embeddingVector) {
+        vector<float> result {};
+        if (embeddingVector) {
+            auto array = Array(embeddingVector);
+            for (Array::iterator i(array); i; ++i) {
+                auto val = i.value().asFloat();
+                result.push_back(val);
+            }
+        }
+        return result;
+    }
+
 
 static FLMutableDict getWordMap() {
          std::string sql1 = "select word, vector from auxiliaryWords";
@@ -304,8 +317,8 @@ namespace vectorSearch_methods
         CBLIndexUpdater* updater;
         TRY(updater = CBLQueryIndex_BeginUpdate(index, documentUpdateLimit, &err), err);
         for (int i=0; i<CBLIndexUpdater_Count(updater); i++) {
-            const FLArray wordEmbeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
-            TRY(CBLIndexUpdater_SetVector(updater, i, wordEmbeddingVector, FLArray_Count(wordEmbeddingVector), &err), err);
+            const FLArray embeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
+            TRY(CBLIndexUpdater_SetVector(updater, i, vectorForWord(embeddingVector), FLArray_Count(wordEmbeddingVector), &err), err);
         }
         TRY(CBLIndexUpdater_Finish(updater, &err), err);
     }
