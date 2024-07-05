@@ -64,7 +64,7 @@ vector<float> vectorForWord(FLArray embeddingVector) {
         FLArrayIterator_Begin(embeddingVector, &iter);
         FLValue value;
         while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-            embeddingFloatArray.push_back(static_cast<float>value);
+            embeddingFloatArray.push_back(static_cast<float>(value));
             FLArrayIterator_Next(&iter);
         }
         return embeddingFloatArray;
@@ -318,7 +318,8 @@ namespace vectorSearch_methods
         TRY(updater = CBLQueryIndex_BeginUpdate(index, documentUpdateLimit, &err), err);
         for (int i=0; i<CBLIndexUpdater_Count(updater); i++) {
             const FLArray embeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
-            TRY(CBLIndexUpdater_SetVector(updater, i, vectorForWord(embeddingVector), FLArray_Count(embeddingVector), &err), err);
+            std::vector<float> floatEmbeddingVector =  vectorForWord(embeddingVector);
+            TRY(CBLIndexUpdater_SetVector(updater, i, &floatEmbeddingVector[0], FLArray_Count(embeddingVector), &err), err);
         }
         TRY(CBLIndexUpdater_Finish(updater, &err), err);
     }
