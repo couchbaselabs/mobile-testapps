@@ -232,6 +232,7 @@ static const unordered_map<string, endpoint_handler> ROUTE_MAP = {
     {"vectorSearch_registerModel", vectorSearch_methods::vectorSearch_registerModel},
     {"vectorSearch_query", vectorSearch_methods::vectorSearch_query},
     {"vectorSearch_getEmbedding", vectorSearch_methods::vectorSearch_getEmbedding},
+    {"vectorSearch_updateQueryIndex", vectorSearch_methods::vectorSearch_updateQueryIndex},
     #endif
     {"release", releaseObject},
     {"flushMemory", flushMemory},
