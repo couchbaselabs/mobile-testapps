@@ -296,5 +296,18 @@ namespace vectorSearch_methods
             });
     }
 
+    void vectorSearch_updateQueryIndex(json& body, mg_connection* conn) {
+        const auto index = static_cast<QueryIndex*>(memory_map::get(body["index"].get<string>()));
+        const auto wordsToUpdate = static_cast<FLMutableArray*>(memory_map::get(body["index"].get<string>()));
+        const auto documentUpdateLimit = 5;
+        CBLError err;
+        TRY(updater = CBLQueryIndex_BeginUpdate(index, documentUpdateLimit, &err), err);
+        for (int i=0; i<CBLIndexUpdater_Count(updater); i++) {
+            const FLValue wordEmbeddingVector = FLDict_Get(wordMap, FLValue_AsString(updater[i]));
+            TRY(CBLIndexUpdater_SetVector(updater, i, wordEmbeddingVector, &err), err);
+        }
+        TRY(CBLIndexUpdater_Finish(updater, &err), err);
+    }
+
 }
 #endif
