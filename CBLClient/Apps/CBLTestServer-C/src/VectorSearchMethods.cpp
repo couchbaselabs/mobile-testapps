@@ -301,7 +301,7 @@ namespace vectorSearch_methods
         const auto wordsToUpdate = static_cast<FLMutableArray*>(memory_map::get(body["index"].get<string>()));
         const auto documentUpdateLimit = 5;
         CBLError err;
-        auto updater;
+        CBLIndexUpdater* updater;
         TRY(updater = CBLQueryIndex_BeginUpdate(index, documentUpdateLimit, &err), err);
         for (int i=0; i<CBLIndexUpdater_Count(updater); i++) {
             const FLValue wordEmbeddingVector = FLDict_Get(wordMap, FLValue_AsString(updater[i]));
