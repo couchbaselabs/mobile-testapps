@@ -321,7 +321,7 @@ namespace vectorSearch_methods
         TRY(updater = CBLQueryIndex_BeginUpdate(index, documentUpdateLimit, &err), err);
         for (int i=0; i<CBLIndexUpdater_Count(updater); i++) {
             MyFile.open("gilad.txt", std::ios_base::app);
-            updater << to_string(FLValue_AsString(CBLIndexUpdater_Value(updater, i))) + "\n";
+            MyFile << to_string(FLValue_AsString(CBLIndexUpdater_Value(updater, i))) + "\n";
             MyFile.close();
             const FLArray embeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
             std::vector<float> floatEmbeddingVector =  vectorForWord(embeddingVector);
