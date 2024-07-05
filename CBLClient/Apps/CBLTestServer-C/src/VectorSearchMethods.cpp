@@ -304,8 +304,8 @@ namespace vectorSearch_methods
         CBLIndexUpdater* updater;
         TRY(updater = CBLQueryIndex_BeginUpdate(index, documentUpdateLimit, &err), err);
         for (int i=0; i<CBLIndexUpdater_Count(updater); i++) {
-            const FLValue wordEmbeddingVector = FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i)));
-            TRY(CBLIndexUpdater_SetVector(updater, i, FLValue_AsArray(wordEmbeddingVector), FLArray_Count(wordEmbeddingVector), &err), err);
+            const FLArray wordEmbeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
+            TRY(CBLIndexUpdater_SetVector(updater, i, wordEmbeddingVector, FLArray_Count(wordEmbeddingVector), &err), err);
         }
         TRY(CBLIndexUpdater_Finish(updater, &err), err);
     }
