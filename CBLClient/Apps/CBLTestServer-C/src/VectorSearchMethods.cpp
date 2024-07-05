@@ -151,13 +151,13 @@ namespace vectorSearch_methods
             }
             try {
                 MyFile.open("gilad.txt", std::ios_base::app);
-                MyFile << "Trying isLazy"
+                MyFile << "Trying isLazy";
                 isLazy = static_cast<bool>(body["isLazy"]);
-                MyFile << "isLazy is set"
+                MyFile << "isLazy is set";
             }
             catch(...) {
                 isLazy.reset();
-                MyFile << "isLazy is null"
+                MyFile << "isLazy is null";
             }
             MyFile.close();
             try
