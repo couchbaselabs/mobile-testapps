@@ -134,21 +134,32 @@ namespace vectorSearch_methods
             std::optional<CBLScalarQuantizerType> scalarEncoding;
             std::optional<bool> isLazy;
             CBLDistanceMetric dMetric;
+            ofstream MyFile("/root/ctestserver/gilad.txt");
+            MyFile << "Starting create index";
+            MyFile.close();
 
             auto* encoding = CBLVectorEncoding_CreateNone();
             try
             {
                 bits = static_cast<uint32_t>(body["bits"]);
                 subquantizers = static_cast<uint32_t>(body["subquantizers"]);
-                isLazy = static_cast<bool>(body["isLazy"]);
             }
             catch (...)
             {
                 bits.reset();
                 subquantizers.reset();
-                isLazy.reset();
             }
-
+            try {
+                MyFile.open("gilad.txt", std::ios_base::app);
+                MyFile << "Trying isLazy"
+                isLazy = static_cast<bool>(body["isLazy"]);
+                MyFile << "isLazy is set"
+            }
+            catch(...) {
+                isLazy.reset();
+                MyFile << "isLazy is null"
+            }
+            MyFile.close();
             try
             {
                 scalarEncoding = static_cast<CBLScalarQuantizerType>(body["scalarEncoding"]);
