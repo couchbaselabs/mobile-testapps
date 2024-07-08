@@ -134,6 +134,9 @@ namespace vectorSearch_methods
             std::optional<CBLScalarQuantizerType> scalarEncoding;
             std::optional<bool> isLazy;
             CBLDistanceMetric dMetric;
+            ofstream MyFile("/root/ctestserver/gilad.txt");
+            MyFile << "Starting create index";
+            MyFile.close();
 
             auto* encoding = CBLVectorEncoding_CreateNone();
             try
@@ -319,13 +322,13 @@ namespace vectorSearch_methods
 
     // Has to be used with lazyVector set to true
     void vectorSearch_updateQueryIndex(json& body, mg_connection* conn) {
+        ofstream MyFile("/root/ctestserver/gilad.txt");
+        MyFile << "Starting to update query index";
+        MyFile.close();
         const auto index = static_cast<CBLQueryIndex*>(memory_map::get(body["index"].get<string>()));
         const auto documentUpdateLimit = 5;
         CBLError err;
         CBLIndexUpdater* updater;
-        ofstream MyFile("/root/ctestserver/gilad.txt");
-        MyFile << "Starting query index";
-        MyFile.close();
         // The updater "knows" which files need to updated
         TRY(updater = CBLQueryIndex_BeginUpdate(index, documentUpdateLimit, &err), err);
         MyFile.open("gilad.txt", std::ios_base::app);
@@ -338,7 +341,15 @@ namespace vectorSearch_methods
             MyFile.close();
             const FLArray embeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
             if (embeddingVector) {
-
+                FLArrayIterator iter;
+                FLArrayIterator_Begin(embeddingVector, &iter);
+                FLValue value;
+                while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
+                    MyFile.open("gilad.txt", std::ios_base::app);
+                    MyFile << to_string(FLValue_AsString(value));
+                    MyFile.close();
+                    FLArrayIterator_Next(&iter);
+                }
                 auto floatEmbeddingVector =  vectorForWord(embeddingVector);
                 for(const int& i : floatEmbeddingVector) {
                     MyFile.open("gilad.txt", std::ios_base::app);
