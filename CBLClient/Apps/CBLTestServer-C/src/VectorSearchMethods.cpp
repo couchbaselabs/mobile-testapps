@@ -360,7 +360,7 @@ namespace vectorSearch_methods
             }
             else {
                 MyFile.open("gilad.txt", std::ios_base::app);
-                MyFile << "i has no embedded vector=" + i + "\n";
+                MyFile << "i has no embedded vector=" + to_string(i) + "\n";
                 MyFile.close();
                // TRY(CBLIndexUpdater_SkipVector(updater, i, &err), err);
             }
