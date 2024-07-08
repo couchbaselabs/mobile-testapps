@@ -336,7 +336,9 @@ namespace vectorSearch_methods
         MyFile.close();
         for (int i=0; i<CBLIndexUpdater_Count(updater); i++) {
             MyFile.open("gilad.txt", std::ios_base::app);
-            MyFile << to_string(FLValue_AsString(CBLIndexUpdater_Value(updater, i))) + "\n";
+            MyFile << "Inside loop: " + to_string(FLValue_AsString(CBLIndexUpdater_Value(updater, i))) + "\n";
+
+            // MyFile << to_string(FLValue_AsString(CBLIndexUpdater_Value(updater, i))) + "\n";
             MyFile.close();
             const FLArray embeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
             std::vector<float> floatEmbeddingVector =  vectorForWord(embeddingVector);
