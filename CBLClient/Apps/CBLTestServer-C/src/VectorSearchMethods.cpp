@@ -359,7 +359,10 @@ namespace vectorSearch_methods
                 TRY(CBLIndexUpdater_SetVector(updater, i, floatEmbeddingVector.data(), floatEmbeddingVector.size(), &err), err);
             }
             else {
-               TRY(CBLIndexUpdater_SkipVector(updater, i, &err), err);
+                MyFile.open("gilad.txt", std::ios_base::app);
+                MyFile << "i has no embedded vector=" + i + "\n";
+                MyFile.close();
+               // TRY(CBLIndexUpdater_SkipVector(updater, i, &err), err);
             }
          }
          TRY(CBLIndexUpdater_Finish(updater, &err), err);
