@@ -336,28 +336,31 @@ namespace vectorSearch_methods
         MyFile.close();
         for (int i=0; i<CBLIndexUpdater_Count(updater); i++) {
             MyFile.open("gilad.txt", std::ios_base::app);
-            MyFile << "Inside loop: " + to_string(FLValue_AsString(CBLIndexUpdater_Value(updater, i))) + "\n";
+            MyFile << to_string(FLValue_AsString(CBLIndexUpdater_Value(updater, i))) + "\n";
             // MyFile << to_string(FLValue_AsString(CBLIndexUpdater_Value(updater, i))) + "\n";
             MyFile.close();
             const FLArray embeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
-            FLArrayIterator iter;
-            FLArrayIterator_Begin(embeddingVector, &iter);
-            FLValue value;
-            while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-                MyFile.open("gilad.txt", std::ios_base::app);
-                MyFile << to_string(FLValue_AsString(value));
-                MyFile.close();
-                FLArrayIterator_Next(&iter);
+            if (embeddingVector) {
+                FLArrayIterator iter;
+                FLArrayIterator_Begin(embeddingVector, &iter);
+                FLValue value;
+                while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
+                    MyFile.open("gilad.txt", std::ios_base::app);
+                    MyFile << to_string(FLValue_AsString(value));
+                    MyFile.close();
+                    FLArrayIterator_Next(&iter);
+                }
+                auto floatEmbeddingVector =  vectorForWord(embeddingVector);
+                for(const int& i : floatEmbeddingVector) {
+                    MyFile.open("gilad.txt", std::ios_base::app);
+                    MyFile << to_string(floatEmbeddingVector[i]) << endl;
+                    MyFile.close();
+                }
+                TRY(CBLIndexUpdater_SetVector(updater, i, floatEmbeddingVector.data(), floatEmbeddingVector.size(), &err), err);
             }
-            auto floatEmbeddingVector =  vectorForWord(embeddingVector);
-             for(const int& i : floatEmbeddingVector) 
-                MyFile.open("gilad.txt", std::ios_base::app);
-                MyFile << to_string(floatEmbeddingVector[i]) << endl;
-                MyFile.close();
-            TRY(CBLIndexUpdater_SetVector(updater, i, floatEmbeddingVector.data(), floatEmbeddingVector.size(), &err), err);
-        }
-        TRY(CBLIndexUpdater_Finish(updater, &err), err);
-    }
+            TRY(CBLIndexUpdater_Finish(updater, &err), err);
+         }
 
+    }
 }
 #endif
