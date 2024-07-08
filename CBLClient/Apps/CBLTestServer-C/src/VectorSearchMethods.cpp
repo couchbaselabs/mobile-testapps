@@ -134,9 +134,6 @@ namespace vectorSearch_methods
             std::optional<CBLScalarQuantizerType> scalarEncoding;
             std::optional<bool> isLazy;
             CBLDistanceMetric dMetric;
-            ofstream MyFile("/root/ctestserver/gilad.txt");
-            MyFile << "Starting create index";
-            MyFile.close();
 
             auto* encoding = CBLVectorEncoding_CreateNone();
             try
@@ -326,6 +323,9 @@ namespace vectorSearch_methods
         const auto documentUpdateLimit = 5;
         CBLError err;
         CBLIndexUpdater* updater;
+        ofstream MyFile("/root/ctestserver/gilad.txt");
+        MyFile << "Starting query index";
+        MyFile.close();
         // The updater "knows" which files need to updated
         TRY(updater = CBLQueryIndex_BeginUpdate(index, documentUpdateLimit, &err), err);
         MyFile.open("gilad.txt", std::ios_base::app);
@@ -338,6 +338,7 @@ namespace vectorSearch_methods
             MyFile.close();
             const FLArray embeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
             if (embeddingVector) {
+
                 auto floatEmbeddingVector =  vectorForWord(embeddingVector);
                 for(const int& i : floatEmbeddingVector) {
                     MyFile.open("gilad.txt", std::ios_base::app);
