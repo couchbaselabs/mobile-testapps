@@ -341,8 +341,8 @@ namespace vectorSearch_methods
             // MyFile << to_string(FLValue_AsString(CBLIndexUpdater_Value(updater, i))) + "\n";
             MyFile.close();
             const FLArray embeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
-            std::vector<float> floatEmbeddingVector =  vectorForWord(embeddingVector);
-            TRY(CBLIndexUpdater_SetVector(updater, i, &floatEmbeddingVector[0], FLArray_Count(embeddingVector), &err), err);
+            auto floatEmbeddingVector =  vectorForWord(embeddingVector);
+            TRY(CBLIndexUpdater_SetVector(updater, i, floatEmbeddingVector.data(), floatEmbeddingVector.size(), &err), err);
         }
         TRY(CBLIndexUpdater_Finish(updater, &err), err);
     }
