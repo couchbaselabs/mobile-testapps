@@ -331,6 +331,9 @@ namespace vectorSearch_methods
         CBLIndexUpdater* updater;
         // The updater "knows" which files need to updated
         TRY(updater = CBLQueryIndex_BeginUpdate(index, documentUpdateLimit, &err), err);
+        MyFile.open("gilad.txt", std::ios_base::app);
+        MyFile << to_string(FLValue_IsInteger(CBLIndexUpdater_Count(updater))) + "\n";
+        MyFile.close();
         for (int i=0; i<CBLIndexUpdater_Count(updater); i++) {
             MyFile.open("gilad.txt", std::ios_base::app);
             MyFile << to_string(FLValue_AsString(CBLIndexUpdater_Value(updater, i))) + "\n";
