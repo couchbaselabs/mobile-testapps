@@ -329,7 +329,7 @@ namespace vectorSearch_methods
         const auto documentUpdateLimit = 5;
         CBLError err;
         CBLIndexUpdater* updater;
-
+        // The updater "knows" which files need to updated
         TRY(updater = CBLQueryIndex_BeginUpdate(index, documentUpdateLimit, &err), err);
         for (int i=0; i<CBLIndexUpdater_Count(updater); i++) {
             const FLArray embeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
@@ -344,6 +344,9 @@ namespace vectorSearch_methods
          TRY(CBLIndexUpdater_Finish(updater, &err), err);
          CBLIndexUpdater_Release(updater);
          CBLQueryIndex_Release(index);
+         MyFile.open("gilad.txt", std::ios_base::app);
+         MyFile << "At the end\n";
+         MyFile.close();
     }
 }
 #endif
