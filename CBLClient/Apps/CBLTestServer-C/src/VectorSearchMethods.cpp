@@ -359,7 +359,7 @@ namespace vectorSearch_methods
                 TRY(CBLIndexUpdater_SetVector(updater, i, floatEmbeddingVector.data(), floatEmbeddingVector.size(), &err), err);
             }
             else {
-               CBLIndexUpdater_SkipVector(updater, i);
+               TRY(CBLIndexUpdater_SkipVector(updater, i, &err), err);
             }
          }
          TRY(CBLIndexUpdater_Finish(updater, &err), err);
