@@ -357,7 +357,7 @@ namespace vectorSearch_methods
             }
          }
          MyFile.open("gilad.txt", std::ios_base::app);
-         MyFile << "Before finish" + "\n";
+         MyFile << "Before finish\n";
          MyFile.close();
          TRY(CBLIndexUpdater_Finish(updater, &err), err);
 
