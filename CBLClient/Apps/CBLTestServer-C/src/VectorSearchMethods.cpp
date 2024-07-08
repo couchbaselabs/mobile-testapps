@@ -325,7 +325,7 @@ namespace vectorSearch_methods
         ofstream MyFile("/root/ctestserver/gilad.txt");
         MyFile << "Starting to update query index";
         const auto index = static_cast<CBLQueryIndex*>(memory_map::get(body["index"].get<string>()));
-        MyFile << "\ndimensions:" + to_string(index.dimensions);
+        MyFile << "\ndimensions:" + to_string(index->dimensions);
         MyFile.close();
         const auto documentUpdateLimit = 5;
         CBLError err;
