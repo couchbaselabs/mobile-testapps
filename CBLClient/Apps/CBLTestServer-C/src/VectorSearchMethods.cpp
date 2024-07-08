@@ -341,11 +341,11 @@ namespace vectorSearch_methods
             MyFile.close();
             const FLArray embeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
             FLArrayIterator iter;
-            FLArrayIterator_Begin(myArray, &iter);
+            FLArrayIterator_Begin(embeddingVector, &iter);
             FLValue value;
             while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
                 MyFile.open("gilad.txt", std::ios_base::app);
-                MyFile << FLValue_AsString(value);
+                MyFile << to_string(FLValue_AsString(value));
                 MyFile.close();
                 FLArrayIterator_Next(&iter);
             }
