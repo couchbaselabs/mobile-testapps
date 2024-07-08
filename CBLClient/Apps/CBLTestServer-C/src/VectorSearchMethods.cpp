@@ -322,11 +322,7 @@ namespace vectorSearch_methods
 
     // Has to be used with lazyVector set to true
     void vectorSearch_updateQueryIndex(json& body, mg_connection* conn) {
-        ofstream MyFile("/root/ctestserver/gilad.txt");
-        MyFile << "Starting to update query index";
         const auto index = static_cast<CBLQueryIndex*>(memory_map::get(body["index"].get<string>()));
-        MyFile << "\ndimensions:" + to_string(index->dimensions);
-        MyFile.close();
         const auto documentUpdateLimit = 5;
         CBLError err;
         CBLIndexUpdater* updater;
@@ -342,15 +338,6 @@ namespace vectorSearch_methods
             MyFile.close();
             const FLArray embeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
             if (embeddingVector) {
-                FLArrayIterator iter;
-                FLArrayIterator_Begin(embeddingVector, &iter);
-                FLValue value;
-                while (NULL != (value = FLArrayIterator_GetValue(&iter))) {
-                    MyFile.open("gilad.txt", std::ios_base::app);
-                    MyFile << to_string(FLValue_AsString(value));
-                    MyFile.close();
-                    FLArrayIterator_Next(&iter);
-                }
                 auto floatEmbeddingVector =  vectorForWord(embeddingVector);
                 for(const int& i : floatEmbeddingVector) {
                     MyFile.open("gilad.txt", std::ios_base::app);
