@@ -58,7 +58,7 @@ static void CBLDatabase_EntryDelete(void* ptr) {
 }
 
 // Converts FLArray to float*
-vector<float> vectorForWord(FLArray embeddingVector) {
+vector<float> FLArrayToFloatVector(FLArray embeddingVector) {
         vector<float> embeddingFloatArray {};
         FLArrayIterator iter;
         FLArrayIterator_Begin(embeddingVector, &iter);
@@ -331,28 +331,13 @@ namespace vectorSearch_methods
         CBLIndexUpdater* updater;
         // The updater "knows" which files need to updated
         TRY(updater = CBLQueryIndex_BeginUpdate(index, documentUpdateLimit, &err), err);
-        MyFile.open("gilad.txt", std::ios_base::app);
-        MyFile << to_string(CBLIndexUpdater_Count(updater)) + "\n";
-        MyFile.close();
         for (int i=0; i<CBLIndexUpdater_Count(updater); i++) {
-            MyFile.open("gilad.txt", std::ios_base::app);
-            MyFile << to_string(FLValue_AsString(CBLIndexUpdater_Value(updater, i))) + "\n";
-            // MyFile << to_string(FLValue_AsString(CBLIndexUpdater_Value(updater, i))) + "\n";
-            MyFile.close();
             const FLArray embeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
             if (embeddingVector) {
-                auto floatEmbeddingVector =  vectorForWord(embeddingVector);
-                for(const int& i : floatEmbeddingVector) {
-                    MyFile.open("gilad.txt", std::ios_base::app);
-                    MyFile << to_string(floatEmbeddingVector[i]) << endl;
-                    MyFile.close();
-                }
+                auto floatEmbeddingVector =  FLArrayToFloatVector(embeddingVector);
                 TRY(CBLIndexUpdater_SetVector(updater, i, floatEmbeddingVector.data(), floatEmbeddingVector.size(), &err), err);
             }
             else {
-                MyFile.open("gilad.txt", std::ios_base::app);
-                MyFile << "i has no embedded vector=" + to_string(i) + "\n";
-                MyFile.close();
                // TRY(CBLIndexUpdater_SkipVector(updater, i, &err), err);
             }
          }
@@ -360,6 +345,9 @@ namespace vectorSearch_methods
          MyFile << "Before finish\n";
          MyFile.close();
          TRY(CBLIndexUpdater_Finish(updater, &err), err);
+         MyFile.open("gilad.txt", std::ios_base::app);
+         MyFile << "After finish\n";
+         MyFile.close();
 
     }
 }
