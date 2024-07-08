@@ -344,9 +344,7 @@ namespace vectorSearch_methods
          TRY(CBLIndexUpdater_Finish(updater, &err), err);
          CBLIndexUpdater_Release(updater);
          CBLQueryIndex_Release(index);
-         MyFile.open("gilad.txt", std::ios_base::app);
-         MyFile << "At the end\n";
-         MyFile.close();
+         write_empty_body(conn);
     }
 }
 #endif
