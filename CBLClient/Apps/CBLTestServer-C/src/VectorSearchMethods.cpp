@@ -20,7 +20,6 @@ using namespace fleece;
 static FLMutableDict wordMap;
 const string InMemoryDbName = "vsTestDatabase";
 ofstream MyFile("/root/ctestserver/gilad.txt");
-MyFile.close();
 
 
 FLMutableDict getPrediction(FLDict input, string key) {
