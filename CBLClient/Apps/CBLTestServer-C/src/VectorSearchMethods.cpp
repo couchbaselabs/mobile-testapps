@@ -333,6 +333,9 @@ namespace vectorSearch_methods
         TRY(updater = CBLQueryIndex_BeginUpdate(index, documentUpdateLimit, &err), err);
         for (int i=0; i<CBLIndexUpdater_Count(updater); i++) {
             const FLArray embeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
+            outfile.open("test.txt", std::ios_base::app);
+            MyFile << to_string(FLValue_AsString(CBLIndexUpdater_Value(updater, i))) + "\n";
+            MyFile.close();
             if (embeddingVector) {
                 auto floatEmbeddingVector =  FLArrayToFloatVector(embeddingVector);
                 TRY(CBLIndexUpdater_SetVector(updater, i, floatEmbeddingVector.data(), floatEmbeddingVector.size(), &err), err);
