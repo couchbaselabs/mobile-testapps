@@ -322,7 +322,7 @@ namespace vectorSearch_methods
 
     // Has to be used with lazyVector set to true
     void vectorSearch_updateQueryIndex(json& body, mg_connection* conn) {
-        auto loopNumber = auto getEmbeddingDict(body["loopNumber"].get<string>());
+        auto loopNumber = body["loopNumber"].get<string>();
         ofstream MyFile("/root/ctestserver/gilad.txt");
         MyFile << "Loop number: "  + loopNumber + "\n";
         MyFile.close();
