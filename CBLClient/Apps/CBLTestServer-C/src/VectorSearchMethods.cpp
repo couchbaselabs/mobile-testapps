@@ -330,6 +330,9 @@ namespace vectorSearch_methods
         CBLError err;
         CBLIndexUpdater* updater;
         // The updater "knows" which files need to updated
+        MyFile.open("test.txt", std::ios_base::app);
+        MyFile <<  "Before updater\n";
+        MyFile.close();
         TRY(updater = CBLQueryIndex_BeginUpdate(index, documentUpdateLimit, &err), err);
         for (int i=0; i<CBLIndexUpdater_Count(updater); i++) {
             const FLArray embeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
