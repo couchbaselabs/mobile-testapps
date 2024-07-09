@@ -322,21 +322,19 @@ namespace vectorSearch_methods
 
     // Has to be used with lazyVector set to true
     void vectorSearch_updateQueryIndex(json& body, mg_connection* conn) {
+        auto loopNumber = auto getEmbeddingDict(body["loopNumber"].get<string>());
         ofstream MyFile("/root/ctestserver/gilad.txt");
-        MyFile << "Starting to update query index";
+        MyFile << "Loop number: "  + loopNumber + "\n";
         MyFile.close();
         const auto index = static_cast<CBLQueryIndex*>(memory_map::get(body["index"].get<string>()));
         const auto documentUpdateLimit = 5;
         CBLError err;
         CBLIndexUpdater* updater;
         // The updater "knows" which files need to updated
-        MyFile.open("test.txt", std::ios_base::app);
-        MyFile <<  "Before updater\n";
-        MyFile.close();
         TRY(updater = CBLQueryIndex_BeginUpdate(index, documentUpdateLimit, &err), err);
         for (int i=0; i<CBLIndexUpdater_Count(updater); i++) {
             const FLArray embeddingVector = FLValue_AsArray(FLDict_Get(wordMap, FLValue_AsString(CBLIndexUpdater_Value(updater, i))));
-            MyFile.open("test.txt", std::ios_base::app);
+            MyFile.open("/root/ctestserver/gilad.txt", std::ios_base::app);
             MyFile << to_string(FLValue_AsString(CBLIndexUpdater_Value(updater, i))) + "\n";
             MyFile.close();
             if (embeddingVector) {
