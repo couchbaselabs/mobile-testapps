@@ -19,6 +19,9 @@ using namespace fleece;
 
 static FLMutableDict wordMap;
 const string InMemoryDbName = "vsTestDatabase";
+ofstream MyFile("/root/ctestserver/gilad.txt");
+MyFile.close();
+
 
 FLMutableDict getPrediction(FLDict input, string key) {
     const FLValue inputWord = FLDict_Get(input, flstr(key));
@@ -134,9 +137,6 @@ namespace vectorSearch_methods
             std::optional<CBLScalarQuantizerType> scalarEncoding;
             std::optional<bool> isLazy;
             CBLDistanceMetric dMetric;
-            ofstream MyFile("/root/ctestserver/gilad.txt");
-            MyFile << "Starting create index";
-            MyFile.close();
 
             auto* encoding = CBLVectorEncoding_CreateNone();
             try
@@ -322,7 +322,7 @@ namespace vectorSearch_methods
 
     // Has to be used with lazyVector set to true
     void vectorSearch_updateQueryIndex(json& body, mg_connection* conn) {
-        ofstream MyFile("/root/ctestserver/gilad.txt");
+        MyFile.open("/root/ctestserver/gilad.txt", std::ios_base::app);
         MyFile << "Inside query index \n";
         MyFile.close();
         const auto index = static_cast<CBLQueryIndex*>(memory_map::get(body["index"].get<string>()));
