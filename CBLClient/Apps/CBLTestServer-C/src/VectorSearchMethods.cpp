@@ -322,12 +322,10 @@ namespace vectorSearch_methods
 
     // Has to be used with lazyVector set to true
     void vectorSearch_updateQueryIndex(json& body, mg_connection* conn) {
-        auto loopNumber = body["loopNumber"].get<string>();
         ofstream MyFile("/root/ctestserver/gilad.txt");
-        MyFile << "Loop number: "  + loopNumber + "\n";
         MyFile.close();
         const auto index = static_cast<CBLQueryIndex*>(memory_map::get(body["index"].get<string>()));
-        const auto documentUpdateLimit = 5;
+        const auto documentUpdateLimit = body["loopNumber"].get<string>();
         CBLError err;
         CBLIndexUpdater* updater;
         // The updater "knows" which files need to updated
