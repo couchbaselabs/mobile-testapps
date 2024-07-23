@@ -112,9 +112,9 @@ public class VectorSearchRequestHandler {
         if (maxTrainingSize != null) {
             config.setMaxTrainingSize(maxTrainingSize);
         }
-        if (isLazy != null) {
+    /*    if (isLazy != null) {
             config.isLazy = isLazy;
-        }
+        }*/
         try {
             collection.createIndex(indexName, config);
             return String.format("Created index with name %s on collection %s", indexName, collectionName);
@@ -123,12 +123,12 @@ public class VectorSearchRequestHandler {
         }
     }
 
-    public String updateIndex(Args args) {
+   /*  public String updateIndex(Args args) {
         String collection = args.get("collection");
         String indexName = args.get("indexName");
         QueryIndex config = new QueryIndex(collection, indexName);
         return "Temp dummy return";
-    }
+    }*/
 
     public String registerModel(Args args) {
         String key = args.get("key");
