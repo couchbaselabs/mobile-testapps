@@ -95,7 +95,7 @@ public class VectorSearchRequestHandler {
         if (metric != null) {
             switch (metric) {
                 case "euclidean":
-                    config.setMetric(VectorIndexConfiguration.DistanceMetric.EUCLIDEAN2);
+                    config.setMetric(VectorIndexConfiguration.DistanceMetric.EUCLIDIAN);
                     break;
                 case "cosine":
                     config.setMetric(VectorIndexConfiguration.DistanceMetric.COSINE);
