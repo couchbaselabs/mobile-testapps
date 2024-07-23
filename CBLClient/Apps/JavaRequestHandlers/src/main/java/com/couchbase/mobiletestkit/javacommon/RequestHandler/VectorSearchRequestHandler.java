@@ -4,6 +4,7 @@ import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -95,7 +96,7 @@ public class VectorSearchRequestHandler {
         if (metric != null) {
             switch (metric) {
                 case "euclidean":
-                    config.setMetric(VectorIndexConfiguration.DistanceMetric.L2);
+                    config.setMetric(VectorIndexConfiguration.DistanceMetric.EUCLIDEAN);
                     break;
                 case "cosine":
                     config.setMetric(VectorIndexConfiguration.DistanceMetric.COSINE);
