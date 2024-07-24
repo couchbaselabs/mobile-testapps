@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import com.couchbase.mobiletestkit.javacommon.*;
 import com.couchbase.lite.*;
 import com.couchbase.lite.internal.utils.FileUtils;
@@ -95,7 +94,7 @@ public class VectorSearchRequestHandler {
         if (metric != null) {
             switch (metric) {
                 case "euclidean":
-                    config.setMetric(VectorIndexConfiguration.DistanceMetric.EUCLIDIAN);
+                    config.setMetric(VectorIndexConfiguration.DistanceMetric.EUCLIDEAN);
                     break;
                 case "cosine":
                     config.setMetric(VectorIndexConfiguration.DistanceMetric.COSINE);
