@@ -54,7 +54,7 @@ public class TestServerMain implements Daemon {
 
             testserverLauncherInstance.initCouchbaseLite();
             testserverLauncherInstance.startServer(true);
-            CouchbaseLite.enableVectorSearc();
+            CouchbaseLite.enableVectorSearch();
 
         }
         else {
