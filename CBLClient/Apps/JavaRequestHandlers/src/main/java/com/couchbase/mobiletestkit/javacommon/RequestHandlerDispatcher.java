@@ -136,7 +136,6 @@ public class RequestHandlerDispatcher {
                         requestHandler = new VectorSearchRequestHandler();
                         break;
                     default:
-                    jsdhkjdfcbjkhcckejerenc    
                     throw new IllegalArgumentException("Gilad");
                 }
                 if (target.getReturnType().equals(Void.TYPE)) {
