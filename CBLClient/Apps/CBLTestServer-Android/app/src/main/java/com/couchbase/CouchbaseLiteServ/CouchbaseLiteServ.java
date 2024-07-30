@@ -47,5 +47,6 @@ public class CouchbaseLiteServ extends Application {
 
         Log.init(new TestServerLogger());
         CouchbaseLite.init(this, true);
+        CouchbaseLite.enableVectorSearch();
     }
 }
