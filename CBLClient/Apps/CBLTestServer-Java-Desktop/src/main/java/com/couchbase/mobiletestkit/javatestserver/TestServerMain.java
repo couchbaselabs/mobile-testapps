@@ -8,6 +8,8 @@ import com.couchbase.mobiletestkit.javacommon.Context;
 import com.couchbase.mobiletestkit.javalistener.Server;
 import com.couchbase.mobiletestkit.javacommon.util.Log;
 import com.couchbase.lite.CouchbaseLite;
+import com.couchbase.lite.CouchbaseLiteException;
+
 import org.nanohttpd.protocols.http.NanoHTTPD;
 
 import java.io.File;
@@ -27,7 +29,7 @@ public class TestServerMain implements Daemon {
      * @param args
      * @throws IOException
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, CouchbaseLiteException {
         if (testserverLauncherInstance == null) {
             testserverLauncherInstance = new TestServerMain();
         }
@@ -45,7 +47,7 @@ public class TestServerMain implements Daemon {
      *
      * @param args Arguments from prunsrv command line
      **/
-    public static void windowsService(String args[]) {
+    public static void windowsService(String args[]) throws CouchbaseLiteException {
         final String cmd = (args.length <= 0) ? "start" : args[0];
         if ("start".equals(cmd)) {
             if (testserverLauncherInstance == null) {
@@ -54,8 +56,6 @@ public class TestServerMain implements Daemon {
 
             testserverLauncherInstance.initCouchbaseLite();
             testserverLauncherInstance.startServer(true);
-            CouchbaseLite.enableVectorSearch();
-
         }
         else {
             try {
@@ -128,14 +128,15 @@ public class TestServerMain implements Daemon {
         notifyAll();
     }
 
-    private void initCouchbaseLite(){
+    private void initCouchbaseLite() throws CouchbaseLiteException {
         Log.init(new TestServerLogger());
         CouchbaseLite.init();
+        CouchbaseLite.enableVectorSearch();
         Log.i(TAG, "CouchbaseLite is initialized.");
     }
 
     @Override
-    public void init(DaemonContext dc) throws DaemonInitException, Exception {
+    public void init(DaemonContext dc) throws DaemonInitException, Exception, CouchbaseLiteException {
         // Log object is not initialized yet, call System.out here
         System.out.println("system.out TestServer service init is called.");
         initCouchbaseLite();
