@@ -23,6 +23,7 @@ import com.couchbase.lite.CouchbaseLite;
 
 
 public class CouchbaseLiteServ extends Application {
+    private static final String TAG = "CouchbaesLiteServ";
     private static Context appContext;
     private static TestServerContext testServerContext;
 
@@ -39,7 +40,7 @@ public class CouchbaseLiteServ extends Application {
     }
 
     @Override
-    public void onCreate() throws CouchbaseLiteException {
+    public void onCreate() {
         super.onCreate();
 
         setContext(this);
@@ -47,6 +48,11 @@ public class CouchbaseLiteServ extends Application {
 
         Log.init(new TestServerLogger());
         CouchbaseLite.init(this, true);
-        CouchbaseLite.enableVectorSearch();
+        try {
+            CouchbaseLite.enableVectorSearch();
+        }
+        catch (Exception e) {
+            Log.i(TAG, "Warning: vector search was not loaded, the vector serach tests are expected to fail");
+        }
     }
 }
