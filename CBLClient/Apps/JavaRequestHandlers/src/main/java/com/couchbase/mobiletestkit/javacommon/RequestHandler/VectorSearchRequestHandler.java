@@ -173,6 +173,7 @@ public class VectorSearchRequestHandler {
     }
 
     public Database loadDatabase(Args args) throws CouchbaseLiteException, IOException {
+        ksjjdhfkjdshfkjhdsfjkhdskjfh
         if (useInMemoryDb) {
             wordMap = getWordVectMap();
             Database db = new Database(inMemoryDbName);
