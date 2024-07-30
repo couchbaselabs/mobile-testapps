@@ -39,7 +39,7 @@ public class CouchbaseLiteServ extends Application {
     }
 
     @Override
-    public void onCreate() {
+    public void onCreate() throws CouchbaseLiteException {
         super.onCreate();
 
         setContext(this);

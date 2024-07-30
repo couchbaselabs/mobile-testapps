@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     private static Context context;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) throws CouchbaseLiteException {
         super.onCreate(savedInstanceState);
 
         context = CouchbaseLiteServ.getTestServerContext();
