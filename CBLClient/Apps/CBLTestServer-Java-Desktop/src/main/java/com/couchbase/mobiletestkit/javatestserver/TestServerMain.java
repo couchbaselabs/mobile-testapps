@@ -54,6 +54,8 @@ public class TestServerMain implements Daemon {
 
             testserverLauncherInstance.initCouchbaseLite();
             testserverLauncherInstance.startServer(true);
+            CouchbaseLite.enableVectorSearc();
+
         }
         else {
             try {
@@ -129,7 +131,6 @@ public class TestServerMain implements Daemon {
     private void initCouchbaseLite(){
         Log.init(new TestServerLogger());
         CouchbaseLite.init();
-        CouchbaseLite.enableVectorSearch();
         Log.i(TAG, "CouchbaseLite is initialized.");
     }
 
