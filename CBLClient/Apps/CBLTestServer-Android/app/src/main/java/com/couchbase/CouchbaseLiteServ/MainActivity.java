@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
         context = CouchbaseLiteServ.getTestServerContext();
         String ip = context.getLocalIpAddress();
-
+        CouchbaseLite.enableVectorSearch();
         setContentView(R.layout.activity_main);
         TextView textView = findViewById(R.id.textView);
         textView.setText(getString(R.string.server_running, ip, PORT));
