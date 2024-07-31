@@ -371,6 +371,7 @@ public class DatabaseRequestHandler {
         String dbFileName = new File(dbPath).getName();
         dbFileName = dbFileName.substring(0, dbFileName.lastIndexOf("."));
         Context context = RequestHandlerDispatcher.context;
+        // The zip utility erorrs when unziping the archive, as a workaround we copy the files to the location
         String filesFolder = context.getFilesDir().getAbsolutePath() + "/vsTestDatabase.cblite2";
         InputStream dbsqlite = context.getAsset("vsTestDatabase.cblite2/db.sqlite3");
         InputStream dbsqliteshm = context.getAsset("vsTestDatabase.cblite2/db.sqlite3-shm");
