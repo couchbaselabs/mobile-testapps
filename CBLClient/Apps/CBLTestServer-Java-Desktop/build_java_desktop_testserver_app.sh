@@ -39,7 +39,7 @@ export PATH=$PATH:$JAVA_HOME
 echo ./gradlew clean -Dversion=${MAVEN_UPLOAD_VERSION} assemble
 ./gradlew clean -Dversion=${MAVEN_UPLOAD_VERSION} assemble
 if [$? -ne 0]; then
-    exit(1)
+    exit 1
 fi
 
 cp "./build/libs/CBLTestServer-Java-Desktop-${MAVEN_UPLOAD_VERSION}-${EDITION}.jar" "CBLTestServer-Java-Desktop-${MAVEN_UPLOAD_VERSION}-${EDITION}.jar"
