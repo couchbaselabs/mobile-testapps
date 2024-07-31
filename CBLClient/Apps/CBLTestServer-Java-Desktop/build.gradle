@@ -7,15 +7,15 @@ group 'com.couchbase.mobiletestkit'
 ext {
     DEF_VERSION = '3.0.0-38'
     COUCHBASE_LITE_JAVA_VERSION = System.getProperty('version', DEF_VERSION)
-    VECTOR_SEARCH_VERSION = System.getenv('VECTOR_SEARCH_VERSION')
+    VECTOR_SEARCH_JAVA_VERSION = System.getenv('VECTOR_SEARCH_VERSION')
 
     JAVA_COMMON_DIR = "${projectDir}/../JavaRequestHandlers"
     ASSET_DIR = "${JAVA_COMMON_DIR}/src/main/assets"
     JAVA_SERVER_DIR = "${projectDir}/../JavaRequestListener"
 }
 
-println "BUILDING TEST SERVER WITH CBL VERSION ${COUCHBASE_LITE_VERSION}"
-println "BUILDING TEST SERVER WITH VS VERSION ${VECTOR_SEARCH_VERSION}"
+println "BUILDING TEST SERVER WITH CBL VERSION ${COUCHBASE_LITE_JAVA_VERSION}"
+println "BUILDING TEST SERVER WITH VS VERSION ${VECTOR_SEARCH_JAVA_VERSION}"
 
 sourceCompatibility = 1.8
 
@@ -63,7 +63,7 @@ dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 
     implementation "com.couchbase.lite:couchbase-lite-java-ee:${COUCHBASE_LITE_JAVA_VERSION}"
-    implementation "com.couchbase.lite:couchbase-lite-java-vector-search:${VECTOR_SEARCH_VERSION}"
+    implementation "com.couchbase.lite:couchbase-lite-java-vector-search:${VECTOR_SEARCH_JAVA_VERSION}"
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'org.nanohttpd:nanohttpd:2.3.2-SNAPSHOT'
 }
