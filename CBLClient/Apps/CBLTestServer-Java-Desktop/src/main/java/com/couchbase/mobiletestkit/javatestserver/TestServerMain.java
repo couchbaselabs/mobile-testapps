@@ -29,7 +29,7 @@ public class TestServerMain implements Daemon {
      * @param args
      * @throws IOException
      */
-    public static void main(String[] args) throws IOException, CouchbaseLiteException {
+    public static void main(String[] args) throws IOException {
         if (testserverLauncherInstance == null) {
             testserverLauncherInstance = new TestServerMain();
         }
@@ -47,7 +47,7 @@ public class TestServerMain implements Daemon {
      *
      * @param args Arguments from prunsrv command line
      **/
-    public static void windowsService(String args[]) throws CouchbaseLiteException {
+    public static void windowsService(String args[]) {
         final String cmd = (args.length <= 0) ? "start" : args[0];
         if ("start".equals(cmd)) {
             if (testserverLauncherInstance == null) {
@@ -128,15 +128,20 @@ public class TestServerMain implements Daemon {
         notifyAll();
     }
 
-    private void initCouchbaseLite() throws CouchbaseLiteException {
+    private void initCouchbaseLite() {
         Log.init(new TestServerLogger());
         CouchbaseLite.init();
-        CouchbaseLite.enableVectorSearch();
+        try {
+            CouchbaseLite.enableVectorSearch();
+        }
+        catch (CouchbaseLiteException e) {
+            Log.i(TAG, "Warning: vector search was not loaded, the vector serach tests are expected to fail");
+        }
         Log.i(TAG, "CouchbaseLite is initialized.");
     }
 
     @Override
-    public void init(DaemonContext dc) throws DaemonInitException, Exception, CouchbaseLiteException {
+    public void init(DaemonContext dc) throws DaemonInitException, Exception {
         // Log object is not initialized yet, call System.out here
         System.out.println("system.out TestServer service init is called.");
         initCouchbaseLite();

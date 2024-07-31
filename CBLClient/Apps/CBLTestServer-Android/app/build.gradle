@@ -69,7 +69,6 @@ android {
         debug {
             debuggable true
             packagingOptions.jniLibs.useLegacyPackaging = true
-            packagingOptions.jniLibs.useLegacyPackaging = true
         }
         customDebuggableBuildType {
             debuggable true
@@ -79,7 +78,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
-            packagingOptions.jniLibs.useLegacyPackaging = true
             packagingOptions.jniLibs.useLegacyPackaging = true
         }
     }
