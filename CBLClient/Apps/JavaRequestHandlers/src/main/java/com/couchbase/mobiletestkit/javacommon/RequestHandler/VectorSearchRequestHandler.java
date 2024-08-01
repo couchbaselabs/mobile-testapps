@@ -113,7 +113,7 @@ public class VectorSearchRequestHandler {
         }
 
         if (isLazy != null) {
-            config.setIsLazy(isLazy);
+            config.setLazy(isLazy);
         }
 
         try {
