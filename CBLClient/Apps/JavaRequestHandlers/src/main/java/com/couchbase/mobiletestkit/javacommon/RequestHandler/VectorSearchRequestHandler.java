@@ -4,6 +4,7 @@ import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -124,10 +125,10 @@ public class VectorSearchRequestHandler {
         }
     }
 
-    public String updateIndex(Args args) {
-        String collection = args.get("collection");
-        String indexName = args.get("indexName");
-        QueryIndex config = new QueryIndex(collection, indexName);
+    public String updateQueryIndex(Args args) {
+        Integer documentUpdateLimit = Integer.parseInt(args.get("loopNumber"));
+        QueryIndex index = args.get("indexName");
+        index.BeginUpdate(documentUpdateLimit);
         return "Temp dummy return";
     }
 
