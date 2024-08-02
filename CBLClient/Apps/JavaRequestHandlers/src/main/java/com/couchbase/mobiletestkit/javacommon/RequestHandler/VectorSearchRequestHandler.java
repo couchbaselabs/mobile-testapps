@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Arrays;
+
 import com.couchbase.mobiletestkit.javacommon.*;
 import com.couchbase.lite.*;
 import com.couchbase.lite.internal.utils.FileUtils;
@@ -132,10 +133,9 @@ public class VectorSearchRequestHandler {
         for (int i=0;  i < updater.count(); i++) {
             String word = updater.getString(i);
             if (wordMap.containsKey(word)) {
-                //Object result = new ArrayList<Float>();
-                Object result = new ArrayList<>();
-                result = wordMap.get(word);
-                List<Float> embeddingsVector = result.asList<Float>;
+                Object resultObj = wordMap.get(word);
+                float[] array = (float []) resultObj;
+                List<Float> embeddingsVector = new ArrayList<Float>(array.length);
                 updater.setVector(embeddingsVector, i);
             }
             else {
