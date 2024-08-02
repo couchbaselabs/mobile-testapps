@@ -138,7 +138,7 @@ public class VectorSearchRequestHandler {
                 updater.skipVector(i);
             }
         }
-        udpater.finish();
+        updater.finish();
         return "Temp dummy return";
     }
 
