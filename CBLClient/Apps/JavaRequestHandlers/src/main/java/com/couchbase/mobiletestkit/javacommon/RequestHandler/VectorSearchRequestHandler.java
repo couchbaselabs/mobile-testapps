@@ -132,7 +132,8 @@ public class VectorSearchRequestHandler {
         for (int i=0;  i < updater.count(); i++) {
             String word = updater.getString(i);
             if (wordMap.containsKey(word)) {
-                updater.setVector(List<Float>(Arrays.asList(wordMap.get(word), i)));
+                List<Float> embeddingsVector = Arrays.asList(wordMap.get(word));
+                updater.setVector(embeddingsVector, i);
             }
             else {
                 updater.skipVector(i);
