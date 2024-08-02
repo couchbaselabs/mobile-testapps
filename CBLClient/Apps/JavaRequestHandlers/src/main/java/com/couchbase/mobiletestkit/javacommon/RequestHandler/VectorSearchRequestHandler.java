@@ -128,9 +128,10 @@ public class VectorSearchRequestHandler {
         Integer documentUpdateLimit = Integer.parseInt(args.get("loopNumber"));
         QueryIndex index = args.get("indexName");
         IndexUpdater updater = index.beginUpdate(documentUpdateLimit);
-        for (Integer i : updater.count()) {
-            if (wordMap.containsKey(updater.value(i))) {
-                updater.setVector(wordMap.get(updater.value(i)), i);
+        for (int i=0;  i < updater.count(); i++) {
+            String word = updater.getString(i);
+            if (wordMap.containsKey(word)) {
+                updater.setVector(wordMap.get(word), i);
             }
             else {
                 updater.skipVector(i);
