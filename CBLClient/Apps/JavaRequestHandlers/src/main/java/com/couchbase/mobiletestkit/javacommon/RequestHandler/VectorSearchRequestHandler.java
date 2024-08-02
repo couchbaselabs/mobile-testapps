@@ -127,7 +127,7 @@ public class VectorSearchRequestHandler {
     public String updateQueryIndex(Args args) {
         Integer documentUpdateLimit = Integer.parseInt(args.get("loopNumber"));
         QueryIndex index = args.get("indexName");
-        index.BeginUpdate(documentUpdateLimit);
+        index.beginUpdate(documentUpdateLimit);
         return "Temp dummy return";
     }
 
