@@ -4,6 +4,7 @@ import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -124,7 +125,7 @@ public class VectorSearchRequestHandler {
         }
     }
 
-    public String updateQueryIndex(Args args) {
+    public String updateQueryIndex(Args args) throws CouchbaseLiteException {
         Integer documentUpdateLimit = Integer.parseInt(args.get("loopNumber"));
         QueryIndex index = args.get("indexName");
         index.beginUpdate(documentUpdateLimit);
