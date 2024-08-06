@@ -131,7 +131,7 @@ public class VectorSearchRequestHandler {
         QueryIndex index = args.get("indexName");
         IndexUpdater updater = index.beginUpdate(documentUpdateLimit);
         for (int updaterIndex=0;  updaterIndex < updater.count(); updaterIndex++) {
-            String word = updater.getString(i);
+            String word = updater.getString(updaterIndex);
             if (wordMap.containsKey(word)) {
                 Array embeddingsObj = wordMap.get(word);
                 List<Float> embeddingsVector = new ArrayList<Float>(embeddingsObj.count());
