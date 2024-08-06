@@ -242,6 +242,12 @@ public class CollectionRequestHandler {
         return;
     }
 
+    public void getIndex(Args args) throws CouchbaseLiteException {
+        Collection collection = args.get("collection");
+        String name = args.get("name");
+        return collection.getIndex(name);
+    }
+
     public void deleteIndex(Args args) throws CouchbaseLiteException {
         Collection collection = args.get("collection");
         String name = args.get("name");
