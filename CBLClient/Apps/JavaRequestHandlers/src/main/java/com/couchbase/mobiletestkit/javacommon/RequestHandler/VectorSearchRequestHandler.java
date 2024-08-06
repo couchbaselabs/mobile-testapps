@@ -130,18 +130,18 @@ public class VectorSearchRequestHandler {
         Integer documentUpdateLimit = Integer.parseInt(args.get("loopNumber"));
         QueryIndex index = args.get("indexName");
         IndexUpdater updater = index.beginUpdate(documentUpdateLimit);
-        for (int i=0;  i < updater.count(); i++) {
+        for (int updaterIndex=0;  updaterIndex < updater.count(); updaterIndex++) {
             String word = updater.getString(i);
             if (wordMap.containsKey(word)) {
                 Array embeddingsObj = wordMap.get(word);
                 List<Float> embeddingsVector = new ArrayList<Float>(embeddingsObj.count());
-                for (i=0; i< embeddingsObj.count(); i++) {
+                for (int i=0; i< embeddingsObj.count(); i++) {
                     embeddingsVector.add(embeddingsObj.getFloat(i));
                 }
-                updater.setVector(embeddingsVector, i);
+                updater.setVector(embeddingsVector, updaterIndex);
             }
             else {
-                updater.skipVector(i);
+                updater.skipVector(updaterIndex);
             }
         }
         updater.finish();
