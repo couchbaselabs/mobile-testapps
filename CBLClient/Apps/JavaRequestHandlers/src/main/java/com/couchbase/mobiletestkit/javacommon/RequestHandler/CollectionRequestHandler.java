@@ -246,7 +246,7 @@ public class CollectionRequestHandler {
 
     public QueryIndex getIndex(Args args) throws CouchbaseLiteException {
         Collection collection = args.get("collection");
-        String name = args.get("name");
+        String name = args.get("indexName");
         return collection.getIndex(name);
     }
 
