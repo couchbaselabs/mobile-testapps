@@ -22,7 +22,7 @@ import com.couchbase.lite.Result;
 import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.Scope;
 import com.couchbase.lite.SelectResult;
-import com.couchbase.lite.ValueIndex;
+import com.couchbase.lite.QueryIndex;
 import com.couchbase.lite.ValueIndexConfiguration;
 import com.couchbase.mobiletestkit.javacommon.Args;
 import com.couchbase.lite.Collection;
@@ -244,7 +244,7 @@ public class CollectionRequestHandler {
         return;
     }
 
-    public ValueIndex getIndex(Args args) throws CouchbaseLiteException {
+    public QueryIndex getIndex(Args args) throws CouchbaseLiteException {
         Collection collection = args.get("collection");
         String name = args.get("name");
         return collection.getIndex(name);
