@@ -12,6 +12,7 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Expression;
+import com.couchbase.lite.Index;
 import com.couchbase.lite.IndexConfiguration;
 import com.couchbase.lite.Limit;
 import com.couchbase.lite.Meta;
@@ -242,7 +243,7 @@ public class CollectionRequestHandler {
         return;
     }
 
-    public void getIndex(Args args) throws CouchbaseLiteException {
+    public ValueIndex getIndex(Args args) throws CouchbaseLiteException {
         Collection collection = args.get("collection");
         String name = args.get("name");
         return collection.getIndex(name);
