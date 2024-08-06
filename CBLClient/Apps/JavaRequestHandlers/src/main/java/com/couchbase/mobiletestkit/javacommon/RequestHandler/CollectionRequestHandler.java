@@ -22,6 +22,7 @@ import com.couchbase.lite.Result;
 import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.Scope;
 import com.couchbase.lite.SelectResult;
+import com.couchbase.lite.ValueIndex;
 import com.couchbase.lite.ValueIndexConfiguration;
 import com.couchbase.mobiletestkit.javacommon.Args;
 import com.couchbase.lite.Collection;
