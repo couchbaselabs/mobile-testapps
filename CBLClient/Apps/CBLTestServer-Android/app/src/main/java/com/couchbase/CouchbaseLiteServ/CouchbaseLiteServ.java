@@ -48,11 +48,11 @@ public class CouchbaseLiteServ extends Application {
 
         Log.init(new TestServerLogger());
         CouchbaseLite.init(this, true);
-        try {
-            CouchbaseLite.enableVectorSearch();
-        }
-        catch (Exception e) {
-            Log.i(TAG, "Warning: vector search was not loaded, the vector serach tests are expected to fail");
-        }
+        //try {
+        //    CouchbaseLite.enableVectorSearch();
+       // }
+        //catch (Exception e) {
+        //    Log.i(TAG, "Warning: vector search was not loaded, the vector serach tests are expected to fail");
+        //}
     }
 }
