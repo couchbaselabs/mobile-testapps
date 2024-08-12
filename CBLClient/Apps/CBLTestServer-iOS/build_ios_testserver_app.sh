@@ -42,7 +42,7 @@ else
 fi
 
 popd
-
+exit 1
 # Build CBLTestServer-iOS
 
 TESTSERVER_APP=CBLTestServer-iOS.app
