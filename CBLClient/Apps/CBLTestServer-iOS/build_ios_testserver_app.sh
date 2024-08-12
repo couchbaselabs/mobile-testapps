@@ -27,12 +27,20 @@ pushd ${FRAMEWORK_DIR}
 pwd
 echo ${WORKSPACE}
 IOS_ZIP=${WORKSPACE}/artifacts/couchbase-lite-swift_xc_${EDITION}_${VERSION}-${BLD_NUM}.zip
+VECTOR_SEARCH_ZIP=${WORKSPACE}/artifacts/couchbase-lite-vector-search_xcframework_1.0.0-58.zip
 if [[ -f ${IOS_ZIP} ]]; then
     unzip ${IOS_ZIP}
 else
     echo "Required file ${IOS_ZIP} not found!"
     exit 1
 fi
+if [[ -f ${VECTOR_SEARCH_ZIP} ]]; then
+    unzip ${VECTOR_SEARCH_ZIP}
+else
+    echo "Required file ${VECTOR_SEARCH_ZIP} not found!"
+    exit 1
+fi
+
 popd
 
 # Build CBLTestServer-iOS
