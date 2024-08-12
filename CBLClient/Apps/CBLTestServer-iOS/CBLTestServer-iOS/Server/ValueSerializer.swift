@@ -1,248 +1,179 @@
 //
-//  Server.swift
+//  ValueSerializer.swift
 //  CBLTestServer-iOS
 //
-//  Created by Raghu Sarangapani on 10/24/17.
+//  Created by Raghu Sarangapani on 10/30/17.
 //  Copyright © 2017 Raghu Sarangapani. All rights reserved.
 //
 
 import Foundation
 import CouchbaseLiteSwift
 
-enum ServerError: Error {
-    case MethodNotImplemented(String)
-}
+public class ValueSerializer {
 
-enum RequestHandlerError: Error {
-    case MethodNotFound(String)
-    case InvalidArgument(String)
-    case IOException(String)
-    case VectorPredictionError(String)
-}
-
-enum ValueSerializerError: Error {
-    case SerializerError(String)
-    case DeSerializerError(String)
-}
-
-public class Server {
-    let kPort:UInt = 8080
-    let server: GCDWebServer!
-    let dictionaryRequestHandler: DictionaryRequestHandler!
-    let queryRequestHandler: QueryRequestHandler!
-    let databaseRequestHandler: DatabaseRequestHandler!
-    let documentRequestHandler: DocumentRequestHandler!
-    let replicatorRequestHandler: ReplicatorRequestHandler!
-    let collectionRequestHandler: CollectionRequestHandler!
-    let scopeRequestHandler: ScopeRequestHandler!
-    let arrayRequestHandler: ArrayRequestHandler!
-    let sessionauthenticatorRequestHandler: SessionAuthenticatorRequestHandler!
-    let encryptionkeyRequestHandler: EncryptionKeyRequestHandler!
-    let blobRequestHandler: BlobRequestHandler!
-    let datatypeRequestHandler: DataTypesInitiatorRequestHandler!
-    let replicatorConfigurationRequestHandler: ReplicatorConfigurationRequestHandler!
-    let expressionRequestHandler: ExpressionRequestHandler!
-    let collationRequestHandler: CollationRequestHandler!
-    let dataSourceRequestHandler: DataSourceRequestHandler!
-    let functionRequestHandler: FunctionRequestHandler!
-    let selectResultRequestHandler: SelectResultRequestHandler!
-    let resultRequestHandler: ResultRequestHandler!
-    let basicAuthenticatorRequestHandler: BasicAuthenticatorRequestHandler!
-    let databaseConfigurationRequestHandler: DatabaseConfigurationRequestHandler!
-    let peerToPeerRequestHandler: PeerToPeerRequestHandler!
-    let listenerAuthenticatorRequestHandler: ListenerAuthenticatorRequestHandler!
-    let predictiveQueryRequestHandler: PredictiveQueriesRequestHandler!
-    let fileLoggingRequestHandler: FileLoggingRequestHandler!
-    let vectorSearchRequestHandler: VectorSearchRequestHandler!
-    let memory = Memory()
-    
-    public init() {
-        Database.log.console.level = .debug
-        dictionaryRequestHandler = DictionaryRequestHandler()
-        queryRequestHandler = QueryRequestHandler()
-        databaseRequestHandler = DatabaseRequestHandler()
-        documentRequestHandler = DocumentRequestHandler()
-        replicatorRequestHandler = ReplicatorRequestHandler()
-        arrayRequestHandler = ArrayRequestHandler()
-        sessionauthenticatorRequestHandler = SessionAuthenticatorRequestHandler()
-        encryptionkeyRequestHandler = EncryptionKeyRequestHandler()
-        blobRequestHandler = BlobRequestHandler()
-        datatypeRequestHandler = DataTypesInitiatorRequestHandler()
-        replicatorConfigurationRequestHandler = ReplicatorConfigurationRequestHandler()
-        expressionRequestHandler = ExpressionRequestHandler()
-        collationRequestHandler = CollationRequestHandler()
-        dataSourceRequestHandler = DataSourceRequestHandler()
-        collectionRequestHandler = CollectionRequestHandler()
-        scopeRequestHandler = ScopeRequestHandler()
-        functionRequestHandler = FunctionRequestHandler()
-        selectResultRequestHandler = SelectResultRequestHandler()
-        resultRequestHandler = ResultRequestHandler()
-        basicAuthenticatorRequestHandler = BasicAuthenticatorRequestHandler()
-        databaseConfigurationRequestHandler = DatabaseConfigurationRequestHandler()
-        peerToPeerRequestHandler = PeerToPeerRequestHandler()
-        listenerAuthenticatorRequestHandler = ListenerAuthenticatorRequestHandler()
-        predictiveQueryRequestHandler = PredictiveQueriesRequestHandler()
-        fileLoggingRequestHandler = FileLoggingRequestHandler()
-        vectorSearchRequestHandler = VectorSearchRequestHandler()
-        server = GCDWebServer()
-        Database.log.console.level = LogLevel.verbose
+    public static func serialize(value: Any?, memory: Memory) throws -> Any {
+        guard let v = value else {
+            return "null"
+        }
         
-        @Sendable func handlePostRequest (request: GCDWebServerRequest, completion: @escaping GCDWebServerCompletionBlock) async throws {
-            var rawArgs = [String: Any]()
+        if ((v as? NSNull) != nil) {
+            return "null"
+        } else if (v is String) {
+            let string = v as! String
+            return "\"" + string + "\""
+        }  else if (v is Bool) {
+            let bool = v as! Bool
+            return (bool ? "true" : "false")
+        } else if (v is Int){
+            let number = v as! Int
+            return "I" + String(number)
+            // Swift does not have a Long type
+        } else if (v is Double){
+            let number = v as! Double
+            return "D" + String(number)
+        } else if (v is Float){
+            let number = v as! Float
+            return "F" + String(number)
+        } else if (v is NSNumber){
+            let number = v as! NSNumber
+            return "#" + "\(number)"
+        } else if (v is Dictionary<String, Any>) {
+            let map = v as! Dictionary<String, Any>
+            var stringMap = [String: Any]()
             
-            var method = ""
-            
-            if request.path.hasPrefix("/") {
-                let start = request.path.index(request.path.startIndex, offsetBy: 1)
-                method = request.path.substring(from: start)
-            } else {
-                method = request.path
+            for (key, val) in map {
+                let stringVal = try serialize(value: val, memory: memory)
+                stringMap[key] = stringVal
             }
             
             do {
-                let args = Args()
-                var queryParams = request.query
-                let r = request as! GCDWebServerDataRequest
-
-                if queryParams?.count == 0 {
-                    queryParams = r.jsonObject as? Dictionary<String, AnyObject>
-                }
-
-                if let queryParams = queryParams {
-                    // Get args from query params
-                    for param in queryParams {
-                        rawArgs[param.key as! String] = param.value
-
-                        if let value = try ValueSerializer.deserialize(value:(param.value as? String), memory: self.memory) as Any? {
-                            // Handle nil value
-                            args.set(value: value, forName: param.key as! String)
-                        } else {
-                            args.set(value: "", forName: param.key as! String)
-                        }
-                    }
-                }
-
-                // Find and invoke the method on the RequestHandler.
-                var body: Any? = nil
-                var result: Any? = nil
-                if "release" == method {
-                    self.memory.remove(address: rawArgs["object"] as! String)
-                } else if "flushMemory" == method {
-                    self.memory.flushMemory()
-                } else if method == "copy_files" {
-                    result = self.memory.CopyFiles(args: args)
-                    body = try ValueSerializer.serialize(value: result, memory: self.memory);
-                } else{
-                    if method.hasPrefix("query") {
-                        result = try self.queryRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("databaseConfiguration") {
-                        result = try self.databaseConfigurationRequestHandler.handleRequest(method: method, args: args)
-                    }else if method.hasPrefix("database") {
-                        result = try self.databaseRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("collection") {
-                        result = try self.collectionRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("scope") {
-                        result = try self.scopeRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("document") {
-                        result = try self.documentRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("dictionary") {
-                        result = try self.dictionaryRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("array") {
-                        result = try self.arrayRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("sessionAuthenticator") {
-                        result = try self.sessionauthenticatorRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("encryptionkey") {
-                        result = try self.encryptionkeyRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("blob") {
-                        result = try self.blobRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("datatype") {
-                        result = try self.datatypeRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("replicatorConfiguration") {
-                        result = try self.replicatorConfigurationRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("replicator") {
-                        result = try self.replicatorRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("expression") {
-                        result = try self.expressionRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("collation") {
-                        result = try self.collationRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("dataSource") {
-                        result = try self.dataSourceRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("function") {
-                        result = try self.functionRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("selectResult") {
-                        result = try self.selectResultRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("result") {
-                        result = try self.resultRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("basicAuthenticator") {
-                        result = try self.basicAuthenticatorRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("peerToPeer") {
-                            result = try self.peerToPeerRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("listenerAuthenticator") {
-                            result = try self.listenerAuthenticatorRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("predictiveQuery") {
-                            result = try self.predictiveQueryRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("logging") {
-                        result = try self.fileLoggingRequestHandler.handleRequest(method: method, args: args)
-                    } else if method.hasPrefix("vectorSearch") {
-                        let taskMethod = method
-                        let taskResult = Task {
-                            try await self.vectorSearchRequestHandler.handleRequest(method: taskMethod, args: args)
-                        }
-                        result = try await taskResult.value
-                    } else {
-                        throw ServerError.MethodNotImplemented(method)
-                    }
-                    if result != nil {
-                        body = try ValueSerializer.serialize(value: result, memory: self.memory);
-                    }
-                }
-
-                if body != nil {
-                    if body is RawData {
-                        guard let dataObj = body as? RawData else {
-                            fatalError("type should be a raw data")
-                        }
-                        completion(GCDWebServerDataResponse(data: dataObj.data, contentType: dataObj.contentType))
-                    } else {
-                        completion(GCDWebServerDataResponse(text: body as! String))
-                    }
+                let data = try JSONSerialization.data(withJSONObject: stringMap, options: [])
+                let json = String.init(data: data, encoding: .utf8) as Any
+                return json
+            } catch {
+                throw ValueSerializerError.SerializerError("Error converting Dict to json")
+            }
+        } else if (v is Array<Any>) {
+            let list = v as! Array<Any>
+            var stringList = [String]()
+            
+            for object in list {
+                let stringVal: String = try serialize(value: object, memory: memory) as! String
+                stringList.append(stringVal)
+            }
+            
+            do {
+                let data = try JSONSerialization.data(withJSONObject: stringList, options: [])
+                return String.init(data: data, encoding: .utf8) as Any
+            } catch {
+                throw ValueSerializerError.SerializerError("Error converting Array to json")
+            }
+        }
+        else if (v is RawData) {
+            return v
+        }
+        else {
+            return memory.add(value: value!)
+        }
+    }
+    
+    public static func deserialize<T>(value: String?, memory: Memory) throws -> T? {
+        if value == nil || value == "null" {
+            return nil
+        } else if (value!.hasPrefix("@")) {
+            return memory.get(address:value!)
+        } else if (value!.hasPrefix("\"") && value!.hasSuffix("\"")) {
+            let start = value!.index(value!.startIndex, offsetBy: 1)
+            let end = value!.index(value!.endIndex, offsetBy: -1)
+            let range = start..<end
+            return value!.substring(with: range) as? T
+        } else if value!.hasPrefix("I") {
+            let start = value!.index(value!.startIndex, offsetBy: 1)
+            let end = value!.index(value!.endIndex, offsetBy: 0)
+            let range = start..<end
+            return Int(value!.substring(with: range)) as? T
+            
+        } else if value!.hasPrefix("F") {
+            let start = value!.index(value!.startIndex, offsetBy: 1)
+            let end = value!.index(value!.endIndex, offsetBy: 0)
+            let range = start..<end
+            return Double(value!.substring(with: range)) as? T
+           
+        } else if value!.hasPrefix("D") {
+            let start = value!.index(value!.startIndex, offsetBy: 1)
+            let end = value!.index(value!.endIndex, offsetBy: 0)
+            let range = start..<end
+            return Double(value!.substring(with: range)) as? T
+        } else if value!.hasPrefix("L") {
+            let start = value!.index(value!.startIndex, offsetBy: 1)
+            let end = value!.index(value!.endIndex, offsetBy: 0)
+            let range = start..<end
+            return Int64(value!.substring(with: range)) as? T
+        } else if value!.hasPrefix("#") {
+                if (value?.range(of:".")) != nil {
+                    return Double(value!) as? T
                 } else {
-                    // Send 200 code and close
-                    completion(GCDWebServerDataResponse(text: "I-1"))
+                    return Int(value!) as? T
                 }
-            } catch let error as RequestHandlerError {
-                var reason = "Unknown Request Handler Error"
-                switch error {
-                case .InvalidArgument(let r):
-                    reason = r
-                case .IOException(let r):
-                    reason = r
-                case .MethodNotFound(let r):
-                    reason = r
-                default:
-                    break
-                }
-                let response = GCDWebServerDataResponse(text: reason)!
-                response.statusCode = 432
-                response.contentType = "text/plain"
-                completion(response)
-            } catch let error as NSError {
-                let response = GCDWebServerDataResponse(text: error.localizedDescription)!
-                completion(response)
+        } else if (value!.hasPrefix("S")) {
+            // for vector search scalar quantizer type
+            let start = value!.index(value!.startIndex, offsetBy: 0)
+            let end = value!.index(value!.endIndex, offsetBy: 0)
+            let quantizerType = value![start..<end]
+            switch quantizerType {
+            case "SQ4":
+                return ScalarQuantizerType.SQ4 as? T
+            
+            case "SQ6":
+                return ScalarQuantizerType.SQ6 as? T
+                
+            case "SQ8":
+                return ScalarQuantizerType.SQ8 as? T
+                
+            default:
+                throw ValueSerializerError.DeSerializerError("Invalid Scalar Quantizer option")
             }
-        }
-        
-        server.addDefaultHandler(forMethod: "POST", request: GCDWebServerDataRequest.self) {
-            (request, completion) in
-            Task {
-                do {
-                    try await handlePostRequest(request: request, completion: completion)
-                } catch {
-                    throw RequestHandlerError.IOException("Couldn't handle request")
+        } else if (value == "true") {
+            return true as? T
+        } else if (value == "false") {
+            return false as? T
+        } else if (value!.hasPrefix("{")) {
+            let data: Data = value!.data(using: String.Encoding.utf8)!
+            var stringMap = [String: Any]()
+            do {
+                stringMap = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers) as! Dictionary<String, Any>
+            } catch {
+                return nil
+            }
+            var map: Dictionary = [String: Any]()
+            
+            for map_param in stringMap {
+                let key = map_param.key
+                if let key_value = try deserialize(value: map_param.value as? String, memory: memory) as Any? {
+                     map[key] = key_value
+                }
+                else{
+                    map[key] = NSNull()
                 }
             }
-
+            return map as? T
+        } else if (value!.hasPrefix("[")) {
+            let data: Data = value!.data(using: String.Encoding.utf8)!
+            var stringList = [String]()
+            do {
+                stringList = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers) as! [String]
+            } catch {
+                return nil
+            }
+            var list = [Any]()
+            
+            for string in stringList {
+                 let object: Any? = try deserialize(value: string, memory: memory)
+                 list.append(object ?? NSNull.init())
+            }
+            return list as? T
+        } else {
+            throw ValueSerializerError.DeSerializerError("Invalid value type \(String(describing: value))")
         }
-        server.start(withPort: kPort, bonjourName: nil)
     }
 }
