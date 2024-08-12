@@ -55,7 +55,6 @@
 		6917C7BA232C30EE00D99DA6 /* RawData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6917C7B9232C30EE00D99DA6 /* RawData.swift */; };
 		73015D9C2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73015D9B2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework */; };
 		73015D9D2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 73015D9B2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		73015DA02B84E9830062E7F4 /* float32_model.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 73015D9F2B84E9830062E7F4 /* float32_model.mlpackage */; };
 		73015DA12B85193E0062E7F4 /* Files in Resources */ = {isa = PBXBuildFile; fileRef = 2E8631EE229F2C8C00859424 /* Files */; };
 		737CB8912B7BA26E00BF0A32 /* VectorSearchRequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737CB8902B7BA26E00BF0A32 /* VectorSearchRequestHandler.swift */; };
 		737CB8942B7F8A5200BF0A32 /* Transformers in Frameworks */ = {isa = PBXBuildFile; productRef = 737CB8932B7F8A5200BF0A32 /* Transformers */; };
@@ -190,7 +189,6 @@
 		4DE0E3212501F24D00DEBA87 /* identity */ = {isa = PBXFileReference; lastKnownFileType = folder; path = identity; sourceTree = "<group>"; };
 		6917C7B9232C30EE00D99DA6 /* RawData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawData.swift; sourceTree = "<group>"; };
 		73015D9B2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = CouchbaseLiteVectorSearch.xcframework; path = ../../../../artifacts/CouchbaseLiteVectorSearch.xcframework; sourceTree = "<group>"; };
-		73015D9F2B84E9830062E7F4 /* float32_model.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; name = float32_model.mlpackage; path = "../../../../../artifacts/gte-small/coreml/feature-extraction/float32_model.mlpackage"; sourceTree = "<group>"; };
 		737CB8902B7BA26E00BF0A32 /* VectorSearchRequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VectorSearchRequestHandler.swift; sourceTree = "<group>"; };
 		7494704A25C4DEAF00355244 /* CouchbaseLiteSwift.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = CouchbaseLiteSwift.xcframework; path = Frameworks/CouchbaseLiteSwift.xcframework; sourceTree = "<group>"; };
 		A38237BA28E19AF3007F14ED /* CollectionRequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionRequestHandler.swift; sourceTree = "<group>"; };
@@ -322,7 +320,6 @@
 				4D9BFA2525EEE6F6008CAB78 /* sg_cert.cer */,
 				29F77F2F1F9FC18D0035178F /* LaunchScreen.storyboard */,
 				29F77F2A1F9FC18D0035178F /* Main.storyboard */,
-				73015D9F2B84E9830062E7F4 /* float32_model.mlpackage */,
 			);
 			path = "CBLTestServer-iOS";
 			sourceTree = "<group>";
@@ -592,7 +589,6 @@
 				FB60EBD421069D5A005052B6 /* PeerToPeerRequestHandler.swift in Sources */,
 				294FB2081FEAF51F00DD0C23 /* QueryRequestHandler.swift in Sources */,
 				6917C7BA232C30EE00D99DA6 /* RawData.swift in Sources */,
-				73015DA02B84E9830062E7F4 /* float32_model.mlpackage in Sources */,
 				FB5A86762017E672008127FC /* DatabaseConfigurationRequestHandler.swift in Sources */,
 				2907D176200E860A00CE56EB /* BasicAuthenticatorRequestHandler.swift in Sources */,
 				29F77F271F9FC18D0035178F /* AppDelegate.swift in Sources */,
