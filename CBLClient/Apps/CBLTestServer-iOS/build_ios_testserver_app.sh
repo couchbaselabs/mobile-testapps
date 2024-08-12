@@ -35,7 +35,7 @@ else
     exit 1
 fi
 if [[ -f ${VECTOR_SEARCH_ZIP} ]]; then
-    unzip ${VECTOR_SEARCH_ZIP}
+    unzip -o ${VECTOR_SEARCH_ZIP}
 else
     echo "Required file ${VECTOR_SEARCH_ZIP} not found!"
     exit 1
