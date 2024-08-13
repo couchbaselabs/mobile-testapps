@@ -21,6 +21,7 @@ import com.couchbase.mobiletestkit.javacommon.Args;
 import com.couchbase.mobiletestkit.javacommon.RequestHandlerDispatcher;
 import com.couchbase.mobiletestkit.javacommon.util.Log;
 import com.couchbase.lite.Authenticator;
+import com.couchbase.lite.ProxyAuthenticator;
 import com.couchbase.lite.Conflict;
 import com.couchbase.lite.ConflictResolver;
 import com.couchbase.lite.Database;
@@ -523,6 +524,12 @@ public class ReplicatorConfigurationRequestHandler {
         ReplicatorConfiguration replicatorConfiguration = args.get("configuration");
         Boolean auto_purge = args.get("auto_purge");
         replicatorConfiguration.setAutoPurgeEnabled(auto_purge);
+    }
+
+    public ReplicatorConfiguration setProxyAuthenticator(Args args) {
+        ReplicatorConfiguration replicatorConfiguration = args.get("configuration");
+        ProxyAuthenticator proxyAuth = args.get("authenticator");
+        return replicatorConfiguration.setProxyAuthenticator(proxyAuth);
     }
 
     private byte[] getPinnedCertFile() {

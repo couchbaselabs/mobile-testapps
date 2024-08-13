@@ -135,6 +135,10 @@ public class RequestHandlerDispatcher {
                         target = VectorSearchRequestHandler.class.getMethod(method, Args.class);
                         requestHandler = new VectorSearchRequestHandler();
                         break;
+                    case "proxyAuthenticator":
+                        target = ProxyAuthenticatorRequestHandler.class.getMethod(method, Args.class);
+                        requestHandler = new ProxyAuthenticatorRequestHandler();
+                        break;
                     default:
                         throw new IllegalArgumentException("Handler not implemented for this call");
                 }
