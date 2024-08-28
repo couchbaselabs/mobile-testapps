@@ -37,6 +37,7 @@ repositories {
     mavenCentral()
     maven {
         url 'http://proget.build.couchbase.com/maven2/internalmaven/'
+        allowInsecureProtocol = true
         // Release repo
         // url 'https://mobile.maven.couchbase.com/maven2/dev/'
     }
