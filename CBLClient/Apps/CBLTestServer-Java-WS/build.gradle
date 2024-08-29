@@ -23,6 +23,7 @@ repositories {
     mavenCentral()
     maven {
         url "http://proget.build.couchbase.com/maven2/internalmaven/"
+        allowInsecureProtocol = true
     }
 }
 
@@ -65,4 +66,3 @@ buildscript {
         classpath 'com.bmuschko:gradle-tomcat-plugin:2.5'
     }
 }
-
