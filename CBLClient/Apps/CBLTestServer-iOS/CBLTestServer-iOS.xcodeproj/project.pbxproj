@@ -102,6 +102,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				73015D9F2B84E9830062E7F4 /* float32_model.mlpackage */,
 				73015D9D2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework in Embed Frameworks */,
 				7494704F25C4DEB600355244 /* CouchbaseLiteSwift.xcframework in Embed Frameworks */,
 			);
@@ -189,6 +190,7 @@
 		4D9BFA2525EEE6F6008CAB78 /* sg_cert.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = sg_cert.cer; sourceTree = "<group>"; };
 		4DE0E3212501F24D00DEBA87 /* identity */ = {isa = PBXFileReference; lastKnownFileType = folder; path = identity; sourceTree = "<group>"; };
 		6917C7B9232C30EE00D99DA6 /* RawData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawData.swift; sourceTree = "<group>"; };
+		73015D9F2B84E9830062E7F4 /* float32_model.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; name = float32_model.mlpackage; path = "../../../../../artifacts/gte-small/latestbuilds.service.couchbase.com/buildteam/miror/huggingface/gte-small/coreml/feature-extraction/float32_model.mlpackage"; sourceTree = "<group>"; };
 		73015D9B2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = CouchbaseLiteVectorSearch.xcframework; path = Frameworks/CouchbaseLiteVectorSearch.xcframework; sourceTree = "<group>"; };
 		737CB8902B7BA26E00BF0A32 /* VectorSearchRequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VectorSearchRequestHandler.swift; sourceTree = "<group>"; };
 		7494704A25C4DEAF00355244 /* CouchbaseLiteSwift.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = CouchbaseLiteSwift.xcframework; path = Frameworks/CouchbaseLiteSwift.xcframework; sourceTree = "<group>"; };
@@ -214,6 +216,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				73015D9F2B84E9830062E7F4 /* float32_model.mlpackage */,
 				73015D9C2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework in Frameworks */,
 				4D8175C625CB71CC0020B14B /* Zip in Frameworks */,
 				7494704E25C4DEB600355244 /* CouchbaseLiteSwift.xcframework in Frameworks */,
@@ -414,7 +417,7 @@
 		29F7869E1F9FC4850035178F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				3015D9E2B84E94B0062E7F4 /* float32_model.mlpackage */,
+				73015D9E2B84E94B0062E7F4 /* float32_model.mlpackage */,
 				73015D9B2B84E93D0062E7F4 /* CouchbaseLiteVectorSearch.xcframework */,
 				7494704A25C4DEAF00355244 /* CouchbaseLiteSwift.xcframework */,
 			);
