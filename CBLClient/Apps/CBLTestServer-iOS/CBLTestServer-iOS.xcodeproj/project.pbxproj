@@ -185,7 +185,7 @@
 		29F7868F1F9FC4180035178F /* GCDWebServerStreamedResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDWebServerStreamedResponse.h; sourceTree = "<group>"; };
 		29F786901F9FC4180035178F /* GCDWebServerStreamedResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDWebServerStreamedResponse.m; sourceTree = "<group>"; };
 		2E8631EE229F2C8C00859424 /* Files */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Files; sourceTree = SOURCE_ROOT; };
-		338674F32C8772670057D97F /* float32_model.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; name = float32_model.mlpackage; path = "../../../../../gte-small/latestbuilds.service.couchbase.com/buildteam/miror/huggingface/gte-small/coreml/feature-extraction/float32_model.mlpackage"; sourceTree = "<group>"; };
+		338674F32C8772670057D97F /* float32_model.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; name = float32_model.mlpackage; path = "../../../../latestbuilds.service.couchbase.com/buildteam/miror/huggingface/gte-small/coreml/feature-extraction/float32_model.mlpackage"; sourceTree = "<group>"; };
 		4D7993E4250ED4B4004CDBA6 /* ListenerAuthenticatorRequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListenerAuthenticatorRequestHandler.swift; sourceTree = "<group>"; };
 		4D9BFA2525EEE6F6008CAB78 /* sg_cert.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = sg_cert.cer; sourceTree = "<group>"; };
 		4DE0E3212501F24D00DEBA87 /* identity */ = {isa = PBXFileReference; lastKnownFileType = folder; path = identity; sourceTree = "<group>"; };
