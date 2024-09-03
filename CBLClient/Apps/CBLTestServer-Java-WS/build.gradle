@@ -6,10 +6,13 @@ sourceCompatibility = 1.8
 
 ext {
     COUCHBASE_LITE_JAVA_VERSION = System.getProperty('version', "3.0.0-38")
-
+    VECTOR_SEARCH_JAVA_VERSION = System.getenv('VECTOR_SEARCH_VERSION')
     JAVA_COMMON_DIR = "${projectDir}/../JavaRequestHandlers"
     ASSET_DIR = "${JAVA_COMMON_DIR}/src/main/assets"
 }
+
+println "BUILDING TEST SERVER WITH CBL VERSION ${COUCHBASE_LITE_JAVA_VERSION}"
+println "BUILDING TEST SERVER WITH VS VERSION ${VECTOR_SEARCH_JAVA_VERSION}"
 
 war {
     archiveBaseName = "CBLTestServer-Java"
@@ -39,6 +42,7 @@ sourceSets {
 
 dependencies {
     providedCompile "com.couchbase.lite:couchbase-lite-java-ee:${COUCHBASE_LITE_JAVA_VERSION}"
+    implementation "com.couchbase.lite:couchbase-lite-java-vector-search:${VECTOR_SEARCH_JAVA_VERSION}"
     implementation 'com.google.code.gson:gson:2.8.5'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
     providedCompile "javax.servlet:javax.servlet-api:4.0.1"
@@ -49,7 +53,8 @@ dependencies {
     tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
             "org.apache.tomcat.embed:tomcat-embed-logging-juli:9.0.0.M6",
             "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}",
-            "com.couchbase.lite:couchbase-lite-java-ee:${COUCHBASE_LITE_JAVA_VERSION}"
+            "com.couchbase.lite:couchbase-lite-java-ee:${COUCHBASE_LITE_JAVA_VERSION}",
+            "com.couchbase.lite:couchbase-lite-java-vector-search:${VECTOR_SEARCH_JAVA_VERSION}"
 }
 
 tomcat {
