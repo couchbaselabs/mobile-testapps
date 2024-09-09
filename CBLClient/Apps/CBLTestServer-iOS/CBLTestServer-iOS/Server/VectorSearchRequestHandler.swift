@@ -213,7 +213,7 @@ func readConfig(name: String) throws -> Config? {
         do {
             let data = try Data(contentsOf: url, options: .mappedIfSafe)
             let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
-            if let jsonDict = jsonResult as? [String: Any] {
+            if let jsonDict = jsonResult as? [NSString: Any] {
                 return Config(jsonDict)
             }
         } catch {
