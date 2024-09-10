@@ -242,7 +242,12 @@ public class Server {
                 }
             }
         }
-        try Extension.enableVectorSearch()
+        do {
+            try Extension.enableVectorSearch()
+        }
+        catch {
+            print("The vetor search extension was not loaded")
+        }
         server.start(withPort: kPort, bonjourName: nil)
     }
 }
