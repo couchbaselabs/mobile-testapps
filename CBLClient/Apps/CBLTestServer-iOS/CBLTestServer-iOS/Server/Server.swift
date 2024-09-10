@@ -53,7 +53,9 @@ public class Server {
     let listenerAuthenticatorRequestHandler: ListenerAuthenticatorRequestHandler!
     let predictiveQueryRequestHandler: PredictiveQueriesRequestHandler!
     let fileLoggingRequestHandler: FileLoggingRequestHandler!
+    #if COUCHBASE_ENTERPRISE
     let vectorSearchRequestHandler: VectorSearchRequestHandler!
+    #endif
     let memory = Memory()
     
     public init() {
@@ -83,7 +85,9 @@ public class Server {
         listenerAuthenticatorRequestHandler = ListenerAuthenticatorRequestHandler()
         predictiveQueryRequestHandler = PredictiveQueriesRequestHandler()
         fileLoggingRequestHandler = FileLoggingRequestHandler()
+        #if COUCHBASE_ENTERPRISE
         vectorSearchRequestHandler = VectorSearchRequestHandler()
+        #endif
         server = GCDWebServer()
         Database.log.console.level = LogLevel.verbose
         
