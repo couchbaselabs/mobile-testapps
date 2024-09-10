@@ -3,6 +3,7 @@ package com.couchbase.javaws;
 import com.couchbase.mobiletestkit.javacommon.*;
 import com.couchbase.mobiletestkit.javacommon.util.Log;
 import com.couchbase.lite.CouchbaseLite;
+import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.LogDomain;
 import com.couchbase.lite.LogLevel;
@@ -28,6 +29,12 @@ public class TestServerWS extends HttpServlet {
     @Override
     public void init() throws ServletException {
         CouchbaseLite.init();
+         try {
+            CouchbaseLite.enableVectorSearch();
+        }
+        catch (CouchbaseLiteException e) {
+            Log.i(TAG, "Warning: vector search was not loaded, the vector serach tests are expected to fail");
+        }
         Database.log.getConsole().setLevel(LogLevel.DEBUG);
         Database.log.getConsole().setDomains(LogDomain.ALL_DOMAINS);
 
