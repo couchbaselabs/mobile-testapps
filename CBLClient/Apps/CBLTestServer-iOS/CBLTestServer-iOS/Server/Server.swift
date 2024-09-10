@@ -184,11 +184,14 @@ public class Server {
                     } else if method.hasPrefix("logging") {
                         result = try self.fileLoggingRequestHandler.handleRequest(method: method, args: args)
                     } else if method.hasPrefix("vectorSearch") {
+                        #if COUCHBASE_ENTERPRISE
                         let taskMethod = method
                         let taskResult = Task {
                             try await self.vectorSearchRequestHandler.handleRequest(method: taskMethod, args: args)
                         }
                         result = try await taskResult.value
+                        #endif
+                        throw ServerError.MethodNotImplemented(method)
                     } else {
                         throw ServerError.MethodNotImplemented(method)
                     }

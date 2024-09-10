@@ -11,7 +11,7 @@ import CouchbaseLiteSwift
 import CoreML
 import Tokenizers
 import Hub
-
+#if COUCHBASE_ENTERPRISE
 public class VectorSearchRequestHandler {
     public func handleRequest(method: String, args: Args) async throws -> Any? {
         switch method {
@@ -307,3 +307,4 @@ private extension VectorSearchRequestHandler {
         }
     }
 }
+#endif
