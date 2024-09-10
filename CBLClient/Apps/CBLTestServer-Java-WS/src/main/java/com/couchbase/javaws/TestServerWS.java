@@ -29,16 +29,16 @@ public class TestServerWS extends HttpServlet {
     @Override
     public void init() throws ServletException {
         CouchbaseLite.init();
-         try {
-            CouchbaseLite.enableVectorSearch();
-        }
-        catch (CouchbaseLiteException e) {
-            Log.e(TAG, "Warning: vector search was not loaded, the vector serach tests are expected to fail");
-        }
         Database.log.getConsole().setLevel(LogLevel.DEBUG);
         Database.log.getConsole().setDomains(LogDomain.ALL_DOMAINS);
 
         Log.init(new TestServerLogger());
+        try {
+            CouchbaseLite.enableVectorSearch();
+        }
+        catch (CouchbaseLiteException e) {
+            Log.i(TAG, "Warning: vector search was not loaded, the vector serach tests are expected to fail");
+        }
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
