@@ -116,6 +116,7 @@ public class ValueSerializer {
                     return Int(value!) as? T
                 }
         } else if (value!.hasPrefix("S")) {
+            #if COUCHBASE_ENTERPRISE
             // for vector search scalar quantizer type
             let start = value!.index(value!.startIndex, offsetBy: 0)
             let end = value!.index(value!.endIndex, offsetBy: 0)
@@ -132,6 +133,7 @@ public class ValueSerializer {
                 
             default:
                 throw ValueSerializerError.DeSerializerError("Invalid Scalar Quantizer option")
+            #endif
             }
         } else if (value == "true") {
             return true as? T
