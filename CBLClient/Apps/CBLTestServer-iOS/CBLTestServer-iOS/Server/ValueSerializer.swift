@@ -130,10 +130,9 @@ public class ValueSerializer {
                 
             case "SQ8":
                 return ScalarQuantizerType.SQ8 as? T
-                
+            #endif    
             default:
                 throw ValueSerializerError.DeSerializerError("Invalid Scalar Quantizer option")
-            #endif
             }
         } else if (value == "true") {
             return true as? T
