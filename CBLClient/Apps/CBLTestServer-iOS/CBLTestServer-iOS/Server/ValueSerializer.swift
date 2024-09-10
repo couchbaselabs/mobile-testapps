@@ -116,12 +116,12 @@ public class ValueSerializer {
                     return Int(value!) as? T
                 }
         } else if (value!.hasPrefix("S")) {
-            #if COUCHBASE_ENTERPRISE
             // for vector search scalar quantizer type
             let start = value!.index(value!.startIndex, offsetBy: 0)
             let end = value!.index(value!.endIndex, offsetBy: 0)
             let quantizerType = value![start..<end]
             switch quantizerType {
+            #if COUCHBASE_ENTERPRISE
             case "SQ4":
                 return ScalarQuantizerType.SQ4 as? T
             
