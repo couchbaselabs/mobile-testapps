@@ -242,7 +242,7 @@ public class Server {
                 }
             }
         }
-        enableVectorSearch()
+        Extension.enableVectorSearch()
         server.start(withPort: kPort, bonjourName: nil)
     }
 }
