@@ -245,12 +245,14 @@ public class Server {
                 }
             }
         }
+        #if COUCHBASE_ENTERPRISE
         do {
             try Extension.enableVectorSearch()
         }
         catch {
             print("The vetor search extension was not loaded")
         }
+        #endif
         server.start(withPort: kPort, bonjourName: nil)
     }
 }
