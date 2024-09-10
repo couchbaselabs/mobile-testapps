@@ -241,8 +241,8 @@ public class Server {
                     throw RequestHandlerError.IOException("Couldn't handle request")
                 }
             }
-
         }
+        enableVectorSearch()
         server.start(withPort: kPort, bonjourName: nil)
     }
 }
