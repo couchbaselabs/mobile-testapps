@@ -33,7 +33,7 @@ public class TestServerWS extends HttpServlet {
             CouchbaseLite.enableVectorSearch();
         }
         catch (CouchbaseLiteException e) {
-            Log.i(TAG, "Warning: vector search was not loaded, the vector serach tests are expected to fail");
+            Log.e(TAG, "Warning: vector search was not loaded, the vector serach tests are expected to fail");
         }
         Database.log.getConsole().setLevel(LogLevel.DEBUG);
         Database.log.getConsole().setDomains(LogDomain.ALL_DOMAINS);
