@@ -87,10 +87,10 @@ public class VectorSearchRequestHandler {
 
         // returns the embedding for input string
         case "vectorSearch_getEmbedding":
-            let model = vectorModel(key: "test")
+            let model = vectorModel(key: "word")
             let testDic = MutableDictionaryObject()
             guard let input: String = args.get(name: "input") else { throw RequestHandlerError.InvalidArgument("Invalid input for prediction")}
-            testDic.setValue(input, forKey: "test")
+            testDic.setValue(input, forKey: "word")
             let prediction = model.predict(input: testDic)
             let value = prediction?.array(forKey: "vector")
             if let value {
