@@ -79,7 +79,7 @@ android {
 repositories {
     // for build version < 3.0.0-160, use below maven url
     // maven { url "http://proget.build.couchbase.com/maven2/internalmaven" }
-    maven { url "http://mobile.nuget.couchbase.com/maven2/internalmaven/"}
+    maven { url "https://mobile.nuget.couchbase.com/maven2/internalmaven/"}
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     google()
     jcenter()
