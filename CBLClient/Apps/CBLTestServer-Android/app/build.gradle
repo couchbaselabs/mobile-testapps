@@ -79,8 +79,12 @@ android {
 repositories {
     // for build version < 3.0.0-160, use below maven url
     // maven { url "http://proget.build.couchbase.com/maven2/internalmaven" }
-    maven { url "https://mobile.nuget.couchbase.com/maven2/internalmaven/"}
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    // external maven
+    maven { url 'https://mobile.maven.couchbase.com/maven2/dev/' }
+    // internal maven
+    maven { url 'https://proget.sc.couchbase.com/maven2/internalmaven' }
+    // where nanohttpd lives
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     google()
     jcenter()
 }
