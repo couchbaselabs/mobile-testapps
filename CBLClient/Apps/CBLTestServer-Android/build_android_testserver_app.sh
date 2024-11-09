@@ -39,6 +39,9 @@ export MAVEN_UPLOAD_VERSION=${VERSION}-${BUILD_NUM}
 echo "Building version ${MAVEN_UPLOAD_VERSION}"
 
 export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
+./gradlew --stop
+./gradlew cleanBuildCache
+./gradlew wrapper --gradle-version 8.1
 
 # Build TestServer
 echo ./gradlew clean -Dversion=${MAVEN_UPLOAD_VERSION} assemble
