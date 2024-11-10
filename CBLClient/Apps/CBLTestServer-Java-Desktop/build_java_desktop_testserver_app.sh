@@ -29,7 +29,7 @@ if [ $FAIL -ne 0 ]; then
     echo "Exiting"
     exit $FAIL
 fi
-
+./gradlew --stop
 export MAVEN_UPLOAD_VERSION=${VERSION}-${BUILD_NUM}
 echo "Building version ${MAVEN_UPLOAD_VERSION}"
 
