@@ -17,6 +17,7 @@ SCRIPT_DIR=os.path.dirname(os.path.realpath(__file__))
 DOWNLOAD_DIR=f'{SCRIPT_DIR}/../downloaded'
 BUILD_DIR=f'{SCRIPT_DIR}/../build'
 ZIPS_DIR=f'{SCRIPT_DIR}/../zips'
+EXTENSIONS_DIR=f'{DOWNLOAD_DIR}/extensions'
 
 json_data={}
 def read_manifest():
