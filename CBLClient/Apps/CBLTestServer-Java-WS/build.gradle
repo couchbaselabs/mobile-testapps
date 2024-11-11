@@ -22,7 +22,8 @@ repositories {
     jcenter()
     mavenCentral()
     maven {
-        url "https://proget.build.couchbase.com/maven2/internalmaven/"
+        url "http://proget.build.couchbase.com/maven2/internalmaven/"
+        allowInsecureProtocol = true
     }
 }
 
