@@ -174,7 +174,7 @@ if __name__ == '__main__':
 
     base_download_url = f"https://packages.couchbase.com/releases/couchbase-lite-vector-search/{args.vs_version}"
     # vector_search_zip_name = f'couchbase-lite-vector-search-{args.vs_version}-{args.vs_bld_num}-linux-x86_64.zip'
-    vector_search_zip_name = f''
+    vector_search_zip_name = f'{base_zip_filename}-linux-x86_64.zip'
     # urllib.request.urlretrieve(f'https://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-vector-search/{args.vs_version}/{args.vs_bld_num}/{vector_search_zip_name}', vector_search_zip_name, show_download_progress)
     print(f'{base_download_url}/{base_zip_filename}-linux-x86_64.zip')
     urllib.request.urlretrieve(f'{base_download_url}/{base_zip_filename}-linux-x86_64.zip')
