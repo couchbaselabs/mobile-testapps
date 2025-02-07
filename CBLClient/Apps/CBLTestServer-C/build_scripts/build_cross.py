@@ -170,11 +170,13 @@ if __name__ == '__main__':
     os.remove(zip_filename)
 
     # new
-    base_zip_filename = "couchbase-lite-vector-search-${args.vs_version}"
-    base_download_url = "https://packages.couchbase.com/releases/couchbase-lite-vector-search/${args.vs_version}"
+    base_zip_filename = f"couchbase-lite-vector-search-{args.vs_version}"
+
+    base_download_url = f"https://packages.couchbase.com/releases/couchbase-lite-vector-search/{args.vs_version}"
     # vector_search_zip_name = f'couchbase-lite-vector-search-{args.vs_version}-{args.vs_bld_num}-linux-x86_64.zip'
     vector_search_zip_name = f''
     # urllib.request.urlretrieve(f'https://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-vector-search/{args.vs_version}/{args.vs_bld_num}/{vector_search_zip_name}', vector_search_zip_name, show_download_progress)
+    print(f'{base_download_url}/{base_zip_filename}-linux-x86_64.zip')
     urllib.request.urlretrieve(f'{base_download_url}/{base_zip_filename}-linux-x86_64.zip')
     with zipfile.ZipFile(vector_search_zip_name) as zip:
         zip.extractall(path=EXTENSIONS_DIR)
