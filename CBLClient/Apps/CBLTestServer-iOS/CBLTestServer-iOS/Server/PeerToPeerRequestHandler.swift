@@ -54,6 +54,8 @@ public class PeerToPeerRequestHandler {
         case "peerToPeer_messageEndpointListenerStart":
             let database: Database = args.get(name:"database")!
             let port: Int = args.get(name:"port")!
+            let config = MessageEndpointListenerConfiguration(database: database, protocolType: ProtocolType.byteStream)
+            let messageEndpointListener = MessageEndpointListener(config: config)
             let peerToPeerListener: ReplicatorTcpListener = ReplicatorTcpListener(databases: [database], port: UInt32(port))
             peerToPeerListener.start()
             return peerToPeerListener
