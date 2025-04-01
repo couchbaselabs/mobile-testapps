@@ -332,7 +332,7 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
         URLEndpointListenerConfiguration config;
         Database sourceDb = args.get("database");
         ArrayList<Collection> collectionsList = args.get("collections");
-        Set<Collection> collections = new HashSet<>(collectionsList);
+        Set<Collection> collections = (collectionsList != null) ? new HashSet<>(collectionsList) : new HashSet<>();
         if (collections.size() != 0) {
             config = new URLEndpointListenerConfiguration(collections);
         }
