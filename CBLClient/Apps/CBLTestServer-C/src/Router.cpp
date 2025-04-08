@@ -17,6 +17,7 @@
 #include "ScopeMethods.hpp"
 #include "EncryptableMethods.h"
 #include "VectorSearchMethods.h"
+#include "PeerToPeerMethods.h"
 #include <functional>
 #include <utility>
 #include <civetweb.h>
@@ -226,6 +227,23 @@ static const unordered_map<string, endpoint_handler> ROUTE_MAP = {
     {"scope_collection", scope_methods::scope_collection},
     {"scope_collectionNames", scope_methods::scope_collectionNames},
     {"scope_defaultScope", scope_methods::scope_defaultScope},
+
+    {"peerToPeer_serverStart", peer_to_peer_methods::peerToPeer_serverStart},
+    {"peerToPeer_messageEndpointListenerStart",peer_to_peer_methods::peerToPeer_messageEndpointListenerStart},
+    {"peerToPeer_getListenerPort", peer_to_peer_methods::peerToPeer_getListenerPort},
+    {"peerToPeer_serverStop", peer_to_peer_methods::peerToPeer_serverStop},
+    {"peerToPeer_clientStart", peer_to_peer_methods::peerToPeer_clientStart},
+    {"peerToPeer_configure", peer_to_peer_methods::peerToPeer_configure},
+    {"peerToPeer_configureCollection", peer_to_peer_methods::peerToPeer_configureCollection},
+
+    {"peerToPeer_addReplicatorEventChangeListener", replicator_methods::replicator_addReplicatorEventChangeListener},
+    {"peerToPeer_removeReplicatorEventListener", replicator_methods::replicator_removeReplicatorEventListener},
+    {"peerToPeer_replicatorEventGetChanges", replicator_methods::replicator_replicatorEventGetChanges},
+    {"peerToPeer_replicatorEventChangesCount", replicator_methods::replicator_replicatorEventChangesCount},
+
+
+//    {"listenerAuthenticator_create"} = ListenerAuthenticatorMethods.listenerAuthenticator_create,
+
     #ifdef COUCHBASE_ENTERPRISE
     {"vectorSearch_createIndex", vectorSearch_methods::vectorSearch_createIndex},
     {"vectorSearch_loadDatabase", vectorSearch_methods::vectorSearch_loadDatabase},
