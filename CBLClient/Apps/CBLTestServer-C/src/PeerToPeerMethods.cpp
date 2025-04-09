@@ -213,7 +213,7 @@ namespace peer_to_peer_methods {
 
     void peerToPeer_serverStart(nlohmann::json& body, mg_connection* conn) {
 
-        auto config = static_cast<CBLURLEndpointListenerConfiguration *>(malloc(sizeof(URLEndpointListenerConfig)));
+        auto config = static_cast<CBLURLEndpointListenerConfiguration *>(malloc(sizeof(CBLURLEndpointListenerConfiguration)));
         memset(config, 0, sizeof(CBLURLEndpointListenerConfiguration));
         vector<CBLCollection> vec;
          for(const auto& c: body["collections"]) {
@@ -290,7 +290,7 @@ namespace peer_to_peer_methods {
         if (body.contains("enable_delta_sync")){
             config->enableDeltaSync=body["enable_delta_sync"].get<bool>();
         }
-        CBLURLEndpointListener* listener
+        CBLURLEndpointListener* listener;
         listener=CBLURLEndpointListener_Start(config);
         write_serialized_body(conn, memory_map::store(listener, CBLURLEndpointListener_EntryDelete));
 
