@@ -95,6 +95,7 @@ set(
     src/SessionAuthenticationMethods.cpp
     src/QueryMethods.cpp
     src/VectorSearchMethods.cpp
+    src/PeerToPeerMethods.cpp
     src/cdecode.c
 )
 
