@@ -31,7 +31,7 @@
 #include INCLUDE_CBL(CouchbaseLite.h)
 
 
-#define CLIENT_CERT_LABEL = "CBL-Client-Cert";
+#define CLIENT_CERT_LABEL "CBL-Client-Cert";
 #define SERVER_CERT_LABEL "CBL-Server-Cert"
 #define CLIENT_CA_CERT_PATH "certs/client-ca.der"
 #define CERT_LOCATION "certs/certs.p12"
@@ -197,7 +197,7 @@ static void CBLURLEndpointListener_EntryDelete(void* ptr ){
     // auto* config = (CBLURLEndpointListenerConfiguration *)ptr;
     // CBLTLSIdentity_Release(config->tlsIdentity);
     // free(config);
-    CBLURLEndpointListener_Release(listener)
+    CBLURLEndpointListener_Release(listener);
 
 }
 
@@ -493,12 +493,12 @@ namespace peer_to_peer_methods {
                 config->acceptOnlySelfSignedServerCertificate = true;
             }
             if (body.contains("max_retries") )
-            {
-                config-maxAttempts=body["max_retries"].get<int>()
+            {s
+                config->maxAttempts=body["max_retries"].get<int>()
             }
             if (body.contains("max_timeout") )
             {
-                config-maxAttempts=body["max_timeout"].get<int>()
+                config->maxAttemptWaitTime=body["max_timeout"].get<int>()
             }
             CBLReplicator* repl;
             repl = CBLReplicator_Create(config, &err)
@@ -645,7 +645,7 @@ namespace peer_to_peer_methods {
                 ifs.close();
                 CBLError error;
                 CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
-                CBLCert* cetificate= CBLCert_CreateWithData(s,&error)
+                CBLCert* certificate= CBLCert_CreateWithData(s,&error)
                 CBLTLSIdentity* identity = CBLTLSIdentity_CreateWithKeyPairAndCerts(keypair, certificate, &error);
                 config->pinnedServerCertificate = s;
             }
