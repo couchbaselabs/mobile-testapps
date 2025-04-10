@@ -187,9 +187,11 @@ if __name__ == '__main__':
 
     cmake_args=['cmake', '..', f'-DCMAKE_PREFIX_PATH={DOWNLOAD_DIR}/libcblite-{args.version}', 
         '-DCMAKE_BUILD_TYPE=Release', f'-DCMAKE_TOOLCHAIN_FILE={args.toolchain}']
+    sysroot_path = os.path.expanduser("~/.cbl_cross/debian9-x86_64-sysroot")
     cmake_args.extend([
-    '-DOPENSSL_INCLUDE_DIR=/usr/include/openssl',
-    '-DOPENSSL_CRYPTO_LIBRARY=/usr/lib/x86_64-linux-gnu/libcrypto.so'])
+        f'-DOPENSSL_INCLUDE_DIR={sysroot_path}/usr/include/openssl',
+        f'-DOPENSSL_SSL_LIBRARY={sysroot_path}/usr/lib/x86_64-linux-gnu/libssl.so',
+        f'-DOPENSSL_CRYPTO_LIBRARY={sysroot_path}/usr/lib/x86_64-linux-gnu/libcrypto.so'])
     if args.os == "raspbian9" or args.os == "debian9-x86_64":
         cmake_args.append('-DCBL_STATIC_CXX=ON')
     elif args.os == "raspios10-arm64":
