@@ -197,6 +197,7 @@ static void CBLURLEndpointListener_EntryDelete(void* ptr ){
     // auto* config = (CBLURLEndpointListenerConfiguration *)ptr;
     // CBLTLSIdentity_Release(config->tlsIdentity);
     // free(config);
+    auto listener = static_cast<CBLURLEndpointListener*>(ptr);
     CBLURLEndpointListener_Release(listener);
 
 }
@@ -215,7 +216,7 @@ namespace peer_to_peer_methods {
 
         auto config = static_cast<CBLURLEndpointListenerConfiguration *>(malloc(sizeof(CBLURLEndpointListenerConfiguration)));
         memset(config, 0, sizeof(CBLURLEndpointListenerConfiguration));
-        vector<CBLCollection> vec;
+        vector<CBLCollection*> vec;
          for(const auto& c: body["collections"]) {
             CBLCollection *rep_object = static_cast<CBLCollection*>(memory_map::get(c.get<string>()));
             vec.push_back(*rep_object);
@@ -238,16 +239,16 @@ namespace peer_to_peer_methods {
             if (tlsAuthType == "self_signed"){
                 std::string certLocation = file_resolution::resolve_path(CERT_LOCATION, false); // .pem 
                 std::ifstream certFile(certLocation, std::ios::binary);
-                ifs.exceptions(ifs.failbit | ifs.badbit);
-                ifs.seekg(0, ios::end);
-                auto fileSize = ifs.tellg();
-                ifs.seekg(0, ios::beg);
+                certFile.exceptions(certFile.failbit | certFile.badbit);
+                certFile.seekg(0, ios::end);
+                auto fileSize = certFile.tellg();
+                certFile.seekg(0, ios::beg);
                 FLSlice s {
                     malloc(fileSize),
                     (size_t)fileSize
                 };
-                ifs.read((char *)s.buf, fileSize);
-                ifs.close();
+                certFile.read((char *)s.buf, fileSize);
+                certFile.close();
                 CBLError error;
                 keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
                 CBLCert* cetificate= CBLCert_CreateWithData(s,&error)
@@ -266,9 +267,10 @@ namespace peer_to_peer_methods {
                 FLDict attributes = FLMutableDict_AsDict(attrDict);
                 CBLKeyUsages usage = (CBLKeyUsages)(kCBLKeyUsagesClientAuth | kCBLKeyUsagesServerAuth);
                 time_t now = time(nullptr);
-                CBLTimestamp expires;
-                expires.seconds = now + 365 * 24 * 60 * 60;
-                expires.microseconds = 0;
+                CBLTimestamp expires {
+                    .seconds = now + 365*24*60*60,
+                    .microseconds = 0
+                };
                 FLString label = FLStr(SERVER_CERT_LABEL);
                 CBLTLSIdentity* identity = CBLTLSIdentity_CreateIdentity(usage, attributes, expires, label, &error);
                 config->tlsIdentity= identity
@@ -291,13 +293,17 @@ namespace peer_to_peer_methods {
             config->enableDeltaSync=body["enable_delta_sync"].get<bool>();
         }
         CBLURLEndpointListener* listener;
-        listener=CBLURLEndpointListener_Start(config);
+        listener= CBLURLEndpointListener_Create(config, &error)
+        bool success= CBLURLEndpointListener_Start(listener, &error);
+        if(!success){
+            throw runtime_error("Server did not start");
+        }
         write_serialized_body(conn, memory_map::store(listener, CBLURLEndpointListener_EntryDelete));
 
     }
 
     void peerToPeer_getListenerPort(nlohmann::json& body, mg_connection* conn) {
-        with<URLEndpointListener *>(body, "listener", [](URLEndpointListener* u){
+        with<CBLURLEndpointListener *>(body, "listener", [](CBLURLEndpointListener* u){
             mg_send_http_ok(conn,u->port );
         }
     }
@@ -310,7 +316,7 @@ namespace peer_to_peer_methods {
             return
           }
           else{
-            with<URLEndpointListener *>(body, "listener", [](URLEndpointListener* u){
+            with<CBLURLEndpointListener *>(body, "listener", [](CBLURLEndpointListener* u){
               CBLURLEndpointListener_Stop(u)
             }
           }
@@ -334,15 +340,15 @@ namespace peer_to_peer_methods {
             string filter_callback_func = body["filter_callback_func"].get<string>();
             bool tls_disable = body["tls_disable"].get<bool>();
             string tlsAuthType = body["tls_auth_type"].get<string>();
-            bool tls_authenticator = body["tls_authenticator"].get<bool>());
-            bool server_verification_mode = body["server_verification_mode"].get<bool>());
+            bool tls_authenticator = body["tls_authenticator"].get<bool>();
+            bool server_verification_mode = body["server_verification_mode"].get<bool>();
             CBLError err;
             string host_url="";
             if (tls_disable){
-              host_url="ws://" + targetIP + ":" + port;
+              host_url="ws://" + targetIP + ":" + std::to_string(port);
             }
             else{
-              host_url="wss://" +targetIP+":"+port;
+              host_url="wss://" +targetIP+":"+std::to_string(port);
             }
             string db_url=host_url+"/"+remoteBBName;
             CBLEndpoint* endpoint;
@@ -452,16 +458,16 @@ namespace peer_to_peer_methods {
             {
                 std::string certLocation = file_resolution::resolve_path(CERT_LOCATION, false); // .pem 
                 std::ifstream certFile(certLocation, std::ios::binary);
-                ifs.exceptions(ifs.failbit | ifs.badbit);
-                ifs.seekg(0, ios::end);
-                auto fileSize = ifs.tellg();
-                ifs.seekg(0, ios::beg);
+                certFile.exceptions(certFile.failbit | certFile.badbit);
+                certFile.seekg(0, ios::end);
+                auto fileSize = certFile.tellg();
+                certFile.seekg(0, ios::beg);
                 FLSlice s {
                     malloc(fileSize),
                     (size_t)fileSize
                 };
-                ifs.read((char *)s.buf, fileSize);
-                ifs.close();
+                certFile.read((char *)s.buf, fileSize);
+                certFile.close();
                 CBLError error;
                 CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
                 CBLCert* cetificate= CBLCert_CreateWithData(s,&error)
@@ -471,16 +477,16 @@ namespace peer_to_peer_methods {
             if (tls_authenticator) {
                 std::string certLocation = file_resolution::resolve_path(CERT_LOCATION, false); // .pem 
                 std::ifstream certFile(certLocation, std::ios::binary);
-                ifs.exceptions(ifs.failbit | ifs.badbit);
-                ifs.seekg(0, ios::end);
-                auto fileSize = ifs.tellg();
-                ifs.seekg(0, ios::beg);
+                certFile.exceptions(certFile.failbit | certFile.badbit);
+                certFile.seekg(0, ios::end);
+                auto fileSize = certFile.tellg();
+                certFile.seekg(0, ios::beg);
                 FLSlice s {
                     malloc(fileSize),
                     (size_t)fileSize
                 };
-                ifs.read((char *)s.buf, fileSize);
-                ifs.close();
+                certFile.read((char *)s.buf, fileSize);
+                certFile.close();
                 CBLError error;
                 CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
                 CBLCert* cetificate= CBLCert_CreateWithData(s,&error)
@@ -515,8 +521,8 @@ namespace peer_to_peer_methods {
             string endPointType = body["endPointType"].get<string>();
             bool tls_disable = body["tls_disable"].get<bool>();
             string tlsAuthType = body["tls_auth_type"].get<string>();
-            bool tls_authenticator = body["tls_authenticator"].get<bool>());
-            bool server_verification_mode = body["server_verification_mode"].get<bool>());
+            bool tls_authenticator = body["tls_authenticator"].get<bool>();
+            bool server_verification_mode = body["server_verification_mode"].get<bool>();
             CBLError err;
             string host_url="";
             if (tls_disable){
@@ -633,16 +639,16 @@ namespace peer_to_peer_methods {
             {
                 std::string certLocation = file_resolution::resolve_path(CERT_LOCATION, false); // .pem 
                 std::ifstream certFile(certLocation, std::ios::binary);
-                ifs.exceptions(ifs.failbit | ifs.badbit);
-                ifs.seekg(0, ios::end);
-                auto fileSize = ifs.tellg();
-                ifs.seekg(0, ios::beg);
+                certFile.exceptions(certFile.failbit | certFile.badbit);
+                certFile.seekg(0, ios::end);
+                auto fileSize = certFile.tellg();
+                certFile.seekg(0, ios::beg);
                 FLSlice s {
                     malloc(fileSize),
                     (size_t)fileSize
                 };
-                ifs.read((char *)s.buf, fileSize);
-                ifs.close();
+                certFile.read((char *)s.buf, fileSize);
+                certFile.close();
                 CBLError error;
                 CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
                 CBLCert* certificate= CBLCert_CreateWithData(s,&error)
@@ -652,16 +658,16 @@ namespace peer_to_peer_methods {
             if (tls_authenticator) {
                 std::string certLocation = file_resolution::resolve_path(CERT_LOCATION, false); // .pem 
                 std::ifstream certFile(certLocation, std::ios::binary);
-                ifs.exceptions(ifs.failbit | ifs.badbit);
-                ifs.seekg(0, ios::end);
-                auto fileSize = ifs.tellg();
-                ifs.seekg(0, ios::beg);
+                certFile.exceptions(certFile.failbit | certFile.badbit);
+                certFile.seekg(0, ios::end);
+                auto fileSize = certFile.tellg();
+                certFile.seekg(0, ios::beg);
                 FLSlice s {
                     malloc(fileSize),
                     (size_t)fileSize
                 };
-                ifs.read((char *)s.buf, fileSize);
-                ifs.close();
+                certFile.read((char *)s.buf, fileSize);
+                certFile.close();
                 CBLError error;
                 CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
                 CBLCert* cetificate= CBLCert_CreateWithData(s,&error)
