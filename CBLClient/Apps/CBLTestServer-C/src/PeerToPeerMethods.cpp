@@ -8,7 +8,6 @@
 #include "PeerToPeerMethods.h"
 #include <cbl/CBLReplicator.h>
 #include <cbl/CBLDatabase.h>
-#include "CBLCollection.h"
 #include <iostream>
 #include <string>
 #include <mutex>
