@@ -217,7 +217,7 @@ namespace peer_to_peer_methods {
         vector<CBLCollection*> vec;
          for(const auto& c: body["collections"]) {
             CBLCollection *rep_object = static_cast<CBLCollection*>(memory_map::get(c.get<string>()));
-            vec.push_back(*rep_object);
+            vec.push_back(rep_object);
         }
         config->collections = vec.data();
         config->collectionCount = vec.size();
@@ -301,8 +301,9 @@ namespace peer_to_peer_methods {
     }
 
     void peerToPeer_getListenerPort(nlohmann::json& body, mg_connection* conn) {
-        with<CBLURLEndpointListener *>(body, "listener", [](CBLURLEndpointListener* u){
-            mg_send_http_ok(conn,u->port );
+        with<CBLURLEndpointListener *>(body, "listener", [conn, &body](CBLURLEndpointListener* u){
+            auto port= CBLURLEndpointListener_Port(u);
+            mg_send_http_ok(conn,port );
         });
     }
 
@@ -314,7 +315,7 @@ namespace peer_to_peer_methods {
             return;
           }
           else{
-            with<CBLURLEndpointListener *>(body, "listener", [](CBLURLEndpointListener* u){
+            with<CBLURLEndpointListener *>(body, "listener", [conn, &body](CBLURLEndpointListener* u){
               CBLURLEndpointListener_Stop(u);
             });
           }
@@ -322,14 +323,14 @@ namespace peer_to_peer_methods {
     }
 
     void peerToPeer_clientStart(nlohmann::json& body, mg_connection* conn) {
-        with<CBLReplicator *>(body, "replicator", [](CBLReplicator* r)
+        with<CBLReplicator *>(body, "replicator", [conn, &body](CBLReplicator* r)
         {
             CBLReplicator_Start(r, false);
         });
         write_empty_body(conn);
     }
     void peerToPeer_configure(nlohmann::json& body, mg_connection* conn) {
-        with<CBLDatabase *>(body, "database", [conn, &body](CBLDatabase* db){
+        <CBLDatabase *>(body, "database", [conn, &body](CBLDatabase* db){
             int port = (int)body["port"].get<int>();
             string targetIP = body["host"].get<string>();
             string remote_DBName = body["serverDBName"].get<string>();
@@ -525,10 +526,10 @@ namespace peer_to_peer_methods {
             CBLError err;
             string host_url="";
             if (tls_disable){
-              host_url="ws://" + targetIP + ":" + port;
+              host_url="ws://" + targetIP + ":" + std::to_string(port);
             }
             else{
-              host_url="wss://" +targetIP+":"+port;
+              host_url="wss://" +targetIP+":" + std::to_string(port);
             }
             string db_url=host_url+"/"+remoteBBName;
             CBLEndpoint* endpoint;
@@ -693,7 +694,7 @@ namespace peer_to_peer_methods {
             if(body.contains("collections")) {
                 for(const auto& c: body["collections"]) {
                     CBLReplicationCollection *rep_object = static_cast<CBLReplicationCollection*>(memory_map::get(c.get<string>()));
-                    vec.push_back(*rep_object);
+                    vec.push_back(rep_object);
                 }
                 config->collections = vec.data();
                 config->collectionCount = vec.size();
