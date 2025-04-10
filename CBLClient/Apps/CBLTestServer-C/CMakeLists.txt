@@ -69,6 +69,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++")
     endif()
 endif()
+find_package(OpenSSL REQUIRED)
+include_directories(${OPENSSL_INCLUDE_DIR})
 
 set(
     TESTSERVER_COMMON_SRC
@@ -194,6 +196,7 @@ target_link_libraries(
     nlohmann_json::nlohmann_json
     cblite
     zip
+    ${OPENSSL_LIBRARIES}
 )
 
 target_include_directories(
