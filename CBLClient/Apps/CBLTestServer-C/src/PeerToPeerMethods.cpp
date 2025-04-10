@@ -31,11 +31,11 @@
 #include INCLUDE_CBL(CouchbaseLite.h)
 
 
-#define CLIENT_CERT_LABEL "CBL-Client-Cert";
-#define SERVER_CERT_LABEL "CBL-Server-Cert";
-#define CLIENT_CA_CERT_PATH "certs/client-ca.der";
-#define CERT_LOCATION "certs/certs.p12";
-#define CERT_PASS "123";
+#define CLIENT_CERT_LABEL "CBL-Client-Cert"
+#define SERVER_CERT_LABEL "CBL-Server-Cert"
+#define CLIENT_CA_CERT_PATH "certs/client-ca.der"
+#define CERT_LOCATION "certs/certs.p12"
+#define CERT_PASS "123"
 
 
 using namespace nlohmann;
@@ -249,8 +249,8 @@ namespace peer_to_peer_methods {
                 certFile.close();
                 CBLError error;
                 keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
-                CBLCert* cetificate= CBLCert_CreateWithData(s,&error);
-                CBLTLSIdentity* identity = CBLTLSIdentity_CreateWithKeyPairAndCerts(keypair, certificate, &error);
+                CBLCert* certificate= CBLCert_CreateWithData(s,&error);
+                CBLTLSIdentity* identity = CBLTLSIdentity_CreateWithKeyPairAndCerts(keyPair, certificate, &error);
                 config->tlsIdentity = identity;
             }
             else if(tlsAuthType == "self_signed_create"){
@@ -262,13 +262,9 @@ namespace peer_to_peer_methods {
                 CBLError error;
                 FLMutableDict attrDict = FLMutableDict_New();
                 FLMutableDict_SetString(attrDict, kCBLCertAttrKeyCommonName, FLStr(SERVER_CERT_LABEL));
-                FLDict attributes = FLMutableDict_AsDict(attrDict);
+                FLDict attributes = FLValue_AsDict(attrDict);
                 CBLKeyUsages usage = (CBLKeyUsages)(kCBLKeyUsagesClientAuth | kCBLKeyUsagesServerAuth);
-                time_t now = time(nullptr);
-                CBLTimestamp expires {
-                    .seconds = now + 365*24*60*60,
-                    .microseconds = 0
-                };
+                CBLTimestamp expires = CBL_Now() + 3600*24*365;
                 FLString label = FLStr(SERVER_CERT_LABEL);
                 CBLTLSIdentity* identity = CBLTLSIdentity_CreateIdentity(usage, attributes, expires, label, &error);
                 config->tlsIdentity= identity;
@@ -303,7 +299,7 @@ namespace peer_to_peer_methods {
     void peerToPeer_getListenerPort(nlohmann::json& body, mg_connection* conn) {
         with<CBLURLEndpointListener *>(body, "listener", [conn, &body](CBLURLEndpointListener* u){
             auto port= CBLURLEndpointListener_Port(u);
-            mg_send_http_ok(conn,port );
+            write_serialized_body(conn,port );
         });
     }
 
@@ -352,7 +348,7 @@ namespace peer_to_peer_methods {
             string db_url=host_url+"/"+remoteBBName;
             CBLEndpoint* endpoint;
             if (endPointType =="URLEndPoint"){
-                endpoint= CBLEndpoint_CreateWithURL(FLStr(host_url),&err);
+                endpoint= CBLEndpoint_CreateWithURL(FLStr(host_url.c_str()),&err);
             }
             auto config = static_cast<CBLReplicatorConfiguration *>(malloc(sizeof(CBLReplicatorConfiguration)));
             memset(config, 0, sizeof(CBLReplicatorConfiguration));
@@ -531,10 +527,10 @@ namespace peer_to_peer_methods {
             else{
               host_url="wss://" +targetIP+":" + std::to_string(port);
             }
-            string db_url=host_url+"/"+remoteBBName;
+            string db_url=host_url+"/"+ remote_DBName;
             CBLEndpoint* endpoint;
             if (endPointType =="URLEndPoint"){
-                endpoint= CBLEndpoint_CreateWithURL(FLStr(host_url),&err);
+                endpoint= CBLEndpoint_CreateWithURL(FLStr(host_url.c_str()),&err);
             }
             auto config = static_cast<CBLReplicatorConfiguration *>(malloc(sizeof(CBLReplicatorConfiguration)));
             memset(config, 0, sizeof(CBLReplicatorConfiguration));
@@ -687,8 +683,6 @@ namespace peer_to_peer_methods {
             {
                 config->maxAttemptWaitTime=body["max_timeout"].get<int>();
             }
-            auto config = static_cast<CBLReplicatorConfiguration *>(malloc(sizeof(CBLReplicatorConfiguration)));
-            memset(config, 0, sizeof(CBLReplicatorConfiguration));
             vector<CBLReplicationCollection*> vec;
             // need to handle configurations param
             if(body.contains("collections")) {
