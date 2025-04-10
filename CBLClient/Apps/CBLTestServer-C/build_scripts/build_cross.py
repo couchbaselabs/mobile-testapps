@@ -185,7 +185,7 @@ if __name__ == '__main__':
     os.makedirs(BUILD_DIR, 0o755, True)
     os.chdir(BUILD_DIR)
 
-    cmake_args=['cmake', '..', f'-DCMAKE_PREFIX_PATH={DOWNLOAD_DIR}/libcblite-{args.version}', 
+    cmake_args=['sudo cmake', '..', f'-DCMAKE_PREFIX_PATH={DOWNLOAD_DIR}/libcblite-{args.version}', 
         '-DCMAKE_BUILD_TYPE=Release', f'-DCMAKE_TOOLCHAIN_FILE={args.toolchain}']
     sysroot_path = os.path.expanduser("~/.cbl_cross/debian9-x86_64-sysroot")
     cmake_args.extend([
