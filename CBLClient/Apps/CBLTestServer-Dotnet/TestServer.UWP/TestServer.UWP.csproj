@@ -154,9 +154,9 @@
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
-    <Content Include="Assets\certs\renewed_cert.p12" />
-    <Content Include="Assets\certs\new_client_cert.pem" />
-    <Content Include="Assets\certs\client-ca-renewed.der" />
+    <Content Include="Assets\certs\certs.p12" />
+    <Content Include="Assets\certs\client.p12" />
+    <Content Include="Assets\certs\client-ca.der" />
     <Content Include="Properties\Default.rd.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -181,9 +181,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <BundleResource Include="Assets\certs\renewed_cert.p12" />
-    <BundleResource Include="Assets\certs\new_client_cert.pem" />
-    <BundleResource Include="Assets\certs\client-ca-renewed.der" />
+    <BundleResource Include="Assets\certs\certs.p12" />
+    <BundleResource Include="Assets\certs\client.p12" />
+    <BundleResource Include="Assets\certs\client-ca.der" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets\certs\" />

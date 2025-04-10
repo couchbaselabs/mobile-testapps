@@ -205,9 +205,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Remove="certs\renewed_cert.p12" />
-    <None Remove="certs\new_client_cert.pem" />
-    <None Remove="certs\client-ca-renewed.der" />
+    <None Remove="certs\certs.p12" />
+    <None Remove="certs\client.p12" />
+    <None Remove="certs\client-ca.der" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -231,9 +231,9 @@
     <ProjectReference Include="..\TestServer\TestServer.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <BundleResource Include="certs\renewed_cert.p12" />
-    <BundleResource Include="certs\new_client_cert.pem" />
-    <BundleResource Include="certs\client-ca-renewed.der" />
+    <BundleResource Include="certs\certs.p12" />
+    <BundleResource Include="certs\client.p12" />
+    <BundleResource Include="certs\client-ca.der" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

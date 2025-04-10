@@ -92,7 +92,7 @@ namespace Couchbase.Lite.Testing
                 _store = new X509Store(StoreName.My);
                 byte[] cert = null;
                 TLSIdentity.DeleteIdentity(_store, ServerCertLabel, null);
-                string certLocation = TestServer.FilePathResolver("certs/renewed_cert.p12", false);
+                string certLocation = TestServer.FilePathResolver("certs/certs.p12", false);
                 byte[] certsData = File.ReadAllBytes(certLocation);
                 TLSIdentity identity = TLSIdentity.ImportIdentity(_store, certsData, "123", ServerCertLabel, null);
                 urlEndpointListenerConfig.TlsIdentity = identity;
@@ -115,7 +115,7 @@ namespace Couchbase.Lite.Testing
             if (tls_authenticator) {
                 _store = new X509Store(StoreName.My);
                 TLSIdentity.DeleteIdentity(_store, ServerCertLabel, null);
-                string certLocation = TestServer.FilePathResolver("certs/client-ca-renewed.der", false);
+                string certLocation = TestServer.FilePathResolver("certs/client-ca.der", false);
                 byte[] caData = File.ReadAllBytes(certLocation);
 
                 var rootCert = new X509Certificate2(caData);
@@ -223,7 +223,7 @@ namespace Couchbase.Lite.Testing
             {
                 _store = new X509Store(StoreName.My);
                 TLSIdentity.DeleteIdentity(_store, ClientCertLabel, null);
-                string certLocation = TestServer.FilePathResolver("certs/renewed_cert.p12", false);
+                string certLocation = TestServer.FilePathResolver("certs/certs.p12", false);
                 byte[] certsData = File.ReadAllBytes(certLocation);
                 TLSIdentity identity = TLSIdentity.ImportIdentity(_store, certsData, "123", ClientCertLabel, null);
                 config.PinnedServerCertificate = identity.Certs[0];
@@ -232,7 +232,7 @@ namespace Couchbase.Lite.Testing
             {
                 _store = new X509Store(StoreName.My);
                 TLSIdentity.DeleteIdentity(_store, ClientCertLabel, null);
-                string certLocation = TestServer.FilePathResolver("certs/new_client_cert.pem", false);
+                string certLocation = TestServer.FilePathResolver("certs/client.p12", false);
                 byte[] certsData = File.ReadAllBytes(certLocation);
                 var identity = TLSIdentity.ImportIdentity(_store, certsData, "123", ClientCertLabel, null);
                 config.Authenticator = new ClientCertificateAuthenticator(identity);
@@ -407,7 +407,7 @@ namespace Couchbase.Lite.Testing
             {
                 _store = new X509Store(StoreName.My);
                 TLSIdentity.DeleteIdentity(_store, ClientCertLabel, null);
-                string certLocation = TestServer.FilePathResolver("certs/renewed_cert.p12", false);
+                string certLocation = TestServer.FilePathResolver("certs/certs.p12", false);
                 byte[] certsData = File.ReadAllBytes(certLocation);
                 TLSIdentity identity = TLSIdentity.ImportIdentity(_store, certsData, "123", ClientCertLabel, null);
                 config.PinnedServerCertificate = identity.Certs[0];
@@ -415,7 +415,7 @@ namespace Couchbase.Lite.Testing
             if (tls_authenticator) {
                 _store = new X509Store(StoreName.My);
                 TLSIdentity.DeleteIdentity(_store, ClientCertLabel, null);
-                string certLocation = TestServer.FilePathResolver("certs/new_client_cert.pem", false);
+                string certLocation = TestServer.FilePathResolver("certs/client.p12", false);
                 byte[] certsData = File.ReadAllBytes(certLocation);
                 var identity = TLSIdentity.ImportIdentity(_store, certsData, "123", ClientCertLabel, null);
                 config.Authenticator = new ClientCertificateAuthenticator(identity);
