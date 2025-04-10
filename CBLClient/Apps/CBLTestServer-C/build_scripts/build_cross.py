@@ -189,6 +189,7 @@ if __name__ == '__main__':
         '-DCMAKE_BUILD_TYPE=Release', f'-DCMAKE_TOOLCHAIN_FILE={args.toolchain}']
     sysroot_path = os.path.expanduser("~/.cbl_cross/debian9-x86_64-sysroot")
     cmake_args.extend([
+        f'-DOPENSSL_ROOT_DIR=~{sysroot_path}/usr',
         f'-DOPENSSL_INCLUDE_DIR={sysroot_path}/usr/include/openssl',
         f'-DOPENSSL_SSL_LIBRARY={sysroot_path}/usr/lib/x86_64-linux-gnu/libssl.so',
         f'-DOPENSSL_CRYPTO_LIBRARY={sysroot_path}/usr/lib/x86_64-linux-gnu/libcrypto.so'])
