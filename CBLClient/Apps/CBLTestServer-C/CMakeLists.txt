@@ -69,7 +69,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++")
     endif()
 endif()
-set(OPENSSL_ROOT_DIR "/usr/bin/openssl")
+include_directories(/usr/include)
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
 
