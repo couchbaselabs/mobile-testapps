@@ -287,6 +287,7 @@ namespace peer_to_peer_methods {
             config->enableDeltaSync=body["enable_delta_sync"].get<bool>();
         }
         CBLURLEndpointListener* listener;
+        CBLError error = {};
         listener= CBLURLEndpointListener_Create(config, &error);
         bool success= CBLURLEndpointListener_Start(listener, &error);
         if(!success){
@@ -326,7 +327,7 @@ namespace peer_to_peer_methods {
         write_empty_body(conn);
     }
     void peerToPeer_configure(nlohmann::json& body, mg_connection* conn) {
-        <CBLDatabase *>(body, "database", [conn, &body](CBLDatabase* db){
+        with <CBLDatabase *>(body, "database", [conn, &body](CBLDatabase* db){
             int port = (int)body["port"].get<int>();
             string targetIP = body["host"].get<string>();
             string remote_DBName = body["serverDBName"].get<string>();
@@ -345,7 +346,7 @@ namespace peer_to_peer_methods {
             else{
               host_url="wss://" +targetIP+":"+std::to_string(port);
             }
-            string db_url=host_url+"/"+remoteBBName;
+            string db_url=host_url+"/"+remote_DBName;
             CBLEndpoint* endpoint;
             if (endPointType =="URLEndPoint"){
                 endpoint= CBLEndpoint_CreateWithURL(FLStr(host_url.c_str()),&err);
