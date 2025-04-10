@@ -70,12 +70,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     endif()
 endif()
 find_package(OpenSSL REQUIRED)
-target_include_directories(
-    testserver PRIVATE
-    ${OPENSSL_INCLUDE_DIR}
-
-)
-
 set(
     TESTSERVER_COMMON_SRC
     src/TestServer.cpp
