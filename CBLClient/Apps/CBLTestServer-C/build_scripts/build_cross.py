@@ -112,6 +112,17 @@ def check_sysroot(name: str):
     print(f'Extracting {name} sysroot to {sysroot_path}...')
     with tarfile.open("sysroot.tar.gz", 'r:gz') as tar:
             tar.extractall(sysroot_path, members=tar_extract_callback(tar))
+    
+    if not (sysroot_path / "usr/include/openssl/pem.h").exists():
+        print("Installing OpenSSL in sysroot...")
+        subprocess.run([
+            "sudo", "chroot", str(sysroot_path), 
+            "apt-get", "update"
+        ])
+        subprocess.run([
+            "sudo", "chroot", str(sysroot_path), 
+            "apt-get", "install", "-y", "libssl-dev"
+        ])
 
     os.remove("sysroot.tar.gz")
 
@@ -187,10 +198,10 @@ if __name__ == '__main__':
 
     cmake_args=['sudo cmake', '..', f'-DCMAKE_PREFIX_PATH={DOWNLOAD_DIR}/libcblite-{args.version}', 
         '-DCMAKE_BUILD_TYPE=Release', f'-DCMAKE_TOOLCHAIN_FILE={args.toolchain}']
-    sysroot_path = os.path.expanduser("~/.cbl_cross/debian9-x86_64-sysroot")
+    sysroot_path = Path.home() / '.cbl_cross' / f'debian9-x86_64-sysroot'
     cmake_args.extend([
         f'-DOPENSSL_ROOT_DIR=~{sysroot_path}/usr',
-        f'-DOPENSSL_INCLUDE_DIR={sysroot_path}/usr/include/openssl',
+        f'-DOPENSSL_INCLUDE_DIR={sysroot_path}/usr/include',
         f'-DOPENSSL_SSL_LIBRARY={sysroot_path}/usr/lib/x86_64-linux-gnu/libssl.so',
         f'-DOPENSSL_CRYPTO_LIBRARY={sysroot_path}/usr/lib/x86_64-linux-gnu/libcrypto.so'])
     if args.os == "raspbian9" or args.os == "debian9-x86_64":
