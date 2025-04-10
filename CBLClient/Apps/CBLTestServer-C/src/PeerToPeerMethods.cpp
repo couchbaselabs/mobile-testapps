@@ -8,6 +8,7 @@
 #include "PeerToPeerMethods.h"
 #include <cbl/CBLReplicator.h>
 #include <cbl/CBLDatabase.h>
+#include "CBLCollection.h"
 #include <iostream>
 #include <string>
 #include <mutex>
@@ -208,8 +209,6 @@ static void CBLReplicator_EntryDelete(void* ptr) {
 }
 
 
-
-
 namespace peer_to_peer_methods {
 
     void peerToPeer_serverStart(nlohmann::json& body, mg_connection* conn) {
@@ -305,7 +304,7 @@ namespace peer_to_peer_methods {
     void peerToPeer_getListenerPort(nlohmann::json& body, mg_connection* conn) {
         with<CBLURLEndpointListener *>(body, "listener", [](CBLURLEndpointListener* u){
             mg_send_http_ok(conn,u->port );
-        }
+        });
     }
 
     void peerToPeer_serverStop(nlohmann::json& body, mg_connection* conn) {
@@ -317,8 +316,8 @@ namespace peer_to_peer_methods {
           }
           else{
             with<CBLURLEndpointListener *>(body, "listener", [](CBLURLEndpointListener* u){
-              CBLURLEndpointListener_Stop(u)
-            }
+              CBLURLEndpointListener_Stop(u);
+            });
           }
         }
     }
@@ -499,8 +498,8 @@ namespace peer_to_peer_methods {
                 config->acceptOnlySelfSignedServerCertificate = true;
             }
             if (body.contains("max_retries") )
-            {s
-                config->maxAttempts=body["max_retries"].get<int>()
+            {
+                config->maxAttempts=body["max_retries"].get<int>();
             }
             if (body.contains("max_timeout") )
             {
@@ -509,7 +508,8 @@ namespace peer_to_peer_methods {
             CBLReplicator* repl;
             repl = CBLReplicator_Create(config, &err)
             write_serialized_body(conn, memory_map::store(repl, CBLReplicator_EntryDelete));
-
+            
+        });
     }
 
     void peerToPeer_configureCollection(nlohmann::json& body, mg_connection* conn) {
@@ -703,6 +703,7 @@ namespace peer_to_peer_methods {
             repl = CBLReplicator_Create(config, &err)
             write_serialized_body(conn, memory_map::store(repl, CBLReplicator_EntryDelete));
 
+        });
     }
 }
 
