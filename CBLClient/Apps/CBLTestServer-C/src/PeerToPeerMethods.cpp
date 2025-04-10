@@ -33,10 +33,10 @@
 
 
 #define CLIENT_CERT_LABEL "CBL-Client-Cert";
-#define SERVER_CERT_LABEL "CBL-Server-Cert"
-#define CLIENT_CA_CERT_PATH "certs/client-ca.der"
-#define CERT_LOCATION "certs/certs.p12"
-#define CERT_PASS "123"
+#define SERVER_CERT_LABEL "CBL-Server-Cert";
+#define CLIENT_CA_CERT_PATH "certs/client-ca.der";
+#define CERT_LOCATION "certs/certs.p12";
+#define CERT_PASS "123";
 
 
 using namespace nlohmann;
@@ -250,7 +250,7 @@ namespace peer_to_peer_methods {
                 certFile.close();
                 CBLError error;
                 keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
-                CBLCert* cetificate= CBLCert_CreateWithData(s,&error)
+                CBLCert* cetificate= CBLCert_CreateWithData(s,&error);
                 CBLTLSIdentity* identity = CBLTLSIdentity_CreateWithKeyPairAndCerts(keypair, certificate, &error);
                 config->tlsIdentity = identity;
             }
@@ -272,7 +272,7 @@ namespace peer_to_peer_methods {
                 };
                 FLString label = FLStr(SERVER_CERT_LABEL);
                 CBLTLSIdentity* identity = CBLTLSIdentity_CreateIdentity(usage, attributes, expires, label, &error);
-                config->tlsIdentity= identity
+                config->tlsIdentity= identity;
                 FLMutableDict_Release(attrDict);
             }
 //             if(body.contains("tls_authenticator")){
@@ -292,7 +292,7 @@ namespace peer_to_peer_methods {
             config->enableDeltaSync=body["enable_delta_sync"].get<bool>();
         }
         CBLURLEndpointListener* listener;
-        listener= CBLURLEndpointListener_Create(config, &error)
+        listener= CBLURLEndpointListener_Create(config, &error);
         bool success= CBLURLEndpointListener_Start(listener, &error);
         if(!success){
             throw runtime_error("Server did not start");
@@ -312,7 +312,7 @@ namespace peer_to_peer_methods {
           string endpointType=body["endPointType"].get<string>();
           if (endpointType == "MessageEndPoint"){
             //TODO: Message endpoint ops arent supported yet.
-            return
+            return;
           }
           else{
             with<CBLURLEndpointListener *>(body, "listener", [](CBLURLEndpointListener* u){
@@ -352,12 +352,12 @@ namespace peer_to_peer_methods {
             string db_url=host_url+"/"+remoteBBName;
             CBLEndpoint* endpoint;
             if (endPointType =="URLEndPoint"){
-                endpoint= CBLEndpoint_CreateWithURL(FLStr(host_url),&err)
+                endpoint= CBLEndpoint_CreateWithURL(FLStr(host_url),&err);
             }
             auto config = static_cast<CBLReplicatorConfiguration *>(malloc(sizeof(CBLReplicatorConfiguration)));
             memset(config, 0, sizeof(CBLReplicatorConfiguration));
             config-> database= db;
-            config-> endpoint= endpoint
+            config-> endpoint= endpoint;
             tolower(replicatorType);
             if(replicatorType == "push") {
                 config->replicatorType = kCBLReplicatorTypePush;
@@ -488,7 +488,7 @@ namespace peer_to_peer_methods {
                 certFile.close();
                 CBLError error;
                 CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
-                CBLCert* cetificate= CBLCert_CreateWithData(s,&error)
+                CBLCert* cetificate= CBLCert_CreateWithData(s,&error);
                 CBLTLSIdentity* identity = CBLTLSIdentity_CreateWithKeyPairAndCerts(keypair, certificate, &error);
                 CBLAuthenticator* auth=CBLListenerAuth_CreateCertificate(identity);
                 config->authenticator=auth;
@@ -503,10 +503,10 @@ namespace peer_to_peer_methods {
             }
             if (body.contains("max_timeout") )
             {
-                config->maxAttemptWaitTime=body["max_timeout"].get<int>()
+                config->maxAttemptWaitTime=body["max_timeout"].get<int>();
             }
             CBLReplicator* repl;
-            repl = CBLReplicator_Create(config, &err)
+            repl = CBLReplicator_Create(config, &err);
             write_serialized_body(conn, memory_map::store(repl, CBLReplicator_EntryDelete));
             
         });
@@ -534,12 +534,12 @@ namespace peer_to_peer_methods {
             string db_url=host_url+"/"+remoteBBName;
             CBLEndpoint* endpoint;
             if (endPointType =="URLEndPoint"){
-                endpoint= CBLEndpoint_CreateWithURL(FLStr(host_url),&err)
+                endpoint= CBLEndpoint_CreateWithURL(FLStr(host_url),&err);
             }
             auto config = static_cast<CBLReplicatorConfiguration *>(malloc(sizeof(CBLReplicatorConfiguration)));
             memset(config, 0, sizeof(CBLReplicatorConfiguration));
             config-> database= db;
-            config-> endpoint= endpoint
+            config-> endpoint= endpoint;
             tolower(replicatorType);
             if(replicatorType == "push") {
                 config->replicatorType = kCBLReplicatorTypePush;
@@ -651,7 +651,7 @@ namespace peer_to_peer_methods {
                 certFile.close();
                 CBLError error;
                 CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
-                CBLCert* certificate= CBLCert_CreateWithData(s,&error)
+                CBLCert* certificate= CBLCert_CreateWithData(s,&error);
                 CBLTLSIdentity* identity = CBLTLSIdentity_CreateWithKeyPairAndCerts(keypair, certificate, &error);
                 config->pinnedServerCertificate = s;
             }
@@ -670,7 +670,7 @@ namespace peer_to_peer_methods {
                 certFile.close();
                 CBLError error;
                 CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
-                CBLCert* cetificate= CBLCert_CreateWithData(s,&error)
+                CBLCert* cetificate= CBLCert_CreateWithData(s,&error);
                 CBLTLSIdentity* identity = CBLTLSIdentity_CreateWithKeyPairAndCerts(keypair, certificate, &error);
                 CBLAuthenticator* auth=CBLListenerAuth_CreateCertificate(identity);
                 config->authenticator=auth;
@@ -681,15 +681,15 @@ namespace peer_to_peer_methods {
             }
             if (body.contains("max_retries") )
             {
-                config-maxAttempts=body["max_retries"].get<int>()
+                config->maxAttempts=body["max_retries"].get<int>();
             }
             if (body.contains("max_timeout") )
             {
-                config-maxAttempts=body["max_timeout"].get<int>()
+                config->maxAttemptWaitTime=body["max_timeout"].get<int>();
             }
             auto config = static_cast<CBLReplicatorConfiguration *>(malloc(sizeof(CBLReplicatorConfiguration)));
             memset(config, 0, sizeof(CBLReplicatorConfiguration));
-            vector<CBLReplicationCollection> vec;
+            vector<CBLReplicationCollection*> vec;
             // need to handle configurations param
             if(body.contains("collections")) {
                 for(const auto& c: body["collections"]) {
@@ -700,7 +700,7 @@ namespace peer_to_peer_methods {
                 config->collectionCount = vec.size();
             }
             CBLReplicator* repl;
-            repl = CBLReplicator_Create(config, &err)
+            repl = CBLReplicator_Create(config, &err);
             write_serialized_body(conn, memory_map::store(repl, CBLReplicator_EntryDelete));
 
         });
