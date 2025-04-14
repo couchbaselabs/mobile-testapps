@@ -278,7 +278,7 @@ namespace peer_to_peer_methods {
                 CBLError error{};
                 FLMutableDict attrDict = FLMutableDict_New();
                 FLMutableDict_SetString(attrDict, kCBLCertAttrKeyCommonName, FLStr(SERVER_CERT_LABEL));
-                FLDict attributes = FLValue_AsDict(attrDict);
+                FLDict attributes = FLValue_AsDict((FLValue)attrDict);
                 CBLKeyUsages usage = kCBLKeyUsagesClientAuth;
                 CBLTLSIdentity* identity = CBLTLSIdentity_CreateIdentity(usage, attributes, 0, kFLSliceNull, &error);
                 config->tlsIdentity= identity;
@@ -480,7 +480,7 @@ namespace peer_to_peer_methods {
                 certFile.close();
                 CBLError error;
                 CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
-                CBLCert* certificate= CBLCert_CreateWithData(s,&error)
+                CBLCert* certificate= CBLCert_CreateWithData(s,&error);
                 CBLTLSIdentity* identity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(keyPair, certificate, &error);
                 config->pinnedServerCertificate = s;
             }
