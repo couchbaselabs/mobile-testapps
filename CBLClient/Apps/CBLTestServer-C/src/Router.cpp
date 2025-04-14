@@ -229,7 +229,6 @@ static const unordered_map<string, endpoint_handler> ROUTE_MAP = {
     {"scope_defaultScope", scope_methods::scope_defaultScope},
 
     {"peerToPeer_serverStart", peer_to_peer_methods::peerToPeer_serverStart},
-    {"peerToPeer_messageEndpointListenerStart",peer_to_peer_methods::peerToPeer_messageEndpointListenerStart},
     {"peerToPeer_getListenerPort", peer_to_peer_methods::peerToPeer_getListenerPort},
     {"peerToPeer_serverStop", peer_to_peer_methods::peerToPeer_serverStop},
     {"peerToPeer_clientStart", peer_to_peer_methods::peerToPeer_clientStart},
