@@ -259,14 +259,14 @@ namespace peer_to_peer_methods {
                 FLSliceResult certData = readFile(certFile);
                 CBLError error{};
                 keyPair = CBLKeyPair_CreateWithPrivateKeyData(keyData, kFLSliceNull, &error);
-                if (keypair==nullptr){
+                if (keyPair==nullptr){
                     throw(error);
                 }
                 CBLCert* certificate= CBLCert_CreateWithData(certData,&error);
                 if (certificate==nullptr){
                     throw(error);
                 }
-                CBLTLSIdentity* identity = CBLTLSIdentity_CreateWithKeyPairAndCerts(keyPair, certificate, &error);
+                CBLTLSIdentity* identity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(keyPair, certificate, &error);
                 config->tlsIdentity = identity;
             }
             else if(tlsAuthType == "self_signed_creatFLSliceResulte"){
@@ -278,7 +278,7 @@ namespace peer_to_peer_methods {
                 CBLError error{};
                 FLMutableDict attrDict = FLMutableDict_New();
                 FLMutableDict_SetString(attrDict, kCBLCertAttrKeyCommonName, FLStr(SERVER_CERT_LABEL));
-                FLDict attributes = FLValue_AsDict(attrDict);
+                FLDict attributes = FLMutableDict_AsDict(attrDict);
                 CBLKeyUsages usage = kCBLKeyUsagesClientAuth;
                 CBLTLSIdentity* identity = CBLTLSIdentity_CreateIdentity(usage, attributes, 0, kFLSliceNull, &error);
                 config->tlsIdentity= identity;
@@ -481,7 +481,7 @@ namespace peer_to_peer_methods {
                 CBLError error;
                 CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
                 CBLCert* certificate= CBLCert_CreateWithData(s,&error)
-                CBLTLSIdentity* identity = CBLTLSIdentity_CreateWithKeyPairAndCerts(keyPair, certificate, &error);
+                CBLTLSIdentity* identity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(keyPair, certificate, &error);
                 config->pinnedServerCertificate = s;
             }
             if (tls_authenticator) {
@@ -500,7 +500,7 @@ namespace peer_to_peer_methods {
                 CBLError error;
                 CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
                 CBLCert* certificate= CBLCert_CreateWithData(s,&error);
-                CBLTLSIdentity* identity = CBLTLSIdentity_CreateWithKeyPairAndCerts(keyPair, certificate, &error);
+                CBLTLSIdentity* identity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(keyPair, certificate, &error);
                 CBLAuthenticator* auth=CBLListenerAuth_CreateCertificate(identity);
                 config->authenticator=auth;
 
@@ -663,7 +663,7 @@ namespace peer_to_peer_methods {
                 CBLError error;
                 CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
                 CBLCert* certificate= CBLCert_CreateWithData(s,&error);
-                CBLTLSIdentity* identity = CBLTLSIdentity_CreateWithKeyPairAndCerts(keypair, certificate, &error);
+                CBLTLSIdentity* identity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(keyPair, certificate, &error);
                 config->pinnedServerCertificate = s;
             }
             if (tls_authenticator) {
@@ -682,7 +682,7 @@ namespace peer_to_peer_methods {
                 CBLError error;
                 CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
                 CBLCert* certificate= CBLCert_CreateWithData(s,&error);
-                CBLTLSIdentity* identity = CBLTLSIdentity_CreateWithKeyPairAndCerts(keyPair, certificate, &error);
+                CBLTLSIdentity* identity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(keyPair, certificate, &error);
                 CBLAuthenticator* auth=CBLListenerAuth_CreateCertificate(identity);
                 config->authenticator=auth;
 
@@ -698,12 +698,12 @@ namespace peer_to_peer_methods {
             {
                 config->maxAttemptWaitTime=body["max_timeout"].get<int>();
             }
-            vector<CBLReplicationCollection*> vec;
+            vector<CBLReplicationCollection> vec;
             // need to handle configurations param
             if(body.contains("collections")) {
                 for(const auto& c: body["collections"]) {
                     CBLReplicationCollection *rep_object = static_cast<CBLReplicationCollection*>(memory_map::get(c.get<string>()));
-                    vec.push_back(rep_object);
+                    vec.push_back(*rep_object);
                 }
                 config->collections = vec.data();
                 config->collectionCount = vec.size();
