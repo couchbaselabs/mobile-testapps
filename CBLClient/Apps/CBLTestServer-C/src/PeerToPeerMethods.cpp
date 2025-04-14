@@ -278,7 +278,7 @@ namespace peer_to_peer_methods {
                 CBLError error{};
                 FLMutableDict attrDict = FLMutableDict_New();
                 FLMutableDict_SetString(attrDict, kCBLCertAttrKeyCommonName, FLStr(SERVER_CERT_LABEL));
-                FLDict attributes = FLMutableDict_AsDict(attrDict);
+                FLDict attributes = FLValue_AsDict(attrDict);
                 CBLKeyUsages usage = kCBLKeyUsagesClientAuth;
                 CBLTLSIdentity* identity = CBLTLSIdentity_CreateIdentity(usage, attributes, 0, kFLSliceNull, &error);
                 config->tlsIdentity= identity;
