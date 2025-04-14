@@ -253,10 +253,10 @@ namespace peer_to_peer_methods {
             auto tlsAuthType= body["tls_auth_type"].get<string>();
             if (tlsAuthType == "self_signed"){
                 std::string keyFile = file_resolution::resolve_path(CERT_LOCATION, false); // .pem 
-                FLSliceResult keyData = readFile(keyFile);
+                FLSlice keyData = FLSliceResult_AsSlice(readFile(keyFile));
 
                 std::string certFile = file_resolution::resolve_path(CERT_LOCATION, false); // .pem 
-                FLSliceResult certData = readFile(certFile);
+                FLSlice certData = FLSliceResult_AsSlice(readFile(certFile));
                 CBLError error{};
                 keyPair = CBLKeyPair_CreateWithPrivateKeyData(keyData, kFLSliceNull, &error);
                 if (keyPair==nullptr){
@@ -288,7 +288,7 @@ namespace peer_to_peer_methods {
                 //TLSIdentity_DeleteIdentity(store, SERVER_CERT_LABEL, nullptr);
                 CBLError error{};
                 std::string certFile = file_resolution::resolve_path(CLIENT_CA_CERT_PATH, false); // .pem 
-                FLSliceResult certData = readFile(certFile);
+                FLSlice certData = FLSliceResult_AsSlice(readFile(certFile));
                 CBLCert* certificate= CBLCert_CreateWithData(certData,&error);
                 if (certificate==nullptr){
                     throw(error);
