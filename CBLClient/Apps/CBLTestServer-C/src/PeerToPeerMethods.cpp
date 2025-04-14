@@ -501,7 +501,7 @@ namespace peer_to_peer_methods {
                 CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
                 CBLCert* certificate= CBLCert_CreateWithData(s,&error);
                 CBLTLSIdentity* identity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(keyPair, certificate, &error);
-                CBLAuthenticator* auth=CBLListenerAuth_CreateCertificate(identity);
+                CBLAuthenticator* auth=CBLAuth_CreateCertificate(identity);
                 config->authenticator=auth;
 
             }
@@ -683,7 +683,7 @@ namespace peer_to_peer_methods {
                 CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
                 CBLCert* certificate= CBLCert_CreateWithData(s,&error);
                 CBLTLSIdentity* identity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(keyPair, certificate, &error);
-                CBLAuthenticator* auth=CBLListenerAuth_CreateCertificate(identity);
+                CBLAuthenticator* auth=CBLAuth_CreateCertificate(identity);
                 config->authenticator=auth;
 
             }
