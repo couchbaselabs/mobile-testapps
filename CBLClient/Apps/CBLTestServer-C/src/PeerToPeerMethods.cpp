@@ -269,7 +269,7 @@ namespace peer_to_peer_methods {
                 CBLTLSIdentity* identity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(keyPair, certificate, &error);
                 config->tlsIdentity = identity;
             }
-            else if(tlsAuthType == "self_signed_creatFLSliceResulte"){
+            else if(tlsAuthType == "self_signed"){
                 //TLSIdentity_DeleteIdentity(store, SERVER_CERT_LABEL, nullptr);
                 // std::map<std::string, std::string> certAttributes;
                 // certAttributes["CN"] = SERVER_CERT_LABEL;
@@ -293,8 +293,8 @@ namespace peer_to_peer_methods {
                 if (certificate==nullptr){
                     throw(error);
                 }
-                CBLListenerAuthenticator* auth= CBLListenerAuth_CreateCertificateWithRootCerts(certificate);
-                config->authenticator = auth;
+                // CBLListenerAuthenticator* auth= CBLListenerAuth_CreateCertificateWithRootCerts(certificate);
+                // config->authenticator = auth;
             }
         }
         if (body.contains("enable_delta_sync")){
