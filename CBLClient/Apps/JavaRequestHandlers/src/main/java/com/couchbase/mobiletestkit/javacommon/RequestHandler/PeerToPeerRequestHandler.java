@@ -264,7 +264,7 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
 
         if (tlsAuthType.equals("self_signed")) {
             TLSIdentity tlsIdentity = TLSIdentity.getIdentity("Servercerts");
-            if (identity == null) { throw new IllegalStateException("Cannot find Servercerts id"); }
+            if (tlsIdentity == null) { throw new IllegalStateException("Cannot find Servercerts id"); }
             if (tlsIdentity != null) {
                 List<Certificate> certs = tlsIdentity.getCerts();
                 X509Certificate cert = (X509Certificate) certs.get(0);
