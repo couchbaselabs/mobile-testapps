@@ -141,6 +141,12 @@ public class TestServerContext implements Context {
                 e.printStackTrace();
             } catch (CouchbaseLiteException | KeyStoreException | CertificateException | NoSuchAlgorithmException | UnrecoverableEntryException e) {
                 e.printStackTrace();
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            if(identity == null){
+                throw new IllegalStateException("TLSIdentity is null");
             }
         return identity;
     }
