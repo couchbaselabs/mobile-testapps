@@ -268,7 +268,7 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
             if (tlsIdentity != null) {
                 List<Certificate> certs = tlsIdentity.getCerts();
                 X509Certificate cert = (X509Certificate) certs.get(0);
-                config.setPinnedServerCertificate(cert);
+                config.setPinnedServerCertificate(cert.getEncoded());
                 Log.i(TAG, "Pinned the certs ... .... ");
             }
         }
