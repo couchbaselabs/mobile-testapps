@@ -130,11 +130,15 @@ public class TestServerContext implements Context {
         TLSIdentity identity = null;
         try {
              InputStream serverCert = this.getCertFile("certs.p12");
+             if (serverCert == null){
+                throw new IllegalStateException("serverCert is null");
+             }
              KeyStoreUtils.importEntry("PKCS12",
                         serverCert,
                         "123456".toCharArray(),
                         "testkit",
                         "123456".toCharArray(), "Servercerts");
+            
              identity = TLSIdentity.getIdentity("Servercerts");
 
             } catch (IOException e) {
