@@ -235,13 +235,16 @@ namespace peer_to_peer_methods {
         }
         memset(config, 0, sizeof(CBLURLEndpointListenerConfiguration));
         vector<CBLCollection*> vec;
-        if (body.contains("collections")){
-            for(const auto& c: body["collections"]) {
+        if (body.contains("collections"))
+        {
+            for(const auto& c: body["collections"]) 
+            {
                 CBLCollection *rep_object = static_cast<CBLCollection*>(memory_map::get(c.get<string>()));
                 if (rep_object == nullptr) {
                     throw std::runtime_error("Failed to map collection: " + c.get<std::string>());
                 }
                 vec.push_back(rep_object);
+            }
         } else {
             auto dbname=body["database"].get<string>();
             CBLDatabase* db=static_cast<CBLDatabase*>(memory_map::get(dbname));
