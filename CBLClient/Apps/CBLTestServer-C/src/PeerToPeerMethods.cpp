@@ -234,8 +234,6 @@ namespace peer_to_peer_methods {
             throw std::runtime_error("Memory allocation failed for CBLURLEndpointListenerConfiguration");
         }
         memset(config, 0, sizeof(CBLURLEndpointListenerConfiguration));
-
-        if (body.contains("collections")){
         vector<CBLCollection*> vec;
         if (body.contains("collections")){
             for(const auto& c: body["collections"]) {
