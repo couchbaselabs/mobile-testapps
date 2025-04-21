@@ -308,7 +308,7 @@ namespace peer_to_peer_methods {
                 config->tlsIdentity= identity;
                 FLMutableDict_Release(attrDict);
             }
-            if(body.contains("tls_authenticator")){
+            if(body.contains("tls_authenticator")&& (body["tls_authenticator"].get<bool>())){
                 //TLSIdentity_DeleteIdentity(store, SERVER_CERT_LABEL, nullptr);
                 CBLError error{};
                 std::string certFile = file_resolution::resolve_path(CLIENT_CA_CERT_PATH, false); // .pem 
