@@ -253,9 +253,10 @@ namespace peer_to_peer_methods {
             auto dbname=body["database"].get<string>();
             CBLDatabase* db=static_cast<CBLDatabase*>(memory_map::get(dbname));
             if (!db) {
-                throw std::runtime_error("Could not resolve database: " + dbName);
+                throw std::runtime_error("Could not resolve database: " + dbname);
             }
-            config->collections = &CBLDatabase_DefaultCollection(db);
+            CBLError error{};
+            config->collections = &CBLDatabase_DefaultCollection(db,&error);
             config->collectionCount = 1;
         }
         if (body.contains("port")) {
