@@ -256,7 +256,14 @@ namespace peer_to_peer_methods {
                 throw std::runtime_error("Could not resolve database: " + dbname);
             }
             CBLError error{};
-            config->collections = &CBLDatabase_DefaultCollection(db,&error);
+            CBLError error;
+            CBLCollection* defaultCollection = CBLDatabase_DefaultCollection(db, &error);
+            if (!defaultCollection) {
+                throw std::runtime_error("Failed to get default collection: " + std::string(CBLError_Message(&error)));
+            }
+
+            CBLCollection* collections[] = { defaultCollection };
+            config->collections = collections;
             config->collectionCount = 1;
         }
         if (body.contains("port")) {
