@@ -293,8 +293,8 @@ namespace peer_to_peer_methods {
                 if (certificate==nullptr){
                     throw(error);
                 }
-                // CBLListenerAuthenticator* auth= CBLListenerAuth_CreateCertificateWithRootCerts(certificate);
-                // config->authenticator = auth;
+                CBLListenerAuthenticator* auth= CBLListenerAuth_CreateCertificateWithRootCerts(certificate);
+                config->authenticator = auth;
             }
         }
         if (body.contains("enable_delta_sync")){
