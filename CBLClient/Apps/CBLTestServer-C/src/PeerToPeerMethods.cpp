@@ -230,15 +230,34 @@ namespace peer_to_peer_methods {
     void peerToPeer_serverStart(nlohmann::json& body, mg_connection* conn) {
 
         auto config = static_cast<CBLURLEndpointListenerConfiguration *>(malloc(sizeof(CBLURLEndpointListenerConfiguration)));
+        if (config == nullptr) {
+            throw std::runtime_error("Memory allocation failed for CBLURLEndpointListenerConfiguration");
+        }
         memset(config, 0, sizeof(CBLURLEndpointListenerConfiguration));
+
+        if (body.contains("collections")){
         vector<CBLCollection*> vec;
          for(const auto& c: body["collections"]) {
             CBLCollection *rep_object = static_cast<CBLCollection*>(memory_map::get(c.get<string>()));
+            if (rep_object == nullptr) {
+                throw std::runtime_error("Failed to map collection: " + c.get<std::string>());
+            }
             vec.push_back(rep_object);
         }
         config->collections = vec.data();
         config->collectionCount = vec.size();
-        
+        if (vec.empty()){
+            throw std::runtime_error("Collection vector length is 0");
+        }
+        } else {
+            auto dbname=body["database"].get<string>();
+            CBLDatabase* db=static_cast<CBLDatabase*>(memory_map::get(dbname));
+            if (!db) {
+                throw std::runtime_error("Could not resolve database: " + dbName);
+            }
+            config->collections = &CBLDatabase_DefaultCollection(db);
+            config->collectionCount = 1;
+        }
         if (body.contains("port")) {
             config->port = body["port"].get<int>();
         } 
@@ -259,11 +278,11 @@ namespace peer_to_peer_methods {
                 FLSlice certData = FLSliceResult_AsSlice(readFile(certFile));
                 CBLError error{};
                 keyPair = CBLKeyPair_CreateWithPrivateKeyData(keyData, kFLSliceNull, &error);
-                if (keyPair==nullptr){
+                if (!keyPair){
                     throw(error);
                 }
                 CBLCert* certificate= CBLCert_CreateWithData(certData,&error);
-                if (certificate==nullptr){
+                if (!certificate){
                     throw(error);
                 }
                 CBLTLSIdentity* identity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(keyPair, certificate, &error);
@@ -303,6 +322,9 @@ namespace peer_to_peer_methods {
         CBLURLEndpointListener* listener;
         CBLError error = {};
         listener= CBLURLEndpointListener_Create(config, &error);
+        if(!listener){
+            throw error;
+        }
         bool success= CBLURLEndpointListener_Start(listener, &error);
         if(!success){
             throw runtime_error("Server did not start");
