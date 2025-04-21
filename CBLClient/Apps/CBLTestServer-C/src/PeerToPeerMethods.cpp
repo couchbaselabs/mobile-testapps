@@ -237,18 +237,13 @@ namespace peer_to_peer_methods {
 
         if (body.contains("collections")){
         vector<CBLCollection*> vec;
-         for(const auto& c: body["collections"]) {
-            CBLCollection *rep_object = static_cast<CBLCollection*>(memory_map::get(c.get<string>()));
-            if (rep_object == nullptr) {
-                throw std::runtime_error("Failed to map collection: " + c.get<std::string>());
-            }
-            vec.push_back(rep_object);
-        }
-        config->collections = vec.data();
-        config->collectionCount = vec.size();
-        if (vec.empty()){
-            throw std::runtime_error("Collection vector length is 0");
-        }
+        if (body.contains("collections")){
+            for(const auto& c: body["collections"]) {
+                CBLCollection *rep_object = static_cast<CBLCollection*>(memory_map::get(c.get<string>()));
+                if (rep_object == nullptr) {
+                    throw std::runtime_error("Failed to map collection: " + c.get<std::string>());
+                }
+                vec.push_back(rep_object);
         } else {
             auto dbname=body["database"].get<string>();
             CBLDatabase* db=static_cast<CBLDatabase*>(memory_map::get(dbname));
@@ -260,11 +255,13 @@ namespace peer_to_peer_methods {
             if (!defaultCollection) {
                 throw std::runtime_error("Failed to get default collection: " + std::string(CBLError_Message(&error)));
             }
-
-            CBLCollection* collections[] = { defaultCollection };
-            config->collections = collections;
-            config->collectionCount = 1;
+             vec.push_back(defaultCollection);
         }
+        if (vec.empty()){
+            throw std::runtime_error("Collection vector length is 0");
+        }
+        config->collections = vec.data();
+        config->collectionCount = vec.size();
         if (body.contains("port")) {
             config->port = body["port"].get<int>();
         } 
