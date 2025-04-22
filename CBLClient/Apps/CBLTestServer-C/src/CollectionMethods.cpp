@@ -3,6 +3,7 @@
 #include "Router.h"
 #include "FleeceHelpers.h"
 #include "DocumentMethods.h"
+#include "QueryMethods.h"
 #include "Defines.h"
 #include "Defer.hh"
 extern "C" {
@@ -474,5 +475,40 @@ namespace collection_methods {
             });
          });
         write_empty_body(conn);
+    }
+
+    void collection_getDocIds(json& body, mg_connection* conn) 
+    {
+        auto limit = body["limit"].get<int64_t>();
+        auto offset = body["offset"].get<int64_t>();
+       with<CBLCollection *>(body, "collection", [conn,&body](CBLCollection* collection) {
+            CBLQuery* query;
+            CBLError err;
+            stringstream ss;
+            json retVal = json::array();
+            auto name =CBLCollection_Name(collection);
+            string collection_name= string((const char *)name.buf,(int) name.size)
+            ss << "SELECT META().id FROM " << collection_name << " LIMIT " << limit << " OFFSET " << offset;
+            CBLDatabase* db= CBLCollection_Database(collection,&err)
+            TRY(query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(ss.str()), nullptr, &err), err);
+            DEFER {
+                CBLQuery_Release(query);
+            };
+
+            CBLResultSet* results;
+            TRY(results = CBLQuery_Execute(query, &err), err);
+            DEFER {
+                CBLResultSet_Release(results);
+            };
+
+            while(CBLResultSet_Next(results)) {
+            FLString id = FLValue_AsString(CBLResultSet_ValueForKey(results, FLSTR("id")));
+            json value= json::parse(string((int)id.size, (const char *)id.buf));
+            retVal.push_back(value);
+            }
+
+            write_serialized_body(conn, retVal);
+        });
+    }
     }
 }
