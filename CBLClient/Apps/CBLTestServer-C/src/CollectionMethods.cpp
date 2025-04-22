@@ -487,9 +487,9 @@ namespace collection_methods {
             stringstream ss;
             json retVal = json::array();
             auto name =CBLCollection_Name(collection);
-            string collection_name= string((const char *)name.buf,(int) name.size)
+            string collection_name= string((const char *)name.buf,(int) name.size);
             ss << "SELECT META().id FROM " << collection_name << " LIMIT " << limit << " OFFSET " << offset;
-            CBLDatabase* db= CBLCollection_Database(collection,&err)
+            CBLDatabase* db= CBLCollection_Database(collection);
             TRY(query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, flstr(ss.str()), nullptr, &err), err);
             DEFER {
                 CBLQuery_Release(query);
@@ -503,7 +503,7 @@ namespace collection_methods {
 
             while(CBLResultSet_Next(results)) {
             FLString id = FLValue_AsString(CBLResultSet_ValueForKey(results, FLSTR("id")));
-            json value= json::parse(string((int)id.size, (const char *)id.buf));
+            json value= json::parse(string((const char *)id.buf,(int)id.size));
             retVal.push_back(value);
             }
 
