@@ -34,8 +34,9 @@
 #define CLIENT_CERT_LABEL "CBL-Client-Cert"
 #define SERVER_CERT_LABEL "CBL-Server-Cert"
 #define CLIENT_CA_CERT_PATH "certs/client-ca.der"
-#define CERT_LOCATION "certs/certs.p12"
-#define CERT_PASS "123"
+#define CERT_LOCATION "certs/cert.pem"
+#define CERT_KEY_LOCATION "certs/key.pem"
+#define CERT_PASS "123456"
 
 
 using namespace nlohmann;
@@ -276,7 +277,7 @@ namespace peer_to_peer_methods {
             CBLKeyPair* keyPair = nullptr;
             auto tlsAuthType= body["tls_auth_type"].get<string>();
             if (tlsAuthType == "self_signed"){
-                std::string keyFile = file_resolution::resolve_path(CERT_LOCATION, false); // .pem 
+                std::string keyFile = file_resolution::resolve_path(CERT_KEY_LOCATION, false); // .pem 
                 FLSlice keyData = FLSliceResult_AsSlice(readFile(keyFile));
 
                 std::string certFile = file_resolution::resolve_path(CERT_LOCATION, false); // .pem 
@@ -358,6 +359,7 @@ namespace peer_to_peer_methods {
             });
           }
         }
+        write_empty_body(conn);
     }
 
     void peerToPeer_clientStart(nlohmann::json& body, mg_connection* conn) {
