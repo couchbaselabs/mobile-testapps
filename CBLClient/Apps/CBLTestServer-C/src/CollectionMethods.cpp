@@ -486,7 +486,7 @@ namespace collection_methods {
             json retVal = json::array();
             auto limit = body["limit"].get<int64_t>();
             auto offset = body["offset"].get<int64_t>();
-            auto name =CBLCollection_Name(collection);
+            auto name =CBLCollection_FullName(collection);
             string collection_name= string((const char *)name.buf,(int) name.size);
             ss << "SELECT META().id FROM " << collection_name << " LIMIT " << limit << " OFFSET " << offset;
             CBLDatabase* db= CBLCollection_Database(collection);
