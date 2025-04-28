@@ -392,7 +392,7 @@ namespace peer_to_peer_methods {
             string db_url=host_url+"/"+remote_DBName;
             CBLEndpoint* endpoint;
             if (endPointType =="URLEndPoint"){
-                endpoint= CBLEndpoint_CreateWithURL(FLStr(host_url.c_str()),&err);
+                TRY(endpoint = CBLEndpoint_CreateWithURL(flstr(db_url), &err), err);
             }
             auto config = static_cast<CBLReplicatorConfiguration *>(malloc(sizeof(CBLReplicatorConfiguration)));
             memset(config, 0, sizeof(CBLReplicatorConfiguration));
@@ -544,6 +544,9 @@ namespace peer_to_peer_methods {
             if (body.contains("max_timeout") )
             {
                 config->maxAttemptWaitTime=body["max_timeout"].get<int>();
+            }
+            if (!db) {
+                fprintf(stderr, "Database is null!\n");
             }
             CBLReplicator* repl;
             repl = CBLReplicator_Create(config, &err);
