@@ -235,7 +235,7 @@ namespace peer_to_peer_methods {
         }
         memset(config, 0, sizeof(CBLURLEndpointListenerConfiguration));
 
-        vector<CBLCollection*>* vec = new vector<CBLCollection*>*();
+        vector<CBLCollection*>* vec = new vector<CBLCollection*>();
 
         if (body.contains("collections"))
         {
