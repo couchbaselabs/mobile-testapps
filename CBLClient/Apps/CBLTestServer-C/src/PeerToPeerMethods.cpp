@@ -234,7 +234,9 @@ namespace peer_to_peer_methods {
             throw std::runtime_error("Memory allocation failed for CBLURLEndpointListenerConfiguration");
         }
         memset(config, 0, sizeof(CBLURLEndpointListenerConfiguration));
-        vector<CBLCollection*> vec;
+
+        vector<CBLCollection*>* vec = new vector();
+
         if (body.contains("collections"))
         {
             for(const auto& c: body["collections"]) 
@@ -243,7 +245,7 @@ namespace peer_to_peer_methods {
                 if (rep_object == nullptr) {
                     throw std::runtime_error("Failed to map collection: " + c.get<std::string>());
                 }
-                vec.push_back(rep_object);
+                vec->push_back(rep_object);
             }
         } else {
             auto dbname=body["database"].get<string>();
@@ -256,13 +258,13 @@ namespace peer_to_peer_methods {
             if (!defaultCollection) {
                 throw std::runtime_error("Failed to get default collection: " + std::string(CBLError_Message(&error)));
             }
-             vec.push_back(defaultCollection);
+             vec->push_back(defaultCollection);
         }
-        if (vec.empty()){
+        if (vec->empty()){
             throw std::runtime_error("Collection vector length is 0");
         }
-        config->collections = vec.data();
-        config->collectionCount = vec.size();
+        config->collections = vec->data();
+        config->collectionCount = vec->size();
         if (body.contains("port")) {
             config->port = body["port"].get<int>();
         } 
