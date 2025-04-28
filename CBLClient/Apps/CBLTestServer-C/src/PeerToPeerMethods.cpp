@@ -33,10 +33,9 @@
 
 #define CLIENT_CERT_LABEL "CBL-Client-Cert"
 #define SERVER_CERT_LABEL "CBL-Server-Cert"
-#define CLIENT_CA_CERT_PATH "certs/client-ca.der"
-#define CERT_LOCATION "certs/cert.pem"
-#define CERT_KEY_LOCATION "certs/key.pem"
-#define CERT_PASS "123456"
+#define CLIENT_CA_CERT_PATH "cert/client.pem"
+#define CERT_LOCATION "cert/ca.pem"
+#define CERT_KEY_LOCATION "cert/ca-key.pem"
 
 
 using namespace nlohmann;

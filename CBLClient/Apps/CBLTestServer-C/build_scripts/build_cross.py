@@ -226,7 +226,7 @@ if __name__ == '__main__':
     shutil.copy2(f'{SCRIPT_DIR}/../../CBLTestServer-Dotnet/TestServer/sg_cert.pem', 'out/bin')
     pbar = ProgressBar(3)
     pbar.start()
-    copy_and_overwrite(f'{SCRIPT_DIR}/../../CBLTestServer-Dotnet/TestServer.NetCore/certs', 'out/bin/certs')
+    copy_and_overwrite(f'{SCRIPT_DIR}/certs', 'out/bin/certs')
     pbar.update(1)
     copy_and_overwrite(f'{SCRIPT_DIR}/../../CBLTestServer-Dotnet/TestServer.NetCore/Databases', 'out/bin/Databases')
     pbar.update(2)
