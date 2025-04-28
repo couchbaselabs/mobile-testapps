@@ -215,7 +215,7 @@ static void CBLURLEndpointListener_EntryDelete(void* ptr ){
     // CBLTLSIdentity_Release(config->tlsIdentity);
     // free(config);
     auto listener = static_cast<CBLURLEndpointListener*>(ptr);
-    CBLURLEndpointListener_Release(listener);
+    // CBLURLEndpointListener_Release(listener);
 
 }
 
@@ -354,6 +354,8 @@ namespace peer_to_peer_methods {
           }
           else{
             with<CBLURLEndpointListener *>(body, "listener", [conn, &body](CBLURLEndpointListener* u){
+               auto port= CBLURLEndpointListener_Port(u);
+               fprintf(stderr,"%d",port);
               CBLURLEndpointListener_Stop(u);
             });
           }
@@ -576,7 +578,7 @@ namespace peer_to_peer_methods {
             string db_url=host_url+"/"+ remote_DBName;
             CBLEndpoint* endpoint;
             if (endPointType =="URLEndPoint"){
-                endpoint= CBLEndpoint_CreateWithURL(FLStr(host_url.c_str()),&err);
+                TRY(endpoint = CBLEndpoint_CreateWithURL(flstr(db_url), &err), err);
             }
             auto config = static_cast<CBLReplicatorConfiguration *>(malloc(sizeof(CBLReplicatorConfiguration)));
             memset(config, 0, sizeof(CBLReplicatorConfiguration));
