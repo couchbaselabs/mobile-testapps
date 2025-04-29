@@ -735,8 +735,20 @@ namespace peer_to_peer_methods {
             // need to handle configurations param
             if(body.contains("collections")) {
                 for(const auto& c: body["collections"]) {
-                    CBLReplicationCollection *rep_object = static_cast<CBLReplicationCollection*>(memory_map::get(c.get<string>()));
-                    vec.push_back(*rep_object);
+                    if (c.is_string()) {
+                        auto key = c.get<std::string>();
+                        auto raw = memory_map::get(key);
+                        if (raw) {
+                            CBLReplicationCollection *rep_object = static_cast<CBLReplicationCollection*>(raw);
+                            vec.push_back(*rep_object);
+                        } else{
+                            throw std::runtime_error("Error reading memory pointer: " + key);
+                        }
+                    }
+                    else{
+                        throw std::runtime_error("Error in collection array, contents: "+ c.dump());
+                    }
+
                 }
                 config->collections = vec.data();
                 config->collectionCount = vec.size();
