@@ -295,7 +295,7 @@ namespace peer_to_peer_methods {
                 CBLTLSIdentity* identity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(keyPair, certificate, &error);
                 config->tlsIdentity = identity;
             }
-            else if(tlsAuthType == "self_signed"){
+            else if(tlsAuthType == "self_signed_create"){
                 //TLSIdentity_DeleteIdentity(store, SERVER_CERT_LABEL, nullptr);
                 // std::map<std::string, std::string> certAttributes;
                 // certAttributes["CN"] = SERVER_CERT_LABEL;
@@ -498,40 +498,38 @@ namespace peer_to_peer_methods {
             }
              if (tlsAuthType == "self_signed")
             {
-                std::string certLocation = file_resolution::resolve_path(CERT_LOCATION, false); // .pem 
-                std::ifstream certFile(certLocation, std::ios::binary);
-                certFile.exceptions(certFile.failbit | certFile.badbit);
-                certFile.seekg(0, ios::end);
-                auto fileSize = certFile.tellg();
-                certFile.seekg(0, ios::beg);
-                FLSlice s {
-                    malloc(fileSize),
-                    (size_t)fileSize
-                };
-                certFile.read((char *)s.buf, fileSize);
-                certFile.close();
-                CBLError error;
-                CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
-                CBLCert* certificate= CBLCert_CreateWithData(s,&error);
+                std::string keyFile = file_resolution::resolve_path(CERT_KEY_LOCATION, false); // .pem 
+                FLSlice keyData = FLSliceResult_AsSlice(readFile(keyFile));
+
+                std::string certFile = file_resolution::resolve_path(CERT_LOCATION, false); // .pem 
+                FLSlice certData = FLSliceResult_AsSlice(readFile(certFile));
+                CBLError error{};
+                CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(keyData, kFLSliceNull, &error);
+                if (!keyPair){
+                    throw(error);
+                }
+                CBLCert* certificate= CBLCert_CreateWithData(certData,&error);
+                if (!certificate){
+                    throw(error);
+                }
                 CBLTLSIdentity* identity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(keyPair, certificate, &error);
-                config->pinnedServerCertificate = s;
+                config->pinnedServerCertificate = certificate;
             }
             if (tls_authenticator) {
-                std::string certLocation = file_resolution::resolve_path(CERT_LOCATION, false); // .pem 
-                std::ifstream certFile(certLocation, std::ios::binary);
-                certFile.exceptions(certFile.failbit | certFile.badbit);
-                certFile.seekg(0, ios::end);
-                auto fileSize = certFile.tellg();
-                certFile.seekg(0, ios::beg);
-                FLSlice s {
-                    malloc(fileSize),
-                    (size_t)fileSize
-                };
-                certFile.read((char *)s.buf, fileSize);
-                certFile.close();
-                CBLError error;
-                CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(s, kFLSliceNull, &error);
-                CBLCert* certificate= CBLCert_CreateWithData(s,&error);
+                std::string keyFile = file_resolution::resolve_path(CERT_KEY_LOCATION, false); // .pem 
+                FLSlice keyData = FLSliceResult_AsSlice(readFile(keyFile));
+
+                std::string certFile = file_resolution::resolve_path(CERT_LOCATION, false); // .pem 
+                FLSlice certData = FLSliceResult_AsSlice(readFile(certFile));
+                CBLError error{};
+                CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(keyData, kFLSliceNull, &error);
+                if (!keyPair){
+                    throw(error);
+                }
+                CBLCert* certificate= CBLCert_CreateWithData(certData,&error);
+                if (!certificate){
+                    throw(error);
+                }
                 CBLTLSIdentity* identity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(keyPair, certificate, &error);
                 CBLAuthenticator* auth=CBLAuth_CreateCertificate(identity);
                 config->authenticator=auth;
