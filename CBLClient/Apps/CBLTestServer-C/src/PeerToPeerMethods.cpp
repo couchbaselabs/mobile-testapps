@@ -513,7 +513,7 @@ namespace peer_to_peer_methods {
                     throw(error);
                 }
                 CBLTLSIdentity* identity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(keyPair, certificate, &error);
-                config->pinnedServerCertificate = certificate;
+                config->pinnedServerCertificate = certData;
             }
             if (tls_authenticator) {
                 std::string keyFile = file_resolution::resolve_path(CERT_KEY_LOCATION, false); // .pem 
