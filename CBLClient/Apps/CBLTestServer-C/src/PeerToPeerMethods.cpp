@@ -34,6 +34,7 @@
 #define CLIENT_CERT_LABEL "CBL-Client-Cert"
 #define SERVER_CERT_LABEL "CBL-Server-Cert"
 #define CLIENT_CA_CERT_PATH "certs/client.pem"
+#define CLIENT_CA_KEY_PATH "certs/client-key.pem"
 #define CERT_LOCATION "certs/ca.pem"
 #define CERT_KEY_LOCATION "certs/ca-key.pem"
 
@@ -516,10 +517,10 @@ namespace peer_to_peer_methods {
                 config->pinnedServerCertificate = certData;
             }
             if (tls_authenticator) {
-                std::string keyFile = file_resolution::resolve_path(CERT_KEY_LOCATION, false); // .pem 
+                std::string keyFile = file_resolution::resolve_path(CLIENT_CA_KEY_PATH, false); // .pem 
                 FLSlice keyData = FLSliceResult_AsSlice(readFile(keyFile));
 
-                std::string certFile = file_resolution::resolve_path(CERT_LOCATION, false); // .pem 
+                std::string certFile = file_resolution::resolve_path(CLIENT_CA_CERT_PATH, false); // .pem 
                 FLSlice certData = FLSliceResult_AsSlice(readFile(certFile));
                 CBLError error{};
                 CBLKeyPair* keyPair = CBLKeyPair_CreateWithPrivateKeyData(keyData, kFLSliceNull, &error);
