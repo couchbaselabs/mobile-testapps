@@ -314,7 +314,7 @@ namespace peer_to_peer_methods {
             if(body.contains("tls_authenticator")&& (body["tls_authenticator"].get<bool>())){
                 //TLSIdentity_DeleteIdentity(store, SERVER_CERT_LABEL, nullptr);
                 CBLError error{};
-                std::string certFile = file_resolution::resolve_path(CLIENT_CA_CERT_PATH, false); // .pem 
+                std::string certFile = file_resolution::resolve_path(CERT_LOCATION, false); // .pem 
                 FLSlice certData = FLSliceResult_AsSlice(readFile(certFile));
                 CBLCert* certificate= CBLCert_CreateWithData(certData,&error);
                 if (certificate==nullptr){
