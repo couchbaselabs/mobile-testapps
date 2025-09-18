@@ -9,7 +9,6 @@
 #include <sstream>
 #include <dirent.h>
 #include <zip.h>
-#include <fstream>
 #include INCLUDE_CBL(CouchbaseLite.h)
 
 #ifdef __ANDROID__
@@ -50,13 +49,13 @@ static string LogTempDirectory() {
 }
 #endif
 
-static json serialize_config(const CBLLogFileConfiguration *config) {
+static json serialize_config(const CBLFileLogSink& config) {
     json serialized;
-    serialized["usePlaintext"] = config->usePlaintext;
-    serialized["maxSize"] = config->maxSize;
-    serialized["maxRotateCount"] = config->maxRotateCount;
-    serialized["level"] = config->level;
-    serialized["directory"] = string(static_cast<const char*>(config->directory.buf), config->directory.size);
+    serialized["usePlaintext"] = config.usePlaintext;
+    serialized["maxSize"] = config.maxSize;
+    serialized["maxRotateCount"] = config.maxKeptFiles - 1;
+    serialized["level"] = config.level;
+    serialized["directory"] = string(static_cast<const char*>(config.directory.buf), config.directory.size);
     return serialized;
 }
 
@@ -95,11 +94,11 @@ namespace file_logging_methods {
             directory = body["directory"].get<string>();
         }
 
-        CBLLogFileConfiguration config {};
+        CBLFileLogSink config {};
         config.directory = { directory.data(), directory.size() };
         if(body.contains("max_rotate_count")) {
             const auto max_rotate_count = body["max_rotate_count"].get<int>();
-            config.maxRotateCount = max_rotate_count;
+            config.maxKeptFiles = max_rotate_count + 1;
         }
 
         if(body.contains("max_size")) {
@@ -129,78 +128,74 @@ namespace file_logging_methods {
             }
         }
 
-        CBLError err;
-        TRY(CBLLog_SetFileConfig(config, &err), err)
+        CBLLogSinks_SetFile(config);
         write_empty_body(conn);
     }
 
     void logging_getPlainTextStatus(json& body, mg_connection* conn) {
-        const auto* config = CBLLog_FileConfig();
-        write_serialized_body(conn, config->usePlaintext);
+        const auto config = CBLLogSinks_File();
+        write_serialized_body(conn, config.usePlaintext);
     }
 
     void logging_getMaxRotateCount(json& body, mg_connection* conn) {
-        const auto* config = CBLLog_FileConfig();
-        write_serialized_body(conn, config->maxRotateCount);
+        const auto config = CBLLogSinks_File();
+        write_serialized_body(conn, config.maxKeptFiles - 1);
     }
 
     void logging_getMaxSize(json& body, mg_connection* conn) {
-        const auto* config = CBLLog_FileConfig();
-        write_serialized_body(conn, config->maxSize);
+        const auto config = CBLLogSinks_File();
+        write_serialized_body(conn, config.maxSize);
     }
 
     void logging_getLogLevel(json& body, mg_connection* conn) {
-        const auto* config = CBLLog_FileConfig();
-        write_serialized_body(conn, static_cast<int>(config->level));
+        const auto config = CBLLogSinks_File();
+        write_serialized_body(conn, static_cast<int>(config.level));
     }
 
     void logging_getConfig(json& body, mg_connection* conn) {
-        const auto* config = CBLLog_FileConfig();
+        const auto config = CBLLogSinks_File();
         json serialized = serialize_config(config);
         write_serialized_body(conn, serialized);
     }
 
     void logging_getDirectory(json& body, mg_connection* conn) {
-        const auto* config = CBLLog_FileConfig();
-        write_serialized_body(conn,  string(static_cast<const char*>(config->directory.buf), config->directory.size));
+        const auto config = CBLLogSinks_File();
+        write_serialized_body(conn,  string(static_cast<const char*>(config.directory.buf), config.directory.size));
     }
 
     void logging_setPlainTextStatus(json& body, mg_connection* conn) {
         const auto plaintext = body["plain_text"].get<bool>();
-        CBLLogFileConfiguration config = *CBLLog_FileConfig();
+        auto config = CBLLogSinks_File();
         config.usePlaintext = plaintext;
 
-        CBLError err;
-        TRY(CBLLog_SetFileConfig(config, &err), err)
-        json serialized = serialize_config(&config);
+        CBLLogSinks_SetFile(config);
+        json serialized = serialize_config(config);
         write_serialized_body(conn, serialized);
     }
 
     void logging_setMaxRotateCount(json& body, mg_connection* conn) {
         const auto maxRotateCount = body["max_rotate_count"].get<int>();
-        CBLLogFileConfiguration config = *CBLLog_FileConfig();
-        config.maxRotateCount = maxRotateCount;
+        auto config = CBLLogSinks_File();
+        config.maxKeptFiles = maxRotateCount + 1;
 
-        CBLError err;
-        TRY(CBLLog_SetFileConfig(config, &err), err)
-        json serialized = serialize_config(&config);
+        CBLLogSinks_SetFile(config);
+        json serialized = serialize_config(config);
         write_serialized_body(conn, serialized);
     }
 
     void logging_setMaxSize(json& body, mg_connection* conn) {
         const auto maxSize = body["max_size"].get<int64_t>();
-        CBLLogFileConfiguration config = *CBLLog_FileConfig();
+        auto config = CBLLogSinks_File();
         config.maxSize = maxSize;
 
-        CBLError err;
-        TRY(CBLLog_SetFileConfig(config, &err), err)
-        json serialized = serialize_config(&config);
+        CBLLogSinks_SetFile(config);
+        json serialized = serialize_config(config);
         write_serialized_body(conn, serialized);
     }
 
     void logging_setLogLevel(json& body, mg_connection* conn) {
         const auto level = body["log_level"].get<string>();
-        CBLLogFileConfiguration config = *CBLLog_FileConfig();
+        auto config = CBLLogSinks_File();
         if(level == "debug") {
             config.level = kCBLLogDebug;
         } else if(level == "verbose") {
@@ -215,9 +210,8 @@ namespace file_logging_methods {
             config.level = kCBLLogNone;
         }
 
-        CBLError err;
-        TRY(CBLLog_SetFileConfig(config, &err), err)
-        json serialized = serialize_config(&config);
+        CBLLogSinks_SetFile(config);
+        json serialized = serialize_config(config);
         write_serialized_body(conn, serialized);
     }
 
@@ -231,25 +225,25 @@ namespace file_logging_methods {
             cbl_mkdir(directory.c_str(), 0755);
         }
 
-        auto config = *CBLLog_FileConfig();
+        auto config = CBLLogSinks_File();
         config.directory = { directory.data(), directory.size() };
-        CBLError err;
-        TRY(CBLLog_SetFileConfig(config, &err), err)
-        json serialized = serialize_config(&config);
+
+        CBLLogSinks_SetFile(config);
+        json serialized = serialize_config(config);
         write_serialized_body(conn, serialized);
     }
 
     void logging_getLogsInZip(json& body, mg_connection* conn) {
-        auto* fileConfig = CBLLog_FileConfig();
-        if(!fileConfig) {
+        auto config = CBLLogSinks_File();
+        if(!config.directory.buf) {
             mg_send_http_error(conn, 500, "Logging not set up yet, need to call logging_configure first");
             return;
         }
 
-        auto flDir = fileConfig->directory;
+        auto flDir = config.directory;
         string logDirectory(static_cast<const char *>(flDir.buf), flDir.size);
         DIR* dir = opendir(logDirectory.c_str());
-        if(!dir) {
+        if (!dir) {
             mg_send_http_error(conn, 500, "opendir returned error %d", errno);
             return;
         }
