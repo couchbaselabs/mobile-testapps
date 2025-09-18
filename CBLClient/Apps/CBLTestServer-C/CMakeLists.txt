@@ -55,7 +55,7 @@ if(ANDROID)
 endif()
 
 message(STATUS ${CMAKE_LIBRARY_ARCHITECTURE})
-find_package(CouchbaseLite 3.0.0 REQUIRED)
+find_package(CouchbaseLite 4.0.0 REQUIRED)
 
 if(ANDROID)
     set( CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY )
@@ -83,6 +83,7 @@ set(
     src/BlobMethods.cpp
     src/CollectionMethods.cpp
     src/ScopeMethods.cpp
+    src/DatabaseHelpers.cpp
     src/DatabaseMethods.cpp
     src/DatabaseConfigurationMethods.cpp
     src/DataTypeMethods.cpp

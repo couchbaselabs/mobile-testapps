@@ -1,4 +1,5 @@
 #include "DatabaseMethods.h"
+#include "DatabaseHelpers.h"
 #include "MemoryMap.h"
 #include "Router.h"
 #include "Defer.hh"
@@ -76,15 +77,17 @@ namespace database_methods {
     }
 
     void database_delete(json& body, mg_connection* conn) {
-        with<CBLDatabase *>(body, "database", [&body, conn](CBLDatabase* db)
+        with<CBLDatabase *>(body, "database", [&body](CBLDatabase* db)
         {
-            with<CBLDocument *>(body, "document", [db, conn](CBLDocument* doc)
+            with<CBLDocument *>(body, "document", [db](CBLDocument* doc)
             {
-                CBLError err;
-                TRY(CBLDatabase_DeleteDocument(db, doc, &err), err)
+                withDefaultCollection(db, [doc](CBLCollection* collection)
+                {
+                    CBLError err{};
+                    TRY(CBLCollection_DeleteDocument(collection, doc, &err), err)
+                });
             });
         });
-
         write_empty_body(conn);
     }
 
@@ -92,34 +95,37 @@ namespace database_methods {
         const auto doc_ids = body["doc_ids"];
         with<CBLDatabase *>(body, "database", [&doc_ids](CBLDatabase* db)
         {
-            CBLError err;
-            TRY(CBLDatabase_BeginTransaction(db, &err), err)
+            withDefaultCollection(db, [db, &doc_ids](CBLCollection* collection)
+            {
+                CBLError err{};
+                TRY(CBLDatabase_BeginTransaction(db, &err), err)
 
-            bool success = false;
-            DEFER {
-                TRY(CBLDatabase_EndTransaction(db, success, &err), err)
-            };
-
-            for(const auto& val : doc_ids) {
-                const auto docID = val.get<string>();
-                const CBLDocument* doc = CBLDatabase_GetDocument(db, flstr(docID), &err);
+                bool success = false;
                 DEFER {
-                    CBLDocument_Release(doc);
+                    TRY(CBLDatabase_EndTransaction(db, success, &err), err)
                 };
 
-                if(!doc) {
-                    if(err.code == 0) {
-                        continue;
+                for(const auto& val : doc_ids) {
+                    const auto docID = val.get<string>();
+                    const CBLDocument* doc = CBLCollection_GetDocument(collection, flstr(docID), &err);
+                    DEFER {
+                        CBLDocument_Release(doc);
+                    };
+
+                    if(!doc) {
+                        if(err.code == 0) {
+                            continue;
+                        }
+
+                        string msgStr = to_string(CBLError_Message(&err));
+                        throw domain_error(msgStr);
                     }
 
-                    string msgStr = to_string(CBLError_Message(&err));
-                    throw domain_error(msgStr);
+                    TRY(CBLCollection_DeleteDocument(collection, doc, &err), err)
                 }
 
-                TRY(CBLDatabase_DeleteDocument(db, doc, &err), err)
-            }
-
-            success = true;
+                success = true;
+            });
         });
 
         write_empty_body(conn);
@@ -138,12 +144,12 @@ namespace database_methods {
         const CBLDocument* doc;
         with<CBLDatabase *>(body, "database", [&docId, &doc](CBLDatabase* db)
         {
-            CBLError err;
-            doc = CBLDatabase_GetDocument(db, flstr(docId), &err);
-            if(!doc && err.code != 0) {
-                std::string errMsg = to_string(CBLError_Message(&err));
-                throw std::domain_error(errMsg);
-            }
+            withDefaultCollection(db, [&docId, &doc](CBLCollection* collection)
+            {
+                CBLError err{};
+                doc = CBLCollection_GetDocument(collection, flstr(docId), &err);
+                TRY(doc, err)
+            });
         });
 
         if(!doc) {
@@ -158,56 +164,63 @@ namespace database_methods {
         const auto docDict = body["documents"];
         with<CBLDatabase *>(body, "database", [&docDict](CBLDatabase* db)
         {
-            CBLError err;
-            TRY(CBLDatabase_BeginTransaction(db, &err), err)
+            withDefaultCollection(db, [db, &docDict](CBLCollection* collection)
+            {
+                CBLError err{};
+                TRY(CBLDatabase_BeginTransaction(db, &err), err)
 
-            bool success = false;
-            DEFER {
-                TRY(CBLDatabase_EndTransaction(db, success, &err), err)
-            };
+                bool success = false;
+                DEFER {
+                    TRY(CBLDatabase_EndTransaction(db, success, &err), err)
+                };
 
-            for(auto& [ key, value ] : docDict.items()) {
-                auto docBody = value;
-                docBody.erase("_id");
-                auto* doc = CBLDocument_CreateWithID(flstr(key));
-                auto* body = FLMutableDict_New();
-                for (const auto& [ bodyKey, bodyValue ] : docBody.items()) {
-                    if(bodyKey == "_attachments") {
-                        for (const auto& [ blobKey, blobValue ] : bodyValue.items()) {
-                            base64_decodestate state;
-                            base64_init_decodestate(&state);
-                            auto b64 = blobValue["data"].get<string>();
-                            auto tmp = malloc(b64.size());
-                            size_t size = base64_decode_block((const uint8_t *)b64.c_str(), b64.size(), tmp, &state);
-                            auto blobContent = FLSliceResult_CreateWith(tmp, size);
-                            auto blob = CBLBlob_CreateWithData(FLSTR("application/octet-stream"), FLSliceResult_AsSlice(blobContent));
-                            auto slot = FLMutableDict_Set(body, flstr(blobKey));
-                            FLSlot_SetBlob(slot, blob);
-                            FLSliceResult_Release(blobContent);
+                for (auto& [ key, value ] : docDict.items()) {
+                    auto docBody = value;
+                    docBody.erase("_id");
+                    auto* doc = CBLDocument_CreateWithID(flstr(key));
+                    auto* body = FLMutableDict_New();
+                    for (const auto& [ bodyKey, bodyValue ] : docBody.items()) {
+                        if(bodyKey == "_attachments") {
+                            for (const auto& [ blobKey, blobValue ] : bodyValue.items()) {
+                                base64_decodestate state;
+                                base64_init_decodestate(&state);
+                                auto b64 = blobValue["data"].get<string>();
+                                auto tmp = malloc(b64.size());
+                                size_t size = base64_decode_block((const uint8_t *)b64.c_str(), b64.size(), tmp, &state);
+                                auto blobContent = FLSliceResult_CreateWith(tmp, size);
+                                auto blob = CBLBlob_CreateWithData(FLSTR("application/octet-stream"), FLSliceResult_AsSlice(blobContent));
+                                auto slot = FLMutableDict_Set(body, flstr(blobKey));
+                                FLSlot_SetBlob(slot, blob);
+                                FLSliceResult_Release(blobContent);
+                            }
+                        } else {
+                            writeFleece(body, bodyKey, bodyValue);
                         }
-                    } else {
-                        writeFleece(body, bodyKey, bodyValue);
                     }
+
+                    CBLDocument_SetProperties(doc, body);
+                    FLMutableDict_Release(body);
+
+                    TRY(CBLCollection_SaveDocument(collection, doc, &err), err)
                 }
 
-                CBLDocument_SetProperties(doc, body);
-                FLMutableDict_Release(body);
-                TRY(CBLDatabase_SaveDocument(db, doc, &err), err)
-            }
-
-            success = true;
+                success = true;
+            });
         });
 
         write_empty_body(conn);
     }
 
     void database_purge(json& body, mg_connection* conn) {
-        with<CBLDatabase *>(body, "database", [conn, &body](CBLDatabase* db)
+        with<CBLDatabase *>(body, "database", [&body](CBLDatabase* db)
         {
-            with<CBLDocument *>(body, "document", [conn, db](CBLDocument* d)
+            with<CBLDocument *>(body, "document", [db](CBLDocument* doc)
             {
-                CBLError err;
-                TRY(CBLDatabase_PurgeDocument(db, d, &err), err)
+                withDefaultCollection(db, [doc](CBLCollection* collection)
+                {
+                    CBLError err{};
+                    TRY(CBLCollection_PurgeDocument(collection, doc, &err), err)
+                });
             });
         });
 
@@ -215,12 +228,15 @@ namespace database_methods {
     }
 
     void database_save(json& body, mg_connection* conn) {
-        with<CBLDatabase *>(body, "database", [conn, &body](CBLDatabase* db)
+        with<CBLDatabase *>(body, "database", [&body](CBLDatabase* db)
         {
-            with<CBLDocument *>(body, "document", [conn, db](CBLDocument* d)
+            with<CBLDocument *>(body, "document", [db](CBLDocument* doc)
             {
-                CBLError err;
-                TRY(CBLDatabase_SaveDocument(db, d, &err), err)
+                withDefaultCollection(db, [doc](CBLCollection* collection)
+                {
+                    CBLError err{};
+                    TRY(CBLCollection_SaveDocument(collection, doc, &err), err)
+                });
             });
         });
 
@@ -229,24 +245,24 @@ namespace database_methods {
 
     void database_saveWithConcurrency(json& body, mg_connection* conn) {
         string concurrencyControlType;
-        if(body.contains("concurrencyControlType")) {
+        if (body.contains("concurrencyControlType")) {
             concurrencyControlType = body["concurrencyControlType"].get<string>();
         }
 
-        with<CBLDatabase *>(body, "database", [conn, &body, &concurrencyControlType](CBLDatabase* db)
+        with<CBLDatabase *>(body, "database", [&body, &concurrencyControlType](CBLDatabase* db)
         {
-            with<CBLDocument *>(body, "document", [conn, db, &concurrencyControlType](CBLDocument* d)
+            with<CBLDocument *>(body, "document", [db, &concurrencyControlType](CBLDocument* doc)
             {
                 auto concurrencyType = kCBLConcurrencyControlLastWriteWins;
-                if(concurrencyControlType == "failOnConflict") {
+                if (concurrencyControlType == "failOnConflict") {
                     concurrencyType = kCBLConcurrencyControlFailOnConflict;
                 }
 
-                CBLError err {};
-                if(!CBLDatabase_SaveDocumentWithConcurrencyControl(db, d, concurrencyType, &err) && err.code != (int)kCBLErrorConflict) {
-                    string errMsg = to_string(CBLError_Message(&err));
-                    throw domain_error(errMsg);
-                }
+                withDefaultCollection(db, [doc, concurrencyType](CBLCollection* collection)
+                {
+                    CBLError err{};
+                    TRY(CBLCollection_SaveDocumentWithConcurrencyControl(collection, doc, concurrencyType, &err), err)
+                });
             });
         });
 
@@ -255,24 +271,24 @@ namespace database_methods {
 
     void database_deleteWithConcurrency(json& body, mg_connection* conn) {
         string concurrencyControlType;
-        if(body.contains("concurrencyControlType")) {
+        if (body.contains("concurrencyControlType")) {
             concurrencyControlType = body["concurrencyControlType"].get<string>();
         }
 
-        with<CBLDatabase *>(body, "database", [conn, &body, &concurrencyControlType](CBLDatabase* db)
+        with<CBLDatabase *>(body, "database", [&body, &concurrencyControlType](CBLDatabase* db)
         {
-            with<CBLDocument *>(body, "document", [conn, db, &concurrencyControlType](CBLDocument* d)
+            with<CBLDocument *>(body, "document", [db, &concurrencyControlType](CBLDocument* doc)
             {
                 auto concurrencyType = kCBLConcurrencyControlLastWriteWins;
-                if(concurrencyControlType == "failOnConflict") {
+                if (concurrencyControlType == "failOnConflict") {
                     concurrencyType = kCBLConcurrencyControlFailOnConflict;
                 }
 
-                CBLError err {};
-                if(!CBLDatabase_DeleteDocumentWithConcurrencyControl(db, d, concurrencyType, &err) && err.code != (int)kCBLErrorConflict) {
-                    string errMsg = to_string(CBLError_Message(&err));
-                    throw domain_error(errMsg);
-                }
+                withDefaultCollection(db, [doc, concurrencyType](CBLCollection* collection)
+                {
+                    CBLError err{};
+                    TRY(CBLCollection_DeleteDocumentWithConcurrencyControl(collection, doc, concurrencyType, &err), err)
+                });
             });
         });
 
@@ -282,7 +298,10 @@ namespace database_methods {
     void database_getCount(json& body, mg_connection* conn) {
         with<CBLDatabase *>(body, "database", [conn](CBLDatabase* db)
         {
-            write_serialized_body(conn, CBLDatabase_Count(db));
+            withDefaultCollection(db, [conn](CBLCollection* collection)
+            {
+                write_serialized_body(conn, CBLCollection_Count(collection));
+            });
         });
     }
 
@@ -314,31 +333,33 @@ namespace database_methods {
 
     void database_getDocuments(json& body, mg_connection* conn) {
         const auto ids = body["ids"];
-        FLMutableDict retVal = FLMutableDict_New();
 
+        FLMutableDict retVal = FLMutableDict_New();
         vector<const CBLDocument *> docs;
         DEFER {
-            for(const auto* doc : docs) {
+            for (const auto* doc : docs) {
                 CBLDocument_Release(doc);
             }
-
             FLMutableDict_Release(retVal);
         };
         
         with<CBLDatabase *>(body, "database", [retVal, &ids, &docs](CBLDatabase* db)
         {
-            for(const auto& idJson : ids) {
-                const auto id = idJson.get<string>();
-                const CBLDocument* doc;
-                CBLError err;
-                TRY((doc = CBLDatabase_GetDocument(db, flstr(id), &err)), err);
-                if(!doc) {
-                    continue;
-                }
+            withDefaultCollection(db, [retVal, &ids, &docs](CBLCollection* collection)
+            {
+                for (const auto& idJson : ids) {
+                    const auto id = idJson.get<string>();
 
-                auto* slot = FLMutableDict_Set(retVal, flstr(id));
-                FLSlot_SetValue(slot, reinterpret_cast<FLValue>(CBLDocument_Properties(doc)));
-            }
+                    CBLError err{};
+                    const CBLDocument* doc = CBLCollection_GetDocument(collection, flstr(id), &err);
+                    TRY(doc, err)
+                    if (!doc) { continue; }
+                    docs.push_back(doc);
+
+                    auto* slot = FLMutableDict_Set(retVal, flstr(id));
+                    FLSlot_SetValue(slot, reinterpret_cast<FLValue>(CBLDocument_Properties(doc)));
+                }
+            });
         });
 
         write_serialized_body(conn, reinterpret_cast<FLValue>(retVal));
@@ -349,21 +370,27 @@ namespace database_methods {
         const auto data = body["data"];
         with<CBLDatabase *>(body, "database", [&id, &data](CBLDatabase* db)
         {
-            CBLDocument* doc;
-            CBLError err;
-            TRY(doc = CBLDatabase_GetMutableDocument(db, flstr(id), &err), err)
-            DEFER {
-                CBLDocument_Release(doc);
-            };
+            withDefaultCollection(db, [&id, &data](CBLCollection* collection)
+            {
+                CBLError err{};
+                CBLDocument* doc = CBLCollection_GetMutableDocument(collection, flstr(id), &err);
+                TRY(doc, err)
+                if (!doc) {
+                    throw domain_error("Document not found");
+                }
+                DEFER {
+                    CBLDocument_Release(doc);
+                };
 
-            FLMutableDict newContent = FLMutableDict_New();
-            for(auto& [key, value] : data.items()) {
-                writeFleece(newContent, key, value);
-            }
+                FLMutableDict newContent = FLMutableDict_New();
+                for(auto& [key, value] : data.items()) {
+                    writeFleece(newContent, key, value);
+                }
 
-            CBLDocument_SetProperties(doc, newContent);
-            FLMutableDict_Release(newContent);
-            TRY(CBLDatabase_SaveDocument(db, doc, &err), err)
+                CBLDocument_SetProperties(doc, newContent);
+                FLMutableDict_Release(newContent);
+                TRY(CBLCollection_SaveDocument(collection, doc, &err), err)
+            });
         });
 
         write_empty_body(conn);
@@ -373,31 +400,37 @@ namespace database_methods {
         const auto docDict = body["documents"];
         with<CBLDatabase *>(body, "database", [&docDict](CBLDatabase* db)
         {
-            CBLError err;
-            TRY(CBLDatabase_BeginTransaction(db, &err), err)
-            auto success = false;
-            DEFER {
-                TRY(CBLDatabase_EndTransaction(db, success, &err), err)
-            };
-
-            for(auto& [key, value] : docDict.items()) {
-                CBLDocument* doc;
-                TRY((doc = CBLDatabase_GetMutableDocument(db,flstr(key), &err)), err)
+            withDefaultCollection(db, [db, &docDict](CBLCollection* collection)
+            {
+                CBLError err{};
+                TRY(CBLDatabase_BeginTransaction(db, &err), err)
+                auto success = false;
                 DEFER {
-                    CBLDocument_Release(doc);
+                    TRY(CBLDatabase_EndTransaction(db, success, &err), err)
                 };
 
-                FLMutableDict newContent = FLMutableDict_New();
-                for(auto& [key, value] : value.items()) {
-                    writeFleece(newContent, key, value);
+                for(auto& [key, value] : docDict.items()) {
+                    CBLDocument* doc = CBLCollection_GetMutableDocument(collection, flstr(key), &err);
+                    TRY(doc, err)
+                    if (!doc) {
+                        throw domain_error("Document not found");
+                    }
+                    DEFER {
+                        CBLDocument_Release(doc);
+                    };
+
+                    FLMutableDict newContent = FLMutableDict_New();
+                    for (auto& [k, v] : value.items()) {
+                        writeFleece(newContent, k, v);
+                    }
+
+                    CBLDocument_SetProperties(doc, newContent);
+                    FLMutableDict_Release(newContent);
+                    TRY(CBLCollection_SaveDocument(collection, doc, &err), err)
                 }
 
-                CBLDocument_SetProperties(doc, newContent);
-                FLMutableDict_Release(newContent);
-                TRY(CBLDatabase_SaveDocument(db, doc, &err), err)
-            }
-
-            success = true;
+                success = true;
+            });
         });
 
         write_empty_body(conn);
@@ -428,22 +461,22 @@ namespace database_methods {
     }
 
     void database_changeEncryptionKey(json& body, mg_connection* conn) {
+        (void)conn; // Mark as unused
 #ifndef COUCHBASE_ENTERPRISE
         mg_send_http_error(conn, 501, "Not supported in CE edition");
 #else
         with<CBLDatabase *>(body, "database", [body, conn](CBLDatabase* db) {
             CBLError err;
             auto password = body["password"].get<string>();
-            if(password == "nil") {
-                TRY(CBLDatabase_ChangeEncryptionKey(db, nullptr, &err), err);
+            if (password == "nil") {
+                TRY(CBLDatabase_ChangeEncryptionKey(db, nullptr, &err), err)
             } else {
                 CBLEncryptionKey encryptionKey;
-                if(!CBLEncryptionKey_FromPassword(&encryptionKey, flstr(password))) {
+                if (!CBLEncryptionKey_FromPassword(&encryptionKey, flstr(password))) {
                     mg_send_http_error(conn, 500, "Failed to create encryption key");
                     return;
                 }
-                
-                TRY(CBLDatabase_ChangeEncryptionKey(db, &encryptionKey, &err), err);
+                TRY(CBLDatabase_ChangeEncryptionKey(db, &encryptionKey, &err), err)
             }
 
             write_empty_body(conn);
