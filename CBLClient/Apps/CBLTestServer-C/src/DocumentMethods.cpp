@@ -1,4 +1,5 @@
 #include "DocumentMethods.h"
+#include "DatabaseHelpers.h"
 #include "Router.h"
 #include "MemoryMap.h"
 #include "FleeceHelpers.h"
@@ -47,8 +48,11 @@ namespace document_methods {
         {
             with<const CBLDocument*>(body, "document", [db](const CBLDocument* doc)
             {
-                CBLError err;
-                TRY(CBLDatabase_DeleteDocument(db, doc, &err), err)
+                withDefaultCollection(db, [doc](CBLCollection* collection)
+                {
+                    CBLError err{};
+                    TRY(CBLCollection_DeleteDocument(collection, doc, &err), err)
+                });
             });            
 
             mg_send_http_ok(conn, "text/plain", 0);
