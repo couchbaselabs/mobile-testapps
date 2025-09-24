@@ -59,7 +59,7 @@ public class Server {
     let memory = Memory()
     
     public init() {
-        Database.log.console.level = .debug
+        LogSinks.console = ConsoleLogSink(level: .debug)
         dictionaryRequestHandler = DictionaryRequestHandler()
         queryRequestHandler = QueryRequestHandler()
         databaseRequestHandler = DatabaseRequestHandler()
@@ -89,7 +89,7 @@ public class Server {
         vectorSearchRequestHandler = VectorSearchRequestHandler()
         #endif
         server = GCDWebServer()
-        Database.log.console.level = LogLevel.verbose
+        LogSinks.console = ConsoleLogSink(level: .verbose)
         
         @Sendable func handlePostRequest (request: GCDWebServerRequest, completion: @escaping GCDWebServerCompletionBlock) async throws {
             var rawArgs = [String: Any]()
@@ -98,7 +98,7 @@ public class Server {
             
             if request.path.hasPrefix("/") {
                 let start = request.path.index(request.path.startIndex, offsetBy: 1)
-                method = request.path.substring(from: start)
+                method = String(request.path[start...])
             } else {
                 method = request.path
             }

@@ -45,23 +45,25 @@ public class DatabaseRequestHandler {
 
         case "database_delete":
             let database: Database = (args.get(name:"database"))!
+            let defaultCol = try database.defaultCollection()
             let document: Document = (args.get(name:"document"))!
 
             do {
-                try database.deleteDocument(document)
+                try defaultCol.delete(document: document)
             } catch {
                 return error
             }
             
         case "database_deleteBulkDocs":
             let database: Database = args.get(name:"database")!
+            let defaultCol = try database.defaultCollection()
             let doc_ids: Array<String> = args.get(name: "doc_ids")!
 
             try database.inBatch {
                 for id in doc_ids {
-                    let document: Document = database.document(withID: id)!
+                    let document: Document = try defaultCol.document(id: id)!
                     do {
-                        try! database.deleteDocument(document)
+                        try! defaultCol.delete(document: document)
                     }
                 }
             }
@@ -78,9 +80,10 @@ public class DatabaseRequestHandler {
 
         case "database_deleteIndex":
             let database: Database = (args.get(name:"database"))!
+            let defaultCol = try database.defaultCollection()
             let name: String = (args.get(name: "name"))!
             
-            try database.deleteIndex(forName: name)
+            try defaultCol.deleteIndex(forName: name)
 
         case "database_getName":
             let database: Database = args.get(name:"database")!
@@ -89,16 +92,19 @@ public class DatabaseRequestHandler {
 
         case "database_getDocument":
             let database: Database = (args.get(name:"database"))!
+            let defaultCol = try database.defaultCollection()
             let id: String? = args.get(name: "id")
-            return try database.document(withID: id!)
+            return try defaultCol.document(id: id!)
             
         case "database_save":
             let database: Database = (args.get(name:"database"))!
+            let defaultCol = try database.defaultCollection()
             let document: MutableDocument = args.get(name:"document")!
-            try database.saveDocument(document)
+            try defaultCol.save(document: document)
             
         case "database_saveWithConcurrency":
             let database: Database = (args.get(name:"database"))!
+            let defaultCol = try database.defaultCollection()
             let document: MutableDocument = args.get(name:"document")!
             let concurrencyControlType : String? = args.get(name:"concurrencyControlType")!
             var concurrencyType = ConcurrencyControl.lastWriteWins
@@ -110,10 +116,12 @@ public class DatabaseRequestHandler {
                     concurrencyType = .lastWriteWins
                 }
             }
-            try! database.saveDocument(document, concurrencyControl: concurrencyType)
+
+            return try defaultCol.save(document: document, concurrencyControl: concurrencyType)
             
         case "database_deleteWithConcurrency":
             let database: Database = (args.get(name:"database"))!
+            let defaultCol = try database.defaultCollection()
             let document: Document = (args.get(name:"document"))!
             let concurrencyControlType : String? = args.get(name:"concurrencyControlType")!
             var concurrencyType = ConcurrencyControl.lastWriteWins
@@ -125,26 +133,24 @@ public class DatabaseRequestHandler {
                     concurrencyType = .lastWriteWins
                 }
             }
-            do {
-                try database.deleteDocument(document, concurrencyControl: concurrencyType)
-            } catch {
-                return error
-            }
+            return try defaultCol.delete(document: document, concurrencyControl: concurrencyType)
 
-            
         case "database_purge":
             let database: Database = (args.get(name:"database"))!
+            let defaultCol = try database.defaultCollection()
             let document: MutableDocument = args.get(name:"document")!
-            try! database.purgeDocument(document)
+            try! defaultCol.purge(document: document)
             
         case "database_contains":
             let database: Database = (args.get(name:"database"))!
+            let defaultCol = try database.defaultCollection()
             let id: String = (args.get(name: "id"))!
-            return try database.document(withID: id) != nil
+            return try defaultCol.document(id: id) != nil
 
         case "database_getCount":
             let database: Database = (args.get(name:"database"))!
-            return try database.count
+            let defaultCol = try database.defaultCollection()
+            return defaultCol.count
 
         case "database_compact":
             let database: Database = (args.get(name:"database"))!
@@ -152,14 +158,15 @@ public class DatabaseRequestHandler {
             
         case "database_addChangeListener":
             let database: Database = (args.get(name:"database"))!
+            let defaultCol = try database.defaultCollection()
             var token: ListenerToken? = nil
             let docId: String? = (args.get(name:"docId"))
             if (docId != nil) {
                 let changeListener = MyDocumentChangeListener()
-                token = try database.addDocumentChangeListener(withID: docId!, listener: changeListener.listener)
+                token = defaultCol.addDocumentChangeListener(id: docId!, listener: changeListener.listener)
             } else {
                 let changeListener = MyDatabaseChangeListener()
-                token = database.addChangeListener(changeListener.listener)
+                token = defaultCol.addChangeListener(listener: changeListener.listener)
             }
             
             return token
@@ -167,8 +174,7 @@ public class DatabaseRequestHandler {
         case "database_removeChangeListener":
             let database: Database = (args.get(name:"database"))!
             let changeListener: ListenerToken = (args.get(name: "changeListener"))!
-
-            database.removeChangeListener(withToken: changeListener)
+            changeListener.remove()
 
         case "database_databaseChangeListenerChangesCount":
             let changeListener: MyDatabaseChangeListener = (args.get(name: "changeListener"))!
@@ -186,7 +192,7 @@ public class DatabaseRequestHandler {
             return changeListener.getChanges()
             
         case "database_databaseChangeGetDocumentId":
-            let change: DatabaseChange = (args.get(name: "change"))!
+            let change: CollectionChange = (args.get(name: "change"))!
 
             return change.documentIDs
             
@@ -201,6 +207,7 @@ public class DatabaseRequestHandler {
 
         case "database_saveDocuments":
             let database: Database = args.get(name:"database")!
+            let defaultCol = try database.defaultCollection()
             let documents: Dictionary<String, Dictionary<String, Any>> = args.get(name: "documents")!
             try database.inBatch {
                 for doc in documents {
@@ -212,13 +219,14 @@ public class DatabaseRequestHandler {
                     }
                     let new_data: Dictionary<String, Any> = setDataBlob(data)
                     let document = MutableDocument(id: id, data: new_data)
-                    try! database.saveDocument(document)
+                    try! defaultCol.save(document: document)
                     
                 }
             }
  
         case "database_updateDocuments":
             let database: Database = args.get(name:"database")!
+            let defaultCol = try database.defaultCollection()
             let documents: Dictionary<String, Dictionary<String, Any>> = args.get(name: "documents")!
             try database.inBatch {
                 for doc in documents {
@@ -228,32 +236,33 @@ public class DatabaseRequestHandler {
                         data["id"] = id
                         data.removeValue(forKey: "_id")
                     }
-                    let updated_doc = database.document(withID: id)!.toMutable()
+                    let updated_doc = try! defaultCol.document(id: id)!.toMutable()
                     let new_data: Dictionary<String, Any> = setDataBlob(data)
                     updated_doc.setData(new_data)
-                    try database.saveDocument(updated_doc)
+                    try defaultCol.save(document: updated_doc)
                 }
             }
             
         case "database_updateDocument":
-            
             let database: Database = (args.get(name:"database"))!
+            let defaultCol = try database.defaultCollection()
             let data: Dictionary<String, Any> = args.get(name: "data")!
             let docId: String = args.get(name: "id")!
-            let updated_doc = database.document(withID: docId)!.toMutable()
+            let updated_doc = try! defaultCol.document(id: docId)!.toMutable()
             let new_data: Dictionary<String, Any> = setDataBlob(data)
             
             updated_doc.setData(new_data)
-            try! database.saveDocument(updated_doc)
+            try! defaultCol.save(document: updated_doc)
             
                
         case "database_getDocIds":
             let database: Database = args.get(name:"database")!
+            let defaultCol = try database.defaultCollection()
             let limit: Int = args.get(name:"limit")!
             let offset: Int = args.get(name:"offset")!
             let query = QueryBuilder
                 .select(SelectResult.expression(Meta.id))
-                .from(DataSource.database(database))
+                .from(DataSource.collection(defaultCol))
                 .limit(Expression.int(limit), offset:Expression.int(offset))
 
             var result: [String] = []
@@ -267,11 +276,12 @@ public class DatabaseRequestHandler {
 
         case "database_getDocuments":
             let database: Database = args.get(name:"database")!
+            let defaultCol = try database.defaultCollection()
             let ids: [String] = args.get(name:"ids")!
             var documents = [String: [String: Any]]()
 
             for id in ids {
-                let document: Document? = database.document(withID: id)
+                let document: Document? = try! defaultCol.document(id: id)
                 if document != nil{
                     var dict = document!.toDictionary()
                     for (key, value) in dict {
@@ -320,9 +330,10 @@ public class DatabaseRequestHandler {
 
         case "database_queryAllDocuments":
             let database: Database = args.get(name:"database")!
+            let defaultCol = try database.defaultCollection()
             let searchQuery = QueryBuilder
                 .select(SelectResult.all())
-                .from(DataSource.database(database))
+                .from(DataSource.collection(defaultCol))
 
             return searchQuery
         default:
@@ -361,13 +372,13 @@ private extension DatabaseRequestHandler {
 }
 
 class MyDatabaseChangeListener  {
-    var changes: [DatabaseChange] = []
+    var changes: [CollectionChange] = []
     
-    lazy var listener: (DatabaseChange) -> Void = { (change: DatabaseChange) in
+    lazy var listener: (CollectionChange) -> Void = { (change: CollectionChange) in
         self.changes.append(change)
     }
     
-    public func getChanges() -> [DatabaseChange] {
+    public func getChanges() -> [CollectionChange] {
         return changes
     }
 }

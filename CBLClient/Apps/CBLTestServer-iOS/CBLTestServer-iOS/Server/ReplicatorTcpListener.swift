@@ -68,7 +68,7 @@ public final class ReplicatorTcpListener: NSObject {
     public init(databases: [Database], port: UInt32) {
         for db in databases {
             let config = MessageEndpointListenerConfiguration(
-                database: db, protocolType: .byteStream)
+                collections: [try! db.defaultCollection()], protocolType: .byteStream)
             listeners[db.name] = MessageEndpointListener(config: config)
         }
         self.port = port

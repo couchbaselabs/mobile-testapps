@@ -177,7 +177,6 @@ public class VectorSearchRequestHandler {
 
 }
 
-@available(iOS 16.0, *)
 public class vectorModel: PredictiveModel {
     // key is the field name in the doc
     // to create embeddings on

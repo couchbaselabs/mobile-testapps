@@ -73,7 +73,8 @@ public class PeerToPeerRequestHandler {
                 config = URLEndpointListenerConfiguration(collections: collections!)
             }
             else if database != nil {
-                config = URLEndpointListenerConfiguration.init(database: [database][0]!)
+                let defaultCol = try database!.defaultCollection()
+                config = URLEndpointListenerConfiguration.init(collections: [defaultCol])
             }
             else {
                 throw RequestHandlerError.InvalidArgument("Provide collections or database")
@@ -103,7 +104,7 @@ public class PeerToPeerRequestHandler {
 
             } else if tlsAuthType == "self_signed_create" {
                 try! TLSIdentity.deleteIdentity(withLabel: "CBL-Cert")
-                let id = try! TLSIdentity.createIdentity(forServer: true , attributes: [certAttrCommonName: "CBL-Server"], expiration: nil, label: "CBL-Cert")
+                let id = try! TLSIdentity.createIdentity(for: .serverAuth, attributes: [certAttrCommonName: "CBL-Server"], expiration: nil, label: "CBL-Cert")
                 config.tlsIdentity = id
                 print("========== Setting CreateIdentity =========")
             }
@@ -147,6 +148,24 @@ public class PeerToPeerRequestHandler {
             var wsPort: String?
             let maxRetries: String? = args.get(name: "max_retries")
             let maxRetryWaitTime: String? = args.get(name: "max_timeout")
+            
+            var finalConfigs: [CollectionConfiguration] = []
+           
+            if let col = collections {
+                if let colConfig = collectionConfigurations {
+                    if colConfig.count == 1 {
+                        finalConfigs = col.map { _ in colConfig[0] }
+                    } else {
+                        assert(colConfig.count == col.count)
+                        finalConfigs = colConfig
+                    }
+                } else {
+                    finalConfigs = col.map { col in CollectionConfiguration(collection: col) }
+                }
+            } else {
+                throw RequestHandlerError.InvalidArgument("No collections provided")
+            }
+            
             if let type = replication_type {
                 if type == "push" {
                     replicatorType = .push
@@ -167,11 +186,11 @@ public class PeerToPeerRequestHandler {
             if endPointType == "URLEndPoint"{
                 let urlEndPoint: URLEndpoint = URLEndpoint(url: url)
                 print(urlEndPoint)
-                replicatorConfig = ReplicatorConfiguration(target: urlEndPoint)
+                replicatorConfig = ReplicatorConfiguration(collections: finalConfigs, target: urlEndPoint)
             }
             else{
                 let endpoint = MessageEndpoint(uid: url.absoluteString, target: url, protocolType: ProtocolType.byteStream, delegate: self)
-                replicatorConfig = ReplicatorConfiguration(target: endpoint)
+                replicatorConfig = ReplicatorConfiguration(collections: finalConfigs, target: endpoint)
             }
             
             if auth != nil {
@@ -209,22 +228,7 @@ public class PeerToPeerRequestHandler {
                 replicatorConfig.maxAttemptWaitTime = maxRetryWaitTimeDouble
             }
             replicatorConfig.replicatorType = replicatorType
-            if let col = collections {
-                if let colConfig = collectionConfigurations {
-                    if colConfig.count == 1 {
-                        replicatorConfig.addCollections(col, config: colConfig[0])
-                    }
-                    else {
-                        assert(colConfig.count == col.count)
-                        for (i, j) in colConfig.enumerated() {
-                            replicatorConfig.addCollection(col[i], config: j)
-                        }
-                    }
-                }
-                else {
-                    replicatorConfig.addCollections(col)
-                }
-            }
+            
             let replicator: Replicator = Replicator(config: replicatorConfig)
             return replicator
             
@@ -233,6 +237,9 @@ public class PeerToPeerRequestHandler {
             let port: Int = args.get(name:"port")!
             let serverDBName: String = args.get(name:"serverDBName")!
             let database: Database = args.get(name:"database")!
+            let defaultCol = try database.defaultCollection()
+            var colConfig = CollectionConfiguration(collection: defaultCol)
+            
             let continuous: Bool? = args.get(name:"continuous")!
             let replication_type: String? = args.get(name: "replicationType")!
             let documentIDs: [String]? = args.get(name: "documentIDs")
@@ -253,6 +260,7 @@ public class PeerToPeerRequestHandler {
             var wsPort: String?
             let maxRetries: String? = args.get(name: "max_retries")
             let maxRetryWaitTime: String? = args.get(name: "max_timeout")
+            
 
             if let type = replication_type {
                 if type == "push" {
@@ -269,15 +277,67 @@ public class PeerToPeerRequestHandler {
             } else {
                 wsPort = "ws"
             }
-
+            
+            if documentIDs != nil {
+                colConfig.documentIDs = documentIDs
+            }
+            if pull_filter != false {
+                if filter_callback_func == "boolean" {
+                    colConfig.pullFilter = _replicatorBooleanFilterCallback;
+                } else if filter_callback_func == "deleted" {
+                    colConfig.pullFilter = _replicatorDeletedFilterCallback;
+                } else if filter_callback_func == "access_revoked" {
+                    colConfig.pullFilter = _replicatorAccessRevokedCallback;
+                } else {
+                    colConfig.pullFilter = _defaultReplicatorFilterCallback;
+                }
+            }
+            if push_filter != false {
+                if filter_callback_func == "boolean" {
+                    colConfig.pushFilter = _replicatorBooleanFilterCallback;
+                } else if filter_callback_func == "deleted" {
+                    colConfig.pushFilter = _replicatorDeletedFilterCallback;
+                } else if filter_callback_func == "access_revoked" {
+                    colConfig.pushFilter = _replicatorAccessRevokedCallback;
+                } else {
+                    colConfig.pushFilter = _defaultReplicatorFilterCallback;
+                }
+            }
+            switch conflict_resolver {
+                case "local_wins":
+                    colConfig.conflictResolver = LocalWinCustomConflictResolver();
+                    break
+                case "remote_wins":
+                    colConfig.conflictResolver = RemoteWinCustomConflictResolver();
+                    break;
+                case "null":
+                    colConfig.conflictResolver = NullWinCustomConflictResolver();
+                    break;
+                case "merge":
+                    colConfig.conflictResolver = MergeWinCustomConflictResolver();
+                    break;
+                case "incorrect_doc_id":
+                    colConfig.conflictResolver = IncorrectDocIdCustomConflictResolver();
+                    break;
+                case "delayed_local_win":
+                    colConfig.conflictResolver = DelayedLocalWinCustomConflictResolver();
+                    break;
+                case "exception_thrown":
+                    colConfig.conflictResolver = ExceptionThrownCustomConflictResolver();
+                    break;
+                default:
+                    colConfig.conflictResolver = ConflictResolver.default
+                    break;
+            }
+            
             let url = URL(string: "\(wsPort ?? "ws")://\(host):\(port)/\(serverDBName)")!
             if endPointType == "URLEndPoint"{
                 let urlEndPoint: URLEndpoint = URLEndpoint(url: url)
-                replicatorConfig = ReplicatorConfiguration(database: database, target: urlEndPoint)
+                replicatorConfig = ReplicatorConfiguration(collections: [colConfig], target: urlEndPoint)
             }
             else{
                 let endpoint = MessageEndpoint(uid: url.absoluteString, target: url, protocolType: ProtocolType.byteStream, delegate: self)
-                replicatorConfig = ReplicatorConfiguration(database: database, target: endpoint)
+                replicatorConfig = ReplicatorConfiguration(collections: [colConfig], target: endpoint)
             }
             
             if auth != nil {
@@ -304,57 +364,6 @@ public class PeerToPeerRequestHandler {
 
             if continuous != nil {
                 replicatorConfig.continuous = continuous!
-            }
-            if documentIDs != nil {
-                replicatorConfig.documentIDs = documentIDs
-            }
-            if pull_filter != false {
-                if filter_callback_func == "boolean" {
-                    replicatorConfig.pullFilter = _replicatorBooleanFilterCallback;
-                } else if filter_callback_func == "deleted" {
-                    replicatorConfig.pullFilter = _replicatorDeletedFilterCallback;
-                } else if filter_callback_func == "access_revoked" {
-                    replicatorConfig.pullFilter = _replicatorAccessRevokedCallback;
-                } else {
-                    replicatorConfig.pullFilter = _defaultReplicatorFilterCallback;
-                }
-            }
-            if push_filter != false {
-                if filter_callback_func == "boolean" {
-                    replicatorConfig.pushFilter = _replicatorBooleanFilterCallback;
-                } else if filter_callback_func == "deleted" {
-                    replicatorConfig.pushFilter = _replicatorDeletedFilterCallback;
-                } else if filter_callback_func == "access_revoked" {
-                    replicatorConfig.pushFilter = _replicatorAccessRevokedCallback;
-                } else {
-                    replicatorConfig.pushFilter = _defaultReplicatorFilterCallback;
-                }
-            }
-            switch conflict_resolver {
-                case "local_wins":
-                    replicatorConfig.conflictResolver = LocalWinCustomConflictResolver();
-                    break
-                case "remote_wins":
-                    replicatorConfig.conflictResolver = RemoteWinCustomConflictResolver();
-                    break;
-                case "null":
-                    replicatorConfig.conflictResolver = NullWinCustomConflictResolver();
-                    break;
-                case "merge":
-                    replicatorConfig.conflictResolver = MergeWinCustomConflictResolver();
-                    break;
-                case "incorrect_doc_id":
-                    replicatorConfig.conflictResolver = IncorrectDocIdCustomConflictResolver();
-                    break;
-                case "delayed_local_win":
-                    replicatorConfig.conflictResolver = DelayedLocalWinCustomConflictResolver();
-                    break;
-                case "exception_thrown":
-                    replicatorConfig.conflictResolver = ExceptionThrownCustomConflictResolver();
-                    break;
-                default:
-                    replicatorConfig.conflictResolver = ConflictResolver.default
-                    break;
             }
             if let heartbeat = heartbeat, let heartbeatDouble = Double(heartbeat) {
                 replicatorConfig.heartbeat = heartbeatDouble
@@ -384,7 +393,7 @@ public class PeerToPeerRequestHandler {
         case "peerToPeer_removeReplicatorEventListener":
             let replication_obj: Replicator = args.get(name: "replicator")!
             let changeListener : MyDocumentReplicationListener = (args.get(name: "changeListener"))!
-            replication_obj.removeChangeListener(withToken: changeListener.listenerToken!)
+            changeListener.listenerToken!.remove()
 
         case "peerToPeer_replicatorEventChangesCount":
             let changeListener: MyDocumentReplicationListener = (args.get(name: "changeListener"))!
@@ -408,7 +417,9 @@ public class PeerToPeerRequestHandler {
         default:
             throw RequestHandlerError.MethodNotFound(method)
         }
+        
         return PeerToPeerRequestHandler.VOID
+
     }
 }
 #if COUCHBASE_ENTERPRISE

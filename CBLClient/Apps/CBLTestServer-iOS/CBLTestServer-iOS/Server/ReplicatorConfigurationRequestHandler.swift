@@ -29,7 +29,8 @@ public class ReplicatorConfigurationRequestHandler {
             let filter_callback_func: String? = args.get(name: "filter_callback_func")
             let channels: [String]? = args.get(name: "channels")
             let documentIDs: [String]? = args.get(name: "documentIDs")
-            var config = CollectionConfiguration()
+            let collection: Collection? = args.get(name: "collection")
+            var config = CollectionConfiguration(collection: collection!)
             let filter1 = { (doc: Document, flags: DocumentFlags) in return false }
             config.conflictResolver = conflictResolver
             if (pull_filter != false) {
@@ -59,45 +60,19 @@ public class ReplicatorConfigurationRequestHandler {
             config.documentIDs = documentIDs
             return config
         
-        case "replicatorConfiguration_addCollection":
-            var replicatorConfiguration: ReplicatorConfiguration = args.get(name: "replicatorConfiguration")!
-            let collection: Collection = args.get(name: "collections")!
-            let collectionConfiguration: CollectionConfiguration? = args.get(name: "configuration")
-            if(collectionConfiguration != nil) {
-                replicatorConfiguration.addCollection((collection), config: collectionConfiguration)
-            }
-            else {
-                replicatorConfiguration.addCollection(collection)
-            }
-        
-        case "replicatorConfiguration_addCollections":
-            var replicatorConfiguration: ReplicatorConfiguration = args.get(name: "replicatorConfiguration")!
-            let collection: [Collection] = args.get(name: "collections")!
-            let collectionConfiguration: CollectionConfiguration? = args.get(name: "configuration")
-            replicatorConfiguration.addCollections((collection), config: collectionConfiguration)
-        
-        case "replicatorConfiguration_removeCollection":
-            let collection: Collection = args.get(name: "collection")!
-            var replicatorConfiguration: ReplicatorConfiguration = args.get(name: "replicatorConfiguration")!
-            replicatorConfiguration.removeCollection(collection)
-            
-        case "replicatorConfiguration_collectionConfig":
-            let collection: Collection = args.get(name: "collection")!
-            let replicatorConfiguration: ReplicatorConfiguration = args.get(name: "replicator")!
-            return replicatorConfiguration.collectionConfig(collection)
-        
         case "replicatorConfiguration_collectionNames":
             let replicatorConfiguration: ReplicatorConfiguration = args.get(name: "replicator")!
             let collectionNames = replicatorConfiguration.collections
             var names = [String]()
             for collection in collectionNames {
-                let collectionObject: Collection = collection
+                let collectionObject: Collection = collection.collection
                 names.append(collectionObject.name)
             }
             return names
             
         case "replicatorConfiguration_create":
             let sourceDb: Database = args.get(name: "sourceDb")!
+            let defaulCol = try sourceDb.defaultCollection()
             let targetURI: String? = args.get(name: "targetURI")!
             let targetDb: Database? = args.get(name: "targetDb")!
             var target: Endpoint?
@@ -116,11 +91,11 @@ public class ReplicatorConfigurationRequestHandler {
                 throw RequestHandlerError.InvalidArgument("Target database or URL should be provided.")
             }
             
-            return ReplicatorConfiguration(database: sourceDb, target: target!)
-        
+            let colConfig = CollectionConfiguration(collection: defaulCol)
+            return ReplicatorConfiguration(collections: [colConfig], target: target!)
+            
         case "replicatorConfiguration_configureCollection":
-            Database.log.console.domains = .all 
-            Database.log.console.level = .verbose
+            LogSinks.console = ConsoleLogSink(level: .verbose, domains: .all)
             let target_url: String? = args.get(name: "target_url")
             let replication_type: String? = args.get(name: "replication_type")
             let continuous: Bool? = args.get(name: "continuous")
@@ -164,14 +139,18 @@ public class ReplicatorConfigurationRequestHandler {
             let targetDatabase: Database? = args.get(name: "target_db")
             if (targetDatabase != nil) {
                 target = DatabaseEndpoint(database: targetDatabase!)
-                config = ReplicatorConfiguration(target: target!)
+                let defaultCol = try targetDatabase!.defaultCollection()
+                let colConfig = CollectionConfiguration(collection: defaultCol)
+                config = ReplicatorConfiguration(collections: [colConfig], target: target!)
             }
             #endif
 
             if (target == nil) {
                 throw RequestHandlerError.InvalidArgument("target url or database should be provided.")
             }
-            config = ReplicatorConfiguration(target: target!)
+            
+            config = ReplicatorConfiguration(collections: collectionConfigurations!, target: target!)
+            
             config.replicatorType = replicatorType
             config.authenticator = authenticator
             if continuous != nil {
@@ -202,26 +181,11 @@ public class ReplicatorConfigurationRequestHandler {
                 config.enableAutoPurge = auto_purge.lowercased() == "enabled"
             }
             
-            if let col = collections {
-                if let colConfig = collectionConfigurations {
-                    if colConfig.count == 1 {
-                        config.addCollections(col, config: colConfig[0])
-                    }
-                    else {
-                        assert(colConfig.count == col.count)
-                        for (i, j) in colConfig.enumerated() {
-                            config.addCollection(col[i], config: j)
-                        }
-                    }
-                }
-                else {
-                    config.addCollections(col)
-                }
-            }
             return Replicator(config: config)
             
         case "replicatorConfiguration_configure":
             let source_db: Database? = args.get(name: "source_db")
+            let defaultCol = try source_db?.defaultCollection()
             let target_url: String? = args.get(name: "target_url")
             let replication_type: String? = args.get(name: "replication_type")!
             let continuous: Bool? = args.get(name: "continuous")
@@ -276,15 +240,78 @@ public class ReplicatorConfigurationRequestHandler {
                 let targetDatabase: Database? = args.get(name: "target_db")
                 if (targetDatabase != nil) {
                     target = DatabaseEndpoint(database: targetDatabase!)
-                    config = ReplicatorConfiguration(database: source_db!, target: target!)
+                    let defaultCol = try targetDatabase!.defaultCollection()
+                    let colConfig = CollectionConfiguration(collection: defaultCol)
+                    config = ReplicatorConfiguration(collections: [colConfig], target: target!)
                 }
             #endif
 
             if (target == nil) {
                 throw RequestHandlerError.InvalidArgument("target url or database should be provided.")
             }
-            config = ReplicatorConfiguration(database: source_db!, target: target!)
+            
+            var colConfig = CollectionConfiguration(collection: defaultCol!)
+            if channels != nil {
+                colConfig.channels = channels
+            }
+            if documentIDs != nil {
+                colConfig.documentIDs = documentIDs
+            }
+            if pull_filter != false {
+                if filter_callback_func == "boolean" {
+                    colConfig.pullFilter = _replicatorBooleanFilterCallback;
+                } else if filter_callback_func == "deleted" {
+                    colConfig.pullFilter = _replicatorDeletedFilterCallback;
+                } else if filter_callback_func == "access_revoked" {
+                    colConfig.pullFilter = _replicatorAccessRevokedCallback;
+                } else {
+                    colConfig.pullFilter = _defaultReplicatorFilterCallback;
+                }
+            }
+            if push_filter != false {
+                if filter_callback_func == "boolean" {
+                    colConfig.pushFilter = _replicatorBooleanFilterCallback;
+                } else if filter_callback_func == "deleted" {
+                    colConfig.pushFilter = _replicatorDeletedFilterCallback;
+                } else if filter_callback_func == "access_revoked" {
+                    colConfig.pushFilter = _replicatorAccessRevokedCallback;
+                } else {
+                    colConfig.pushFilter = _defaultReplicatorFilterCallback;
+                }
+            }
+            switch conflict_resolver {
+                case "local_wins":
+                    colConfig.conflictResolver = LocalWinCustomConflictResolver();
+                    break
+                case "remote_wins":
+                    colConfig.conflictResolver = RemoteWinCustomConflictResolver();
+                    break;
+                case "null":
+                    colConfig.conflictResolver = NullWinCustomConflictResolver();
+                    break;
+                case "merge":
+                    colConfig.conflictResolver = MergeWinCustomConflictResolver();
+                    break;
+                case "incorrect_doc_id":
+                    colConfig.conflictResolver = IncorrectDocIdCustomConflictResolver();
+                    break;
+                case "delayed_local_win":
+                    colConfig.conflictResolver = DelayedLocalWinCustomConflictResolver();
+                    break;
+                case "delete_not_win":
+                    colConfig.conflictResolver = DeleteDocCustomConflictResolver();
+                    break
+                case "exception_thrown":
+                    colConfig.conflictResolver = ExceptionThrownCustomConflictResolver();
+                    break;
+                default:
+                    colConfig.conflictResolver = ConflictResolver.default
+                    break;
+            }
+            
+            config = ReplicatorConfiguration(collections: [colConfig], target: target!)
             config.replicatorType = replicatorType
+            
             if continuous != nil {
                 config.continuous = continuous!
             } else {
@@ -293,70 +320,16 @@ public class ReplicatorConfigurationRequestHandler {
             if headers != nil {
                 config.headers = headers
             }
+            
             config.authenticator = authenticator
-            if channels != nil {
-                config.channels = channels
-            }
-            if documentIDs != nil {
-                config.documentIDs = documentIDs
-            }
+            
             if pinnedservercert != nil {
                 let path = Bundle(for: type(of:self)).path(forResource: pinnedservercert, ofType: "cer")
                 let data = try! NSData(contentsOfFile: path!, options: [])
                 let certificate = SecCertificateCreateWithData(nil, data)
                 config.pinnedServerCertificate = certificate
             }
-            if pull_filter != false {
-                if filter_callback_func == "boolean" {
-                    config.pullFilter = _replicatorBooleanFilterCallback;
-                } else if filter_callback_func == "deleted" {
-                    config.pullFilter = _replicatorDeletedFilterCallback;
-                } else if filter_callback_func == "access_revoked" {
-                    config.pullFilter = _replicatorAccessRevokedCallback;
-                } else {
-                    config.pullFilter = _defaultReplicatorFilterCallback;
-                }
-            }
-            if push_filter != false {
-                if filter_callback_func == "boolean" {
-                    config.pushFilter = _replicatorBooleanFilterCallback;
-                } else if filter_callback_func == "deleted" {
-                    config.pushFilter = _replicatorDeletedFilterCallback;
-                } else if filter_callback_func == "access_revoked" {
-                    config.pushFilter = _replicatorAccessRevokedCallback;
-                } else {
-                    config.pushFilter = _defaultReplicatorFilterCallback;
-                }
-            }
-            switch conflict_resolver {
-                case "local_wins":
-                    config.conflictResolver = LocalWinCustomConflictResolver();
-                    break
-                case "remote_wins":
-                    config.conflictResolver = RemoteWinCustomConflictResolver();
-                    break;
-                case "null":
-                    config.conflictResolver = NullWinCustomConflictResolver();
-                    break;
-                case "merge":
-                    config.conflictResolver = MergeWinCustomConflictResolver();
-                    break;
-                case "incorrect_doc_id":
-                    config.conflictResolver = IncorrectDocIdCustomConflictResolver();
-                    break;
-                case "delayed_local_win":
-                    config.conflictResolver = DelayedLocalWinCustomConflictResolver();
-                    break;
-                case "delete_not_win":
-                    config.conflictResolver = DeleteDocCustomConflictResolver();
-                    break
-                case "exception_thrown":
-                    config.conflictResolver = ExceptionThrownCustomConflictResolver();
-                    break;
-                default:
-                    config.conflictResolver = ConflictResolver.default
-                    break;
-            }
+            
             if let heartbeat = heartbeat, let heartbeatDouble = Double(heartbeat) {
                 config.heartbeat = heartbeatDouble
             }
@@ -377,16 +350,16 @@ public class ReplicatorConfigurationRequestHandler {
             return replicatorConfiguration.authenticator
             
         case "replicatorConfiguration_getChannels":
-            let replicatorConfiguration: ReplicatorConfiguration = args.get(name: "configuration")!
-            return replicatorConfiguration.channels
+            let colConfiguration: CollectionConfiguration = args.get(name: "configuration")!
+            return colConfiguration.channels
             
         case "replicatorConfiguration_getDatabase":
-            let replicatorConfiguration: ReplicatorConfiguration = args.get(name: "configuration")!
-            return replicatorConfiguration.database
+            let colConfiguration: CollectionConfiguration = args.get(name: "configuration")!
+            return colConfiguration.collection.database
             
         case "replicatorConfiguration_getDocumentIDs":
-            let replicatorConfiguration: ReplicatorConfiguration = args.get(name: "configuration")!
-            return replicatorConfiguration.documentIDs
+            let colConfiguration: CollectionConfiguration = args.get(name: "configuration")!
+            return colConfiguration.documentIDs
             
         case "replicatorConfiguration_getPinnedServerCertificate":
             let replicatorConfiguration: ReplicatorConfiguration = args.get(name: "configuration")!
@@ -411,10 +384,10 @@ public class ReplicatorConfigurationRequestHandler {
             return replicatorConfiguration
         
         case "replicatorConfiguration_setChannels":
-            var replicatorConfiguration: ReplicatorConfiguration = args.get(name: "configuration")!
+            var colConfiguration: CollectionConfiguration = args.get(name: "configuration")!
             let channels: [String] = args.get(name: "channels")!
-            replicatorConfiguration.channels = channels
-            return replicatorConfiguration
+            colConfiguration.channels = channels
+            return colConfiguration
         
         case "replicatorConfiguration_setContinuous":
             var replicatorConfiguration: ReplicatorConfiguration = args.get(name: "configuration")!
@@ -423,10 +396,10 @@ public class ReplicatorConfigurationRequestHandler {
             return replicatorConfiguration
         
         case "replicatorConfiguration_setDocumentIDs":
-            var replicatorConfiguration: ReplicatorConfiguration = args.get(name: "configuration")!
+            var colConfiguration: CollectionConfiguration = args.get(name: "configuration")!
             let documentIds: [String] = args.get(name: "documentIds")!
-            replicatorConfiguration.documentIDs = documentIds
-            return replicatorConfiguration
+            colConfiguration.documentIDs = documentIds
+            return colConfiguration
             
         case "replicatorConfiguration_setAutoPurge":
             var replicatorConfiguration: ReplicatorConfiguration = args.get(name: "configuration")!
@@ -460,7 +433,6 @@ public class ReplicatorConfigurationRequestHandler {
         default:
             throw RequestHandlerError.MethodNotFound(method)
         }
-        return ReplicatorConfigurationRequestHandler.VOID
     }
 
 

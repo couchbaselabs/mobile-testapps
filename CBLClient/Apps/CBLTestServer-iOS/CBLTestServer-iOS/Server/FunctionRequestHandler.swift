@@ -171,7 +171,7 @@ public class FunctionRequestHandler {
             
         case "function_rank":
             let indexName: String = args.get(name: "expression")!
-            return FullTextFunction.rank(indexName)
+            return FullTextFunction.rank(Expression.fullTextIndex(indexName))
 
         default:
             throw RequestHandlerError.MethodNotFound(method)
