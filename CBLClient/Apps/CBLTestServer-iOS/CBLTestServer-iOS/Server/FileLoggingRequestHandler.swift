@@ -67,7 +67,7 @@ public class FileLoggingRequestHandler {
 
         case "logging_getConfig":
             guard let fileSink = LogSinks.file else { return nil }
-            return serializeConfig(LogSinks.file!)
+            return serializeConfig(fileSink)
             
         case "logging_getLogsInZip":
             guard let fileSink = LogSinks.file else {
@@ -104,7 +104,7 @@ public class FileLoggingRequestHandler {
                     level: sink.level,
                     directory: sink.directory,
                     usePlainText: sink.usePlaintext,
-                    maxKeptFiles: max_kept_files - 1,
+                    maxKeptFiles: max_kept_files + 1,
                     maxFileSize: sink.maxFileSize
                 )
                 return serializeConfig(LogSinks.file!)
