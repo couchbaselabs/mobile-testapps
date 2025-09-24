@@ -75,12 +75,41 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
         } else {
             uri = new URI("wss://" + ipaddress + ":" + port + "/" + serverDBName);
         }
+        Set<CollectionConfiguration> collectionConfigs = new HashSet<>();
+        if (collections != null) {
+            if (configuration != null && configuration.size() > 1 && configuration.size() == collections.size()) {
+                for (int i = 0; i < collections.size(); i++) {
+                    CollectionConfiguration collConfig = (i < configuration.size())
+                            ? configuration.get(i)
+                            : new CollectionConfiguration(collections.get(i));
+                    collectionConfigs.add(collConfig);
+                }
+            } else if (configuration != null && configuration.size() == 1) {
+                CollectionConfiguration sharedConfig = configuration.get(0);
+                for (Collection collection : collections) {
+                    CollectionConfiguration collConfig = new CollectionConfiguration(collection);
+                    if (sharedConfig.getChannels() != null) collConfig.setChannels(sharedConfig.getChannels());
+                    if (sharedConfig.getDocumentIDs() != null) collConfig.setDocumentIDs(sharedConfig.getDocumentIDs());
+                    if (sharedConfig.getPushFilter() != null) collConfig.setPushFilter(sharedConfig.getPushFilter());
+                    if (sharedConfig.getPullFilter() != null) collConfig.setPullFilter(sharedConfig.getPullFilter());
+                    if (sharedConfig.getConflictResolver() != null) collConfig.setConflictResolver(sharedConfig.getConflictResolver());
+                    collectionConfigs.add(collConfig);
+                }
+            } else if (configuration == null) {
+                for (Collection collection : collections) {
+                    collectionConfigs.add(new CollectionConfiguration(collection));
+                }
+            } else {
+                throw new Exception("Mismatch in number of collections and configurations");
+            }
+        }
+
         if (endPointType.equals("URLEndPoint")) {
             URLEndpoint urlEndPoint = new URLEndpoint(uri);
-            config = new ReplicatorConfiguration(urlEndPoint);
+            config = new ReplicatorConfiguration(collectionConfigs, urlEndPoint);
         } else if (endPointType.equals("MessageEndPoint")) {
             MessageEndpoint messageEndPoint = new MessageEndpoint("p2p", uri, ProtocolType.BYTE_STREAM, this);
-            config = new ReplicatorConfiguration(messageEndPoint);
+            config = new ReplicatorConfiguration(collectionConfigs, messageEndPoint);
         } else {
             throw new IllegalArgumentException("Incorrect EndPoint type");
         }
@@ -123,30 +152,6 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
 
         if (serverVerificationMode) {
             config.setAcceptOnlySelfSignedServerCertificate(true);
-        }
-        if (collections != null) {
-            if (configuration != null && configuration.size()>1 && configuration.size() == collections.size()) {
-                for (int i = 0; i < collections.size(); i++) {
-                    if (i< configuration.size()) {
-                        config.addCollection(collections.get(i), configuration.get(i));
-                    }
-                    else {
-                        config.addCollection(collections.get(i), null);
-                    }
-                }
-            }
-            else if (configuration != null && configuration.size()==1 && collections.size()>1) {
-                config.addCollections(collections, configuration.get(0));
-            }
-            else if (configuration != null && configuration.size() == 1 && collections.size() ==1) {
-                config.addCollections(collections, configuration.get(0));
-            }
-            else if(configuration == null) {
-                config.addCollections(collections, null);
-            }
-            else {
-                throw new Exception("\"Mismatch in number of collections and configurations\"");
-            }
         }
         replicator = new Replicator(config);
         return replicator;
@@ -194,13 +199,83 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
         } else {
             uri = new URI("wss://" + ipaddress + ":" + port + "/" + serverDBName);
         }
+        CollectionConfiguration collectionConfig = new CollectionConfiguration(sourceDb.getDefaultCollection());
+
+        if (documentIds != null) {
+            collectionConfig.setDocumentIDs(documentIds);
+        }
+
+        if (push_filter) {
+            switch (filter_callback_func) {
+                case "boolean":
+                    collectionConfig.setPushFilter(new ReplicatorBooleanFilterCallback());
+                    break;
+                case "deleted":
+                    collectionConfig.setPushFilter(new ReplicatorDeletedFilterCallback());
+                    break;
+                case "access_revoked":
+                    collectionConfig.setPushFilter(new ReplicatorAccessRevokedFilterCallback());
+                    break;
+                default:
+                    collectionConfig.setPushFilter(new DefaultReplicatorFilterCallback());
+                    break;
+            }
+        }
+
+        if (pull_filter) {
+            switch (filter_callback_func) {
+                case "boolean":
+                    collectionConfig.setPullFilter(new ReplicatorBooleanFilterCallback());
+                    break;
+                case "deleted":
+                    collectionConfig.setPullFilter(new ReplicatorDeletedFilterCallback());
+                    break;
+                case "access_revoked":
+                    collectionConfig.setPullFilter(new ReplicatorAccessRevokedFilterCallback());
+                    break;
+                default:
+                    collectionConfig.setPullFilter(new DefaultReplicatorFilterCallback());
+                    break;
+            }
+        }
+
+        switch (conflict_resolver) {
+            case "local_wins":
+                collectionConfig.setConflictResolver(new LocalWinsCustomConflictResolver());
+                break;
+            case "remote_wins":
+                collectionConfig.setConflictResolver(new RemoteWinsCustomConflictResolver());
+                break;
+            case "null":
+                collectionConfig.setConflictResolver(new NullCustomConflictResolver());
+                break;
+            case "merge":
+                collectionConfig.setConflictResolver(new MergeCustomConflictResolver());
+                break;
+            case "incorrect_doc_id":
+                collectionConfig.setConflictResolver(new IncorrectDocIdConflictResolver());
+                break;
+            case "delayed_local_win":
+                collectionConfig.setConflictResolver(new DelayedLocalWinConflictResolver());
+                break;
+            case "delete_not_win":
+                collectionConfig.setConflictResolver(new DeleteDocConflictResolver());
+                break;
+            case "exception_thrown":
+                collectionConfig.setConflictResolver(new ExceptionThrownConflictResolver());
+                break;
+            default:
+                collectionConfig.setConflictResolver(ConflictResolver.DEFAULT);
+                break;
+        }
+
 
         if (endPointType.equals("URLEndPoint")) {
             URLEndpoint urlEndPoint = new URLEndpoint(uri);
-            config = new ReplicatorConfiguration(sourceDb, urlEndPoint);
+            config = new ReplicatorConfiguration(Set.of(collectionConfig), urlEndPoint);
         } else if (endPointType.equals("MessageEndPoint")) {
             MessageEndpoint messageEndPoint = new MessageEndpoint("p2p", uri, ProtocolType.BYTE_STREAM, this);
-            config = new ReplicatorConfiguration(sourceDb, messageEndPoint);
+            config = new ReplicatorConfiguration(Set.of(collectionConfig), messageEndPoint);
         } else {
             throw new IllegalArgumentException("Incorrect EndPoint type");
         }
@@ -209,9 +284,6 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
             config.setContinuous(continuous);
         } else {
             config.setContinuous(false);
-        }
-        if (documentIds != null) {
-            config.setDocumentIDs(documentIds);
         }
         if (heartbeat != null && !heartbeat.trim().isEmpty()){
             config.setHeartbeat(Integer.parseInt(heartbeat));
@@ -225,39 +297,6 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
             config.setMaxAttemptWaitTime(Integer.parseInt(maxTimeout));
         }
 
-
-        if (push_filter) {
-            switch (filter_callback_func) {
-                case "boolean":
-                    config.setPushFilter(new ReplicatorBooleanFilterCallback());
-                    break;
-                case "deleted":
-                    config.setPushFilter(new ReplicatorDeletedFilterCallback());
-                    break;
-                case "access_revoked":
-                    config.setPushFilter(new ReplicatorAccessRevokedFilterCallback());
-                    break;
-                default:
-                    config.setPushFilter(new DefaultReplicatorFilterCallback());
-                    break;
-            }
-        }
-        if (pull_filter) {
-            switch (filter_callback_func) {
-                case "boolean":
-                    config.setPullFilter(new ReplicatorBooleanFilterCallback());
-                    break;
-                case "deleted":
-                    config.setPullFilter(new ReplicatorDeletedFilterCallback());
-                    break;
-                case "access_revoked":
-                    config.setPullFilter(new ReplicatorAccessRevokedFilterCallback());
-                    break;
-                default:
-                    config.setPullFilter(new DefaultReplicatorFilterCallback());
-                    break;
-            }
-        }
         if (args.get("basic_auth") != null) {
             config.setAuthenticator(args.get("basic_auth"));
         }
@@ -280,35 +319,6 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
 
         if (serverVerificationMode) {
             config.setAcceptOnlySelfSignedServerCertificate(true);
-        }
-        switch (conflict_resolver) {
-            case "local_wins":
-                config.setConflictResolver(new LocalWinsCustomConflictResolver());
-                break;
-            case "remote_wins":
-                config.setConflictResolver(new RemoteWinsCustomConflictResolver());
-                break;
-            case "null":
-                config.setConflictResolver(new NullCustomConflictResolver());
-                break;
-            case "merge":
-                config.setConflictResolver(new MergeCustomConflictResolver());
-                break;
-            case "incorrect_doc_id":
-                config.setConflictResolver(new IncorrectDocIdConflictResolver());
-                break;
-            case "delayed_local_win":
-                config.setConflictResolver(new DelayedLocalWinConflictResolver());
-                break;
-            case "delete_not_win":
-                config.setConflictResolver(new DeleteDocConflictResolver());
-                break;
-            case "exception_thrown":
-                config.setConflictResolver(new ExceptionThrownConflictResolver());
-                break;
-            default:
-                config.setConflictResolver(ConflictResolver.DEFAULT);
-                break;
         }
         replicator = new Replicator(config);
         return replicator;
@@ -337,7 +347,7 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
             config = new URLEndpointListenerConfiguration(collections);
         }
         else if (sourceDb != null) {
-            config = new URLEndpointListenerConfiguration(sourceDb);
+            config = new URLEndpointListenerConfiguration(sourceDb.getCollections());
         }
         else {
             throw new IllegalArgumentException("Provide collections array or database");
@@ -385,12 +395,12 @@ public class PeerToPeerRequestHandler implements MessageEndpointDelegate {
         return p2ptcpListener.getPort();
     }
 
-    public ReplicatorTcpListener messageEndpointListenerStart(Args args) throws IOException {
+    public ReplicatorTcpListener messageEndpointListenerStart(Args args) throws IOException, CouchbaseLiteException {
         Database sourceDb = args.get("database");
         int port = args.get("port");
         MessageEndpointListener messageEndpointListener =
                 new MessageEndpointListener(new MessageEndpointListenerConfiguration(
-                        sourceDb,
+                        sourceDb.getCollections(),
                         ProtocolType.BYTE_STREAM));
         ReplicatorTcpListener p2ptcpListener = new ReplicatorTcpListener(sourceDb, port);
         p2ptcpListener.start();

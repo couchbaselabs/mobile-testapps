@@ -1,5 +1,7 @@
 package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,13 +10,14 @@ import java.util.Map;
 import java.util.Set;
 
 import com.couchbase.lite.Blob;
+import com.couchbase.lite.CollectionChange;
+import com.couchbase.lite.CollectionChangeListener;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Expression;
-import com.couchbase.lite.Index;
 import com.couchbase.lite.IndexConfiguration;
-import com.couchbase.lite.Limit;
+import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.Meta;
 import com.couchbase.lite.Query;
 import com.couchbase.lite.QueryBuilder;
@@ -30,6 +33,7 @@ import com.couchbase.lite.Collection;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.MutableDocument;
 import com.couchbase.mobiletestkit.javacommon.RequestHandlerDispatcher;
+import com.couchbase.mobiletestkit.javacommon.util.ConcurrentExecutor;
 import com.couchbase.mobiletestkit.javacommon.util.Log;
 
 public class CollectionRequestHandler {
@@ -313,5 +317,62 @@ public class CollectionRequestHandler {
         }
 
         return data;
+    }
+
+
+    public ListenerToken addChangeListener(Args args) throws CouchbaseLiteException {
+        Database database = args.get("database");
+        ListenerToken token;
+        if (args.contain("docId")) {
+            String docId = args.get("docId");
+            MyDocumentChangeListener changeListener = new MyDocumentChangeListener();
+            token = database.getDefaultCollection().addDocumentChangeListener(docId, ConcurrentExecutor.EXECUTOR, changeListener);
+        }
+        else {
+            MyCollectionChangeListener changeListener = new MyCollectionChangeListener();
+            token = database.getDefaultCollection().addChangeListener(ConcurrentExecutor.EXECUTOR, changeListener);
+        }
+        return token;
+    }
+
+    public void removeChangeListener(Args args) {
+        Database database = args.get("database");
+        ListenerToken token = args.get("changeListenerToken");
+        token.remove();
+    }
+
+    public int databaseChangeListenerChangesCount(Args args) {
+        MyCollectionChangeListener changeListener = args.get("changeListener");
+        return changeListener.getChanges().size();
+    }
+
+    public CollectionChange databaseChangeListenerGetChange(Args args) {
+        MyCollectionChangeListener changeListener = args.get("changeListener");
+        int index = args.get("index");
+        return changeListener.getChanges().get(index);
+    }
+
+    public Database changeGetDatabase(Args args) {
+        CollectionChange change = args.get("change");
+        return change.getDatabase();
+    }
+
+    public List<String> changeGetDocumentId(Args args) {
+        CollectionChange change = args.get("change");
+        return change.getDocumentIDs();
+    }
+
+    class MyCollectionChangeListener implements CollectionChangeListener {
+        private List<CollectionChange> changes;
+
+        public List<CollectionChange> getChanges() {
+            return changes;
+        }
+
+
+        @Override
+        public void changed(@NonNull CollectionChange change) {
+            changes.add(change);
+        }
     }
 }

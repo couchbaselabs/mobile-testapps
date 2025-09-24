@@ -26,6 +26,7 @@ import java.net.SocketException;
 import java.util.Collections;
 import java.util.List;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.mobiletestkit.javacommon.util.Log;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.MessageEndpointListener;
@@ -42,10 +43,10 @@ public final class ReplicatorTcpListener {
     private Thread loopThread;
     private final Database database;
 
-    public ReplicatorTcpListener(Database database, int port) {
+    public ReplicatorTcpListener(Database database, int port) throws CouchbaseLiteException {
         this.database = database;
         MessageEndpointListenerConfiguration config =
-            new MessageEndpointListenerConfiguration(database, ProtocolType.BYTE_STREAM);
+            new MessageEndpointListenerConfiguration(database.getCollections(), ProtocolType.BYTE_STREAM);
         this.endpointListener = new MessageEndpointListener(config);
         this.port = port;
     }

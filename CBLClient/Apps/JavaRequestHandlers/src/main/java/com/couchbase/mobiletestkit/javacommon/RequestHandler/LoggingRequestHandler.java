@@ -2,6 +2,8 @@ package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 
 import java.io.File;
 
+import com.couchbase.lite.logging.FileLogSink;
+import com.couchbase.lite.logging.LogSinks;
 import com.couchbase.mobiletestkit.javacommon.Args;
 import com.couchbase.mobiletestkit.javacommon.RequestHandlerDispatcher;
 import com.couchbase.mobiletestkit.javacommon.RawData;
@@ -16,7 +18,7 @@ public class LoggingRequestHandler {
     /* - Logging - */
     /* ----------- */
 
-    public LogFileConfiguration configure(Args args) {
+    public FileLogSink configure(Args args) {
         String log_level = args.get("log_level");
         String directory = args.get("directory");
         int maxRotateCount = args.get("max_rotate_count");
@@ -28,80 +30,104 @@ public class LoggingRequestHandler {
             directory = RequestHandlerDispatcher.context.getFilesDir().getAbsolutePath() + File.separator + "logs_" + ts;
             Log.i(TAG, "File logging configured at: " + directory);
         }
-        LogFileConfiguration config = new LogFileConfiguration(directory);
+        FileLogSink.Builder builder = new FileLogSink.Builder()
+                .setDirectory(directory);
         if (maxRotateCount > 1) {
-            config.setMaxRotateCount(maxRotateCount);
+            builder.setMaxKeptFiles(maxRotateCount-1);
         }
         if (maxSize > 512000) {
-            config.setMaxSize(maxSize);
+            builder.setMaxFileSize(maxSize);
         }
-        config.setUsePlaintext(plainText);
-        Database.log.getFile().setConfig(config);
-        switch (log_level) {
-            case "debug":
-                Database.log.getFile().setLevel(LogLevel.DEBUG);
-                break;
-            case "verbose":
-                Database.log.getFile().setLevel(LogLevel.VERBOSE);
-                break;
-            case "info":
-                Database.log.getFile().setLevel(LogLevel.INFO);
-                break;
-            case "error":
-                Database.log.getFile().setLevel(LogLevel.ERROR);
-                break;
-            case "warning":
-                Database.log.getFile().setLevel(LogLevel.WARNING);
-                break;
-            default:
-                Database.log.getFile().setLevel(LogLevel.NONE);
-                break;
-        }
-        return config;
+        builder.setPlainText(plainText);
+
+        LogLevel level = parseLogLevel(log_level);
+        builder.setLevel(level);
+
+        FileLogSink sink = builder.build();
+        LogSinks.get().setFile(sink);
+        return sink;
     }
 
     public boolean getPlainTextStatus(Args args) {
-        return Database.log.getFile().getConfig().usesPlaintext();
+        FileLogSink sink = LogSinks.get().getFile();
+        return sink != null && sink.isPlainText();
     }
 
     public int getMaxRotateCount(Args args) {
-        return Database.log.getFile().getConfig().getMaxRotateCount();
+        FileLogSink sink = LogSinks.get().getFile();
+        return sink != null ? sink.getMaxKeptFiles() - 1 : 0;
     }
 
     public long getMaxSize(Args args) {
-        return Database.log.getFile().getConfig().getMaxSize();
+        FileLogSink sink = LogSinks.get().getFile();
+        return sink != null ? sink.getMaxFileSize(): 0;
     }
 
     public String getDirectory(Args args) {
-        return Database.log.getFile().getConfig().getDirectory();
+        FileLogSink sink = LogSinks.get().getFile();
+        return sink != null ? sink.getDirectory() : "";
     }
 
-    public LogFileConfiguration getConfig(Args args) {
-        return Database.log.getFile().getConfig();
+    public FileLogSink getConfig(Args args) {
+        return LogSinks.get().getFile();
     }
 
-    public LogFileConfiguration setPlainTextStatus(Args args) {
-        LogFileConfiguration config = args.get("config");
+    public FileLogSink setPlainTextStatus(Args args) {
         Boolean plain_text = args.get("plain_text");
-        config.setUsePlaintext(plain_text);
-        return config;
+        FileLogSink currentSink = LogSinks.get().getFile();
+
+        if (currentSink == null) return null;
+
+        FileLogSink newSink = new FileLogSink.Builder()
+                .setDirectory(currentSink.getDirectory())
+                .setLevel(currentSink.getLevel())
+                .setMaxFileSize(currentSink.getMaxFileSize())
+                .setMaxKeptFiles(currentSink.getMaxKeptFiles())
+                .setPlainText(plain_text)
+                .build();
+
+        LogSinks.get().setFile(newSink);
+        return newSink;
     }
 
-    public LogFileConfiguration setMaxRotateCount(Args args) {
-        LogFileConfiguration config = args.get("config");
+    public FileLogSink setMaxRotateCount(Args args) {
         int max_rotate_count = args.get("max_rotate_count");
-        config.setMaxRotateCount(max_rotate_count);
-        return config;
+        FileLogSink currentSink = LogSinks.get().getFile();
+
+        if (currentSink == null) return null;
+
+        FileLogSink newSink = new FileLogSink.Builder()
+                .setDirectory(currentSink.getDirectory())
+                .setLevel(currentSink.getLevel())
+                .setMaxFileSize(currentSink.getMaxFileSize())
+                .setMaxKeptFiles(max_rotate_count)  // Note: method name changed
+                .setPlainText(currentSink.isPlainText())
+                .build();
+
+        LogSinks.get().setFile(newSink);
+        return newSink;
     }
 
-    public LogFileConfiguration setMaxSize(Args args) {
-        LogFileConfiguration config = args.get("config");
+
+    public FileLogSink setMaxSize(Args args) {
         long max_size = args.get("max_size");
-        config.setMaxSize(max_size);
-        return config;
+        FileLogSink currentSink = LogSinks.get().getFile();
+
+        if (currentSink == null) return null;
+
+        FileLogSink newSink = new FileLogSink.Builder()
+                .setDirectory(currentSink.getDirectory())
+                .setLevel(currentSink.getLevel())
+                .setMaxFileSize(max_size)  // Note: method name is setMaxFileSize
+                .setMaxKeptFiles(currentSink.getMaxKeptFiles())
+                .setPlainText(currentSink.isPlainText())
+                .build();
+
+        LogSinks.get().setFile(newSink);
+        return newSink;
     }
 
-    public LogFileConfiguration setConfig(Args args) {
+    public FileLogSink setConfig(Args args) {
         String directory = args.get("directory");
         if (directory.isEmpty()) {
             long ts = System.currentTimeMillis() / 1000;
@@ -109,43 +135,39 @@ public class LoggingRequestHandler {
 
             Log.i(TAG, "File logging configured at: " + directory);
         }
-        LogFileConfiguration config = new LogFileConfiguration(directory);
-        Database.log.getFile().setConfig(config);
-        return config;
+        FileLogSink newSink = new FileLogSink.Builder()
+                .setDirectory(directory)
+                .build();
+        LogSinks.get().setFile(newSink);
+        return newSink;
     }
 
     public int getLogLevel(Args args) {
-        return Database.log.getFile().getLevel().ordinal();
+        FileLogSink sink = LogSinks.get().getFile();
+        return sink != null ? sink.getLevel().ordinal() : LogLevel.NONE.ordinal();
     }
 
-    public LogFileConfiguration setLogLevel(Args args) {
-        LogFileConfiguration config = args.get("config");
+    public FileLogSink setLogLevel(Args args) {
         String log_level = args.get("log_level");
-        switch (log_level) {
-            case "debug":
-                Database.log.getFile().setLevel(LogLevel.DEBUG);
-                break;
-            case "verbose":
-                Database.log.getFile().setLevel(LogLevel.VERBOSE);
-                break;
-            case "info":
-                Database.log.getFile().setLevel(LogLevel.INFO);
-                break;
-            case "error":
-                Database.log.getFile().setLevel(LogLevel.ERROR);
-                break;
-            case "warning":
-                Database.log.getFile().setLevel(LogLevel.WARNING);
-                break;
-            default:
-                Database.log.getFile().setLevel(LogLevel.NONE);
-                break;
-        }
-        return config;
+        FileLogSink currentSink = LogSinks.get().getFile();
+
+        if (currentSink == null) return null;
+
+        LogLevel level = parseLogLevel(log_level);
+        FileLogSink newSink = new FileLogSink.Builder()
+                .setDirectory(currentSink.getDirectory())
+                .setLevel(level)
+                .setMaxFileSize(currentSink.getMaxFileSize())
+                .setMaxKeptFiles(currentSink.getMaxKeptFiles())
+                .setPlainText(currentSink.isPlainText())
+                .build();
+
+        LogSinks.get().setFile(newSink);
+        return newSink;
     }
 
     public RawData getLogsInZip(Args args) {
-        LogFileConfiguration fileLoggerConfig = Database.log.getFile().getConfig();
+        FileLogSink fileLoggerConfig = LogSinks.get().getFile();
         if (fileLoggerConfig == null) { return null; }
 
         ZipUtils zipper = new ZipUtils();
@@ -160,6 +182,17 @@ public class LoggingRequestHandler {
         }
         finally {
             zipper.deleteRecursive(zipDir);
+        }
+    }
+
+    private LogLevel parseLogLevel(String log_level) {
+        switch (log_level) {
+            case "debug": return LogLevel.DEBUG;
+            case "verbose": return LogLevel.VERBOSE;
+            case "info": return LogLevel.INFO;
+            case "error": return LogLevel.ERROR;
+            case "warning": return LogLevel.WARNING;
+            default: return LogLevel.NONE;
         }
     }
 

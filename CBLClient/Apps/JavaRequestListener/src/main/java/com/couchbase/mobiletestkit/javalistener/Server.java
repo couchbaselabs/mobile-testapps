@@ -1,27 +1,24 @@
 package com.couchbase.mobiletestkit.javalistener;
 
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
+import com.couchbase.lite.logging.ConsoleLogSink;
+import com.couchbase.lite.logging.LogSinks;
 import com.couchbase.mobiletestkit.javacommon.*;
 
 import com.couchbase.mobiletestkit.javacommon.util.Log;
 import com.google.gson.Gson;
 import org.nanohttpd.protocols.http.IHTTPSession;
 import org.nanohttpd.protocols.http.NanoHTTPD;
-import org.nanohttpd.protocols.http.response.IStatus;
 import org.nanohttpd.protocols.http.response.Response;
 import org.nanohttpd.protocols.http.response.Status;
 
-import com.couchbase.lite.Database;
 import com.couchbase.lite.LogDomain;
 import com.couchbase.lite.LogLevel;
 
@@ -70,9 +67,8 @@ public class Server extends NanoHTTPD {
         Log.i(TAG, "Request URI: " + path);
 
         String method = (path.startsWith("/") ? path.substring(1) : path);
-
-        Database.log.getConsole().setLevel(LogLevel.DEBUG);
-        Database.log.getConsole().setDomains(LogDomain.ALL_DOMAINS);
+        ConsoleLogSink consoleLogSink = new ConsoleLogSink(LogLevel.DEBUG, LogDomain.ALL);
+        LogSinks.get().setConsole(consoleLogSink);
         // Get args from query string.
         Map<String, String> rawArgs = new HashMap<>();
 
