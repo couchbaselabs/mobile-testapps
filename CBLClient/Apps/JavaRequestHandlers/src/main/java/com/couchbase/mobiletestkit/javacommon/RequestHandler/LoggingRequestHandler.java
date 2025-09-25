@@ -33,7 +33,7 @@ public class LoggingRequestHandler {
         FileLogSink.Builder builder = new FileLogSink.Builder()
                 .setDirectory(directory);
         if (maxRotateCount > 1) {
-            builder.setMaxKeptFiles(maxRotateCount-1);
+            builder.setMaxKeptFiles(maxRotateCount+1);
         }
         if (maxSize > 512000) {
             builder.setMaxFileSize(maxSize);
@@ -78,11 +78,7 @@ public class LoggingRequestHandler {
 
         if (currentSink == null) return null;
 
-        FileLogSink newSink = new FileLogSink.Builder()
-                .setDirectory(currentSink.getDirectory())
-                .setLevel(currentSink.getLevel())
-                .setMaxFileSize(currentSink.getMaxFileSize())
-                .setMaxKeptFiles(currentSink.getMaxKeptFiles())
+        FileLogSink newSink = new FileLogSink.Builder(currentSink)
                 .setPlainText(plain_text)
                 .build();
 
@@ -96,12 +92,8 @@ public class LoggingRequestHandler {
 
         if (currentSink == null) return null;
 
-        FileLogSink newSink = new FileLogSink.Builder()
-                .setDirectory(currentSink.getDirectory())
-                .setLevel(currentSink.getLevel())
-                .setMaxFileSize(currentSink.getMaxFileSize())
-                .setMaxKeptFiles(max_rotate_count)  // Note: method name changed
-                .setPlainText(currentSink.isPlainText())
+        FileLogSink newSink = new FileLogSink.Builder(currentSink)
+                .setMaxKeptFiles(max_rotate_count+1)
                 .build();
 
         LogSinks.get().setFile(newSink);
@@ -115,12 +107,8 @@ public class LoggingRequestHandler {
 
         if (currentSink == null) return null;
 
-        FileLogSink newSink = new FileLogSink.Builder()
-                .setDirectory(currentSink.getDirectory())
-                .setLevel(currentSink.getLevel())
-                .setMaxFileSize(max_size)  // Note: method name is setMaxFileSize
-                .setMaxKeptFiles(currentSink.getMaxKeptFiles())
-                .setPlainText(currentSink.isPlainText())
+        FileLogSink newSink = new FileLogSink.Builder(currentSink)
+                .setMaxFileSize(max_size)
                 .build();
 
         LogSinks.get().setFile(newSink);
@@ -154,12 +142,8 @@ public class LoggingRequestHandler {
         if (currentSink == null) return null;
 
         LogLevel level = parseLogLevel(log_level);
-        FileLogSink newSink = new FileLogSink.Builder()
-                .setDirectory(currentSink.getDirectory())
+        FileLogSink newSink = new FileLogSink.Builder(currentSink)
                 .setLevel(level)
-                .setMaxFileSize(currentSink.getMaxFileSize())
-                .setMaxKeptFiles(currentSink.getMaxKeptFiles())
-                .setPlainText(currentSink.isPlainText())
                 .build();
 
         LogSinks.get().setFile(newSink);

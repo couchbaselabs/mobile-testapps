@@ -226,7 +226,7 @@ public class ReplicatorConfigurationRequestHandler {
         if (args.get("targetURI") != null) {
             targetURI = new URI((String) args.get("targetURI"));
         }
-        Set<CollectionConfiguration> collectionConfigurations = CollectionConfiguration.fromCollections(sourceDb.getCollections());
+        Set<CollectionConfiguration> collectionConfigurations = CollectionConfiguration.fromCollections(Set.of(sourceDb.getDefaultCollection()));
         if (targetDb != null) {
             DatabaseEndpoint target = new DatabaseEndpoint(targetDb);
             return new ReplicatorConfiguration(collectionConfigurations, target);
@@ -419,8 +419,8 @@ public class ReplicatorConfigurationRequestHandler {
     }
 
     public List<String> getChannels(Args args) {
-        CollectionConfiguration collectionConfiguration = args.get("configuration");
-        return collectionConfiguration.getChannels();
+        ReplicatorConfiguration replicatorConfiguration = args.get("configuration");
+        return replicatorConfiguration.getCollections().stream().findFirst().map(CollectionConfiguration::getChannels).orElse(null);
     }
 
     /*public ConflictResolver getConflictResolver(Args args){
@@ -429,13 +429,13 @@ public class ReplicatorConfigurationRequestHandler {
     }*/
 
     public Database getDatabase(Args args) {
-        CollectionConfiguration collectionConfiguration = args.get("configuration");
-        return collectionConfiguration.getCollection().getDatabase();
+        ReplicatorConfiguration replicatorConfiguration = args.get("configuration");
+        return replicatorConfiguration.getCollections().stream().findFirst().map(it -> it.getCollection().getDatabase()).orElse(null);
     }
 
     public List<String> getDocumentIDs(Args args) {
-        CollectionConfiguration collectionConfigurationConfiguration = args.get("configuration");
-        return collectionConfigurationConfiguration.getDocumentIDs();
+        ReplicatorConfiguration replicatorConfiguration = args.get("configuration");
+        return replicatorConfiguration.getCollections().stream().findFirst().map(CollectionConfiguration::getDocumentIDs).orElse(null);
     }
 
     public byte[] getPinnedServerCertificate(Args args) {
@@ -474,12 +474,6 @@ public class ReplicatorConfigurationRequestHandler {
         ReplicatorConfiguration replicatorConfiguration = args.get("configuration");
         Boolean continuous = args.get("continuous");
         replicatorConfiguration.setContinuous(continuous);
-    }
-
-    public void setDocumentIDs(Args args) {
-        CollectionConfiguration collectionConfigurationConfiguration = args.get("configuration");
-        List<String> documentIds = args.get("documentIds");
-        collectionConfigurationConfiguration.setDocumentIDs(documentIds);
     }
 
     public void setPinnedServerCertificate(Args args) {
