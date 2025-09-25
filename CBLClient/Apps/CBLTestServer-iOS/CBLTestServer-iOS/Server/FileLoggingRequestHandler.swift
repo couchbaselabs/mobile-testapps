@@ -15,7 +15,7 @@ public class FileLoggingRequestHandler {
     fileprivate var _pushPullReplListener:NSObjectProtocol?
     
     public func handleRequest(method: String, args: Args) throws -> Any? {
-        let max_kept_files: Int = args.get(name: "max_kept_files")!
+        let max_rotate_count: Int = args.get(name: "max_rotate_count")!
         let max_file_size: UInt64 = UInt64(truncating: args.get(name: "max_size")!)
         
         let log_level: String = args.get(name: "log_level")!
@@ -40,7 +40,7 @@ public class FileLoggingRequestHandler {
                         level: level,
                         directory: directory,
                         usePlainText: plain_text,
-                        maxKeptFiles: max_kept_files,
+                        maxKeptFiles: max_rotate_count + 1,
                         maxFileSize: max_file_size
                     )
             return serializeConfig(LogSinks.file!)
@@ -104,7 +104,7 @@ public class FileLoggingRequestHandler {
                     level: sink.level,
                     directory: sink.directory,
                     usePlainText: sink.usePlaintext,
-                    maxKeptFiles: max_kept_files + 1,
+                    maxKeptFiles: max_rotate_count + 1,
                     maxFileSize: sink.maxFileSize
                 )
                 return serializeConfig(LogSinks.file!)
