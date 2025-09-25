@@ -151,16 +151,16 @@ public class PeerToPeerRequestHandler {
             
             var finalConfigs: [CollectionConfiguration] = []
            
-            if let col = collections {
+            if let cols = collections {
                 if let colConfig = collectionConfigurations {
                     if colConfig.count == 1 {
-                        finalConfigs = col.map { _ in colConfig[0] }
+                        finalConfigs = cols.map { _ in colConfig[0] }
                     } else {
                         assert(colConfig.count == col.count)
                         finalConfigs = colConfig
                     }
                 } else {
-                    finalConfigs = col.map { col in CollectionConfiguration(collection: col) }
+                    finalConfigs = cols.map { col in CollectionConfiguration(collection: col) }
                 }
             } else {
                 throw RequestHandlerError.InvalidArgument("No collections provided")
