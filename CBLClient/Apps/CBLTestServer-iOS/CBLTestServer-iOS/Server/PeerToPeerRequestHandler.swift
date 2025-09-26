@@ -156,7 +156,7 @@ public class PeerToPeerRequestHandler {
                     if colConfig.count == 1 {
                         finalConfigs = cols.map { _ in colConfig[0] }
                     } else {
-                        assert(colConfig.count == col.count)
+                        assert(colConfig.count == cols.count)
                         finalConfigs = colConfig
                     }
                 } else {
