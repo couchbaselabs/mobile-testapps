@@ -1,9 +1,10 @@
 package com.couchbase.javaws;
 
+import com.couchbase.lite.logging.ConsoleLogSink;
+import com.couchbase.lite.logging.LogSinks;
 import com.couchbase.mobiletestkit.javacommon.*;
 import com.couchbase.mobiletestkit.javacommon.util.Log;
 import com.couchbase.lite.CouchbaseLite;
-import com.couchbase.lite.Database;
 import com.couchbase.lite.LogDomain;
 import com.couchbase.lite.LogLevel;
 import com.google.gson.Gson;
@@ -28,9 +29,7 @@ public class TestServerWS extends HttpServlet {
     @Override
     public void init() throws ServletException {
         CouchbaseLite.init();
-        Database.log.getConsole().setLevel(LogLevel.DEBUG);
-        Database.log.getConsole().setDomains(LogDomain.ALL_DOMAINS);
-
+        LogSinks.get().setConsole(new ConsoleLogSink(LogLevel.DEBUG, LogDomain.ALL));
         Log.init(new TestServerLogger());
     }
 

@@ -22,10 +22,8 @@ import org.junit.Test;
 
 import com.couchbase.mobiletestkit.javacommon.*;
 import com.couchbase.mobiletestkit.javacommon.RequestHandler.*;
-import com.couchbase.lite.Database;
-import com.couchbase.lite.FileLogger;
 import com.couchbase.lite.LogDomain;
-import com.couchbase.lite.LogLevel;
+import com.couchbase.lite.internal.logging.Log;
 
 
 public class LogTest {
@@ -52,17 +50,13 @@ public class LogTest {
 
         Assert.assertNotNull(data);
         Assert.assertEquals("application/zip", data.contentType);
-        // I don't know a good way to test the contents of the zip data.  Pick a random number...
         Assert.assertTrue(data.data.length > 20);
     }
 
     private void writeAllLogs(String message) {
-        FileLogger logger = Database.log.getFile();
-        logger.log(LogLevel.DEBUG, LogDomain.DATABASE, message);
-        logger.log(LogLevel.VERBOSE, LogDomain.DATABASE, message);
-        logger.log(LogLevel.INFO, LogDomain.DATABASE, message);
-        logger.log(LogLevel.WARNING, LogDomain.DATABASE, message);
-        logger.log(LogLevel.ERROR, LogDomain.DATABASE, message);
+        Log.d(LogDomain.DATABASE, message);
+        Log.i(LogDomain.DATABASE, message);
+        Log.w(LogDomain.DATABASE, message);
+        Log.e(LogDomain.DATABASE, message);
     }
 }
-

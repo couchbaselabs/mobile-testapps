@@ -1,7 +1,5 @@
 package com.couchbase.mobiletestkit.javacommon.RequestHandler;
 
-import androidx.annotation.NonNull;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -371,7 +369,7 @@ public class CollectionRequestHandler {
 
 
         @Override
-        public void changed(@NonNull CollectionChange change) {
+        public void changed(CollectionChange change) {
             changes.add(change);
         }
     }
