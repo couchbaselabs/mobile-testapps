@@ -32,11 +32,12 @@ public class PredictiveQueriesRequestHandler {
             let model: EchoModel = args.get(name: "model")!
             let dict: [String: Any] = args.get(name: "dictionary")!
             let database: Database = args.get(name: "database")!
+            let defaultCol = try database.defaultCollection()
             let input = Expression.value(dict)
             let prediction = Function.prediction(model: model.name, input: input)
             let queryResult = QueryBuilder
                 .select(SelectResult.expression(prediction))
-                 .from(DataSource.database(database))
+                 .from(DataSource.collection(defaultCol))
             
             var resultArray = [Any]()
             
@@ -50,11 +51,12 @@ public class PredictiveQueriesRequestHandler {
             let model: EchoModel = args.get(name: "model")!
             let text: String = args.get(name: "nonDictionary")!
             let database: Database = args.get(name: "database")!
+            let defaultCol = try database.defaultCollection()
             let input = Expression.value(text)
             let prediction = Function.prediction(model: model.name, input: input)
             let queryResult = QueryBuilder
                 .select(SelectResult.expression(prediction))
-                .from(DataSource.database(database))
+                .from(DataSource.collection(defaultCol))
             // return try queryResult.execute()
             do{
                 try queryResult.execute();
@@ -69,13 +71,14 @@ public class PredictiveQueriesRequestHandler {
             
         case "predictiveQuery_getEuclideanDistance":
             let database: Database = args.get(name: "database")!
+            let defaultCol = try database.defaultCollection()
             let key1: String = args.get(name: "key1")!
             let key2: String = args.get(name: "key2")!
             let key3_distance = Function.euclideanDistance(between: Expression.property(key1),
                                                       and: Expression.property(key2))
             let queryResult = QueryBuilder
                 .select(SelectResult.expression(key3_distance))
-                .from(DataSource.database(database))
+                .from(DataSource.collection(defaultCol))
             var resultArray = [Any]()
             
             for row in try queryResult.execute() {
@@ -86,13 +89,14 @@ public class PredictiveQueriesRequestHandler {
             
         case "predictiveQuery_getSquaredEuclideanDistance":
             let database: Database = args.get(name: "database")!
+            let defaultCol = try database.defaultCollection()
             let key1: String = args.get(name: "key1")!
             let key2: String = args.get(name: "key2")!
             let distance = Function.squaredEuclideanDistance(between: Expression.property(key1),
                                                            and: Expression.property(key2))
             let queryResult = QueryBuilder
                 .select(SelectResult.expression(distance))
-                .from(DataSource.database(database))
+                .from(DataSource.collection(defaultCol))
             var resultArray = [Any]()
             
             for row in try queryResult.execute() {
@@ -103,13 +107,14 @@ public class PredictiveQueriesRequestHandler {
             
         case "predictiveQuery_getCosineDistance":
             let database: Database = args.get(name: "database")!
+            let defaultCol = try database.defaultCollection()
             let key1: String = args.get(name: "key1")!
             let key2: String = args.get(name: "key2")!
             let distance = Function.cosineDistance(between: Expression.property(key1),
                                                              and: Expression.property(key2))
             let queryResult = QueryBuilder
                 .select(SelectResult.expression(distance))
-                .from(DataSource.database(database))
+                .from(DataSource.collection(defaultCol))
             var resultArray = [Any]()
             
             for row in try queryResult.execute() {

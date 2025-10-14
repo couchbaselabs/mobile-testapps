@@ -201,9 +201,10 @@ public class DocumentRequestHandler {
 
         case "document_delete":
             let database: Database = (args.get(name:"database"))!
+            let defaultCol = try! database.defaultCollection()
             let document: MutableDocument = args.get(name:"document")!
             
-            try! database.deleteDocument(document)
+            try! defaultCol.delete(document: document)
             
         case "document_getId":
             let document: Document = args.get(name: "document")!

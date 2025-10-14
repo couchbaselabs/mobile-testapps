@@ -20,7 +20,8 @@ public class DataSourceRequestHandler {
         ////////////////
         case "datasource_database":
             let database: Database = args.get(name: "database")!
-            return DataSource.database(database)
+            let defaultCol = try database.defaultCollection()
+            return DataSource.collection(defaultCol)
 
         default:
             throw RequestHandlerError.MethodNotFound(method)

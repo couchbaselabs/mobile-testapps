@@ -67,7 +67,7 @@ public class ReplicatorRequestHandler {
         case "replicator_removeReplicatorEventListener":
             let replication_obj: Replicator = args.get(name: "replicator")!
             let changeListener : MyDocumentReplicationListener = (args.get(name: "changeListener"))!
-            replication_obj.removeChangeListener(withToken: changeListener.listenerToken!)
+            changeListener.listenerToken!.remove()
 
         case "replicator_replicatorEventChangesCount":
             let changeListener: MyDocumentReplicationListener = (args.get(name: "changeListener"))!
@@ -98,7 +98,7 @@ public class ReplicatorRequestHandler {
         case "replicator_removeChangeListener":
             let replication_obj: Replicator = args.get(name: "replicator")!
             let changeListener : MyReplicationChangeListener = (args.get(name: "changeListener"))!
-            replication_obj.removeChangeListener(withToken: changeListener.listenerToken!)
+            changeListener.listenerToken!.remove()
 
         case "replicator_changeListenerChangesCount":
             let changeListener: MyReplicationChangeListener = (args.get(name: "changeListener"))!
