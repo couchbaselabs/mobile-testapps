@@ -20,7 +20,7 @@
 #define INCLUDE_CBL(X) STRINGIFY(cbl/X)
 #define INCLUDE_FLEECE(X) STRINGIFY(fleece/X)
 #endif
-
+#include <stdexcept>
 #include <string>
 #include <errno.h>
 #include INCLUDE_FLEECE(Fleece.h)
