@@ -24,7 +24,7 @@ rm -rf $DOWNLOAD_DIR 2> /dev/null
 mkdir -p $DOWNLOAD_DIR
 pushd $DOWNLOAD_DIR
 
-ZIP_FILENAME=couchbase-lite-c-${EDITION}-${VERSION}-${BLD_NUM}-${OS}.tar.gz
+ZIP_FILENAME=couchbase-lite-c-${EDITION}-${VERSION}-${BLD_NUM}-linux-x86_64.tar.gz
 curl -O http://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-c/${VERSION}/${BLD_NUM}/${ZIP_FILENAME}
 tar xvf ${ZIP_FILENAME}
 rm ${ZIP_FILENAME}
