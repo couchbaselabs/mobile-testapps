@@ -493,6 +493,8 @@ namespace replicator_configuration_methods {
                         cols[0].conflictResolver = CBLDefaultConflictResolver;
                     }
                 }
+                config->collections = cols;
+                config->collectionCount = 1;
 
                 if (body.contains("continuous")) {
                     config->continuous = body["continuous"].get<bool>();
