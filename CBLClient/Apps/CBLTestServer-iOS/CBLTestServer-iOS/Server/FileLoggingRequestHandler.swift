@@ -71,7 +71,8 @@ public class FileLoggingRequestHandler {
             
         case "logging_getLogsInZip":
             guard let fileSink = LogSinks.file else {
-                fatalError("failed to get the config directory")
+                print("File Logging was not enabled")
+                return nil
             }
             let path = fileSink.directory
             do {
@@ -124,7 +125,7 @@ public class FileLoggingRequestHandler {
             }
             return nil
 
-        case "logging_setDirectory":
+        case "logging_setConfig":
             if let sink = LogSinks.file {
                 LogSinks.file = FileLogSink(
                     level: sink.level,
@@ -134,10 +135,8 @@ public class FileLoggingRequestHandler {
                     maxFileSize: sink.maxFileSize
                 )
                 return serializeConfig(LogSinks.file!)
-            } else {
-                LogSinks.file = FileLogSink(level: level, directory: directory)
-                return serializeConfig(LogSinks.file!)
             }
+            return nil
 
         case "logging_setLogLevel":
             let level = parseLogLevel(log_level)
@@ -150,10 +149,8 @@ public class FileLoggingRequestHandler {
                     maxFileSize: sink.maxFileSize
                 )
                 return serializeConfig(LogSinks.file!)
-            } else {
-                LogSinks.file = FileLogSink(level: level, directory: directory)
-                return serializeConfig(LogSinks.file!)
             }
+            return nil
 
         default:
             throw RequestHandlerError.MethodNotFound(method)
