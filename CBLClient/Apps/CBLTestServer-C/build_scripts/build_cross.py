@@ -79,7 +79,26 @@ def check_toolchain(name: str):
         os.makedirs(toolchain_path, 0o755, True)
         print(f'Extracting {name} toolchain to {toolchain_path}...')
         with tarfile.open('toolchain.tar.gz', 'r:gz') as tar:
-            tar.extractall(toolchain_path, members=tar_extract_callback(tar))
+            def is_within_directory(directory, target):
+                
+                abs_directory = os.path.abspath(directory)
+                abs_target = os.path.abspath(target)
+            
+                prefix = os.path.commonprefix([abs_directory, abs_target])
+                
+                return prefix == abs_directory
+            
+            def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+            
+                for member in tar.getmembers():
+                    member_path = os.path.join(path, member.name)
+                    if not is_within_directory(path, member_path):
+                        raise Exception("Attempted Path Traversal in Tar File")
+            
+                tar.extractall(path, members, numeric_owner=numeric_owner) 
+                
+            
+            safe_extract(tar, toolchain_path, members=tar_extract_callback(tar))
         
         outer_dir = toolchain_path / os.listdir(toolchain_path)[0]
         files_to_move = outer_dir.glob("**/*")
@@ -111,7 +130,26 @@ def check_sysroot(name: str):
     os.makedirs(sysroot_path, 0o755, True)
     print(f'Extracting {name} sysroot to {sysroot_path}...')
     with tarfile.open("sysroot.tar.gz", 'r:gz') as tar:
-            tar.extractall(sysroot_path, members=tar_extract_callback(tar))
+            def is_within_directory(directory, target):
+                
+                abs_directory = os.path.abspath(directory)
+                abs_target = os.path.abspath(target)
+            
+                prefix = os.path.commonprefix([abs_directory, abs_target])
+                
+                return prefix == abs_directory
+            
+            def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+            
+                for member in tar.getmembers():
+                    member_path = os.path.join(path, member.name)
+                    if not is_within_directory(path, member_path):
+                        raise Exception("Attempted Path Traversal in Tar File")
+            
+                tar.extractall(path, members, numeric_owner=numeric_owner) 
+                
+            
+            safe_extract(tar, sysroot_path, members=tar_extract_callback(tar))
 
     os.remove("sysroot.tar.gz")
 
@@ -166,7 +204,26 @@ if __name__ == '__main__':
     zip_filename=f'couchbase-lite-c-{args.edition}-{args.version}-{args.bld_num}-{build_system}.tar.gz'
     urllib.request.urlretrieve(f'http://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-c/{args.version}/{args.bld_num}/{zip_filename}', zip_filename, show_download_progress)
     with tarfile.open(zip_filename, 'r:gz') as tar:
-        tar.extractall(DOWNLOAD_DIR)
+        def is_within_directory(directory, target):
+            
+            abs_directory = os.path.abspath(directory)
+            abs_target = os.path.abspath(target)
+        
+            prefix = os.path.commonprefix([abs_directory, abs_target])
+            
+            return prefix == abs_directory
+        
+        def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+        
+            for member in tar.getmembers():
+                member_path = os.path.join(path, member.name)
+                if not is_within_directory(path, member_path):
+                    raise Exception("Attempted Path Traversal in Tar File")
+        
+            tar.extractall(path, members, numeric_owner=numeric_owner) 
+            
+        
+        safe_extract(tar, DOWNLOAD_DIR)
     os.remove(zip_filename)
 
     vector_search_zip_name = f'couchbase-lite-vector-search-{args.vs_version}-{args.vs_bld_num}-linux-x86_64.zip'
