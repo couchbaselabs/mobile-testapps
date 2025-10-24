@@ -9,14 +9,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import com.couchbase.lite.Collection;
 import com.couchbase.lite.MaintenanceType;
 import com.couchbase.mobiletestkit.javacommon.Args;
 import com.couchbase.mobiletestkit.javacommon.Context;
 import com.couchbase.mobiletestkit.javacommon.RequestHandlerDispatcher;
-import com.couchbase.mobiletestkit.javacommon.util.ConcurrentExecutor;
 import com.couchbase.mobiletestkit.javacommon.util.Log;
 import com.couchbase.mobiletestkit.javacommon.util.ZipUtils;
 import com.couchbase.lite.Blob;
@@ -24,13 +20,10 @@ import com.couchbase.lite.ConcurrencyControl;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Database;
-import com.couchbase.lite.DatabaseChange;
-import com.couchbase.lite.DatabaseChangeListener;
 import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.EncryptionKey;
 import com.couchbase.lite.Expression;
-import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.Meta;
 import com.couchbase.lite.MutableDocument;
 import com.couchbase.lite.Query;
@@ -38,9 +31,6 @@ import com.couchbase.lite.QueryBuilder;
 import com.couchbase.lite.Result;
 import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.SelectResult;
-import com.couchbase.lite.Scope;
-import com.couchbase.lite.internal.utils.FileUtils;
-import com.couchbase.mobiletestkit.javacommon.Memory;
 
 public class DatabaseRequestHandler {
     private static final String TAG = "DATABASE";
@@ -74,7 +64,11 @@ public class DatabaseRequestHandler {
 
     public long getCount(Args args) {
         Database database = args.get("database");
-        return database.getCount();
+        try {
+            return  database.getDefaultCollection().getCount();
+        } catch (CouchbaseLiteException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void close(Args args) throws CouchbaseLiteException {
@@ -97,23 +91,23 @@ public class DatabaseRequestHandler {
         return database.getName();
     }
 
-    public Document getDocument(Args args) {
+    public Document getDocument(Args args) throws CouchbaseLiteException {
         Database database = args.get("database");
         String id = args.get("id");
-        return database.getDocument(id);
+        return database.getDefaultCollection().getDocument(id);
     }
 
     public List<String> getIndexes(Args args) throws CouchbaseLiteException {
         Database database = args.get("database");
-        return database.getIndexes();
+        return new ArrayList<>(database.getDefaultCollection().getIndexes());
     }
 
-    public Map<String, Map<String, Object>> getDocuments(Args args) {
+    public Map<String, Map<String, Object>> getDocuments(Args args) throws CouchbaseLiteException {
         Database database = args.get("database");
         List<String> ids = args.get("ids");
         Map<String, Map<String, Object>> documents = new HashMap<>();
         for (String id : ids) {
-            Document document = database.getDocument(id);
+            Document document = database.getDefaultCollection().getDocument(id);
             if (document != null) {
                 Map<String, Object> doc = document.toMap();
                 // looping through the document, replace the Blob with its properties
@@ -147,10 +141,10 @@ public class DatabaseRequestHandler {
         Database database = args.get("database");
         String id = args.get("id");
         Map<String, Object> data = args.get("data");
-        MutableDocument updatedDoc = database.getDocument(id).toMutable();
+        MutableDocument updatedDoc = database.getDefaultCollection().getDocument(id).toMutable();
         Map<String, Object> new_data = this.setDataBlob(data);
         updatedDoc.setData(new_data);
-        database.save(updatedDoc);
+        database.getDefaultCollection().save(updatedDoc);
     }
 
     public void updateDocuments(Args args) throws CouchbaseLiteException {
@@ -160,11 +154,11 @@ public class DatabaseRequestHandler {
             for (Map.Entry<String, Map<String, Object>> entry : documents.entrySet()) {
                 String id = entry.getKey();
                 Map<String, Object> data = entry.getValue();
-                MutableDocument updatedDoc = database.getDocument(id).toMutable();
+                MutableDocument updatedDoc = database.getDefaultCollection().getDocument(id).toMutable();
                 Map<String, Object> new_data = this.setDataBlob(data);
                 updatedDoc.setData(new_data);
                 try {
-                    database.save(updatedDoc);
+                    database.getDefaultCollection().save(updatedDoc);
                 }
                 catch (CouchbaseLiteException e) {
                     Log.e(TAG, "DB Save failed", e);
@@ -176,7 +170,7 @@ public class DatabaseRequestHandler {
     public void purge(Args args) throws CouchbaseLiteException {
         Database database = args.get("database");
         MutableDocument document = args.get("document");
-        database.purge(document);
+        database.getDefaultCollection().purge(document);
     }
 
     public void saveDocuments(Args args) throws CouchbaseLiteException {
@@ -190,7 +184,7 @@ public class DatabaseRequestHandler {
                 Map<String, Object> new_data = this.setDataBlob(data);
                 MutableDocument document = new MutableDocument(id, new_data);
                 try {
-                    database.save(document);
+                    database.getDefaultCollection().save(document);
                 }
                 catch (CouchbaseLiteException e) {
                     Log.e(TAG, "DB Save failed", e);
@@ -202,7 +196,7 @@ public class DatabaseRequestHandler {
     public void save(Args args) throws CouchbaseLiteException {
         Database database = args.get("database");
         MutableDocument document = args.get("document");
-        database.save(document);
+        database.getDefaultCollection().save(document);
     }
 
     public void saveWithConcurrency(Args args) throws CouchbaseLiteException {
@@ -213,13 +207,13 @@ public class DatabaseRequestHandler {
             && (concurrencyControlType.equals("failOnConflict")))
                 ? ConcurrencyControl.FAIL_ON_CONFLICT
                 : ConcurrencyControl.LAST_WRITE_WINS;
-        database.save(document, concurrencyType);
+        database.getDefaultCollection().save(document, concurrencyType);
     }
 
     public void delete(Args args) throws CouchbaseLiteException {
         Database database = args.get("database");
         Document document = args.get("document");
-        database.delete(document);
+        database.getDefaultCollection().delete(document);
     }
 
     public void deleteWithConcurrency(Args args) throws CouchbaseLiteException {
@@ -231,7 +225,7 @@ public class DatabaseRequestHandler {
                 ? ConcurrencyControl.FAIL_ON_CONFLICT
                 : ConcurrencyControl.LAST_WRITE_WINS;
 
-        database.delete(document, concurrencyType);
+        database.getDefaultCollection().delete(document, concurrencyType);
     }
 
     public void deleteDB(Args args) {
@@ -275,9 +269,9 @@ public class DatabaseRequestHandler {
         final List<String> docIds = args.get("doc_ids");
         db.inBatch(() -> {
             for (String id : docIds) {
-                Document document = db.getDocument(id);
+                Document document = db.getDefaultCollection().getDocument(id);
                 try {
-                    db.delete(document);
+                    db.getDefaultCollection().delete(document);
                 }
                 catch (CouchbaseLiteException e) {
                     Log.e(TAG, "DB Delete failed", e);
@@ -293,7 +287,7 @@ public class DatabaseRequestHandler {
         int offset = args.get("offset");
         Query query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(database.getDefaultCollection()))
             .limit(Expression.intValue(limit), Expression.intValue(offset));
         List<String> result = new ArrayList<>();
         ResultSet results = query.execute();
@@ -303,48 +297,6 @@ public class DatabaseRequestHandler {
         }
         return result;
 
-    }
-
-    public ListenerToken addChangeListener(Args args) {
-        Database database = args.get("database");
-        ListenerToken token;
-        if (args.contain("docId")) {
-            String docId = args.get("docId");
-            MyDocumentChangeListener changeListener = new MyDocumentChangeListener();
-            token = database.addDocumentChangeListener(docId, ConcurrentExecutor.EXECUTOR, changeListener);
-        }
-        else {
-            MyDatabaseChangeListener changeListener = new MyDatabaseChangeListener();
-            token = database.addChangeListener(ConcurrentExecutor.EXECUTOR, changeListener);
-        }
-        return token;
-    }
-
-    public void removeChangeListener(Args args) {
-        Database database = args.get("database");
-        ListenerToken token = args.get("changeListenerToken");
-        database.removeChangeListener(token);
-    }
-
-    public int databaseChangeListenerChangesCount(Args args) {
-        MyDatabaseChangeListener changeListener = args.get("changeListener");
-        return changeListener.getChanges().size();
-    }
-
-    public DatabaseChange databaseChangeListenerGetChange(Args args) {
-        MyDatabaseChangeListener changeListener = args.get("changeListener");
-        int index = args.get("index");
-        return changeListener.getChanges().get(index);
-    }
-
-    public Database changeGetDatabase(Args args) {
-        DatabaseChange change = args.get("change");
-        return change.getDatabase();
-    }
-
-    public List<String> changeGetDocumentId(Args args) {
-        DatabaseChange change = args.get("change");
-        return change.getDocumentIDs();
     }
 
     public void copy(Args args) throws CouchbaseLiteException {
@@ -425,15 +377,3 @@ public class DatabaseRequestHandler {
     }
 }
 
-class MyDatabaseChangeListener implements DatabaseChangeListener {
-    private List<DatabaseChange> changes;
-
-    public List<DatabaseChange> getChanges() { 
-        return changes;
-    }
-
-    @Override
-    public void changed(DatabaseChange change) { 
-        changes.add(change); 
-    }
-}

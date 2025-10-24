@@ -48,7 +48,7 @@ public class PredictiveQueriesRequestHandler {
 
         Query query = QueryBuilder
             .select(SelectResult.expression(prediction))
-            .from(DataSource.database(database));
+            .from(DataSource.collection(database.getDefaultCollection()));
 
         List<Object> resultArray = new ArrayList<>();
         ResultSet rows = query.execute();
@@ -58,7 +58,7 @@ public class PredictiveQueriesRequestHandler {
         return resultArray;
     }
 
-    public String nonDictionary(Args args) {
+    public String nonDictionary(Args args) throws CouchbaseLiteException {
         EchoModel echoModel = args.get("model");
         Database database = args.get("database");
         String dict = args.get("nonDictionary");
@@ -67,7 +67,7 @@ public class PredictiveQueriesRequestHandler {
 
         Query query = QueryBuilder
             .select(SelectResult.expression(prediction))
-            .from(DataSource.database(database));
+            .from(DataSource.collection(database.getDefaultCollection()));
 
         List<Object> resultArray = new ArrayList<>();
         try {
@@ -88,7 +88,7 @@ public class PredictiveQueriesRequestHandler {
 
         Query query = QueryBuilder
             .select(SelectResult.expression(distance))
-            .from(DataSource.database(database));
+            .from(DataSource.collection(database.getDefaultCollection()));
 
         List<Object> resultArray = new ArrayList<>();
         ResultSet rows = query.execute();
@@ -112,7 +112,7 @@ public class PredictiveQueriesRequestHandler {
 
         Query query = QueryBuilder
             .select(SelectResult.expression(distance))
-            .from(DataSource.database(database));
+            .from(DataSource.collection(database.getDefaultCollection()));
 
         List<Object> resultArray = new ArrayList<>();
         ResultSet rows = query.execute();
@@ -131,7 +131,7 @@ public class PredictiveQueriesRequestHandler {
 
         Query query = QueryBuilder
             .select(SelectResult.expression(distance))
-            .from(DataSource.database(database));
+            .from(DataSource.collection(database.getDefaultCollection()));
 
         List<Object> resultArray = new ArrayList<>();
         ResultSet rows = query.execute();

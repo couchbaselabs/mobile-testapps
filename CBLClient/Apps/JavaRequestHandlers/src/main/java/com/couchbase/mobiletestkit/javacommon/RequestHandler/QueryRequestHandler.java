@@ -7,6 +7,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.couchbase.lite.Collection;
+import com.couchbase.lite.IndexExpression;
 import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.Parameters;
 import com.couchbase.lite.QueryChange;
@@ -18,7 +20,6 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Expression;
-import com.couchbase.lite.FullTextExpression;
 import com.couchbase.lite.FullTextFunction;
 import com.couchbase.lite.FullTextIndex;
 import com.couchbase.lite.FullTextIndexItem;
@@ -68,11 +69,10 @@ public class QueryRequestHandler {
 
     public List<Object> getDoc(Args args) throws CouchbaseLiteException {
         Database database = args.get("database");
-        long out = database.getCount();
         Expression doc_id = Expression.value(args.get("doc_id"));
         Query query = QueryBuilder
             .select(SelectResult.all())
-            .from(DataSource.database(database))
+            .from(DataSource.collection(database.getDefaultCollection()))
             .where((Meta.id).equalTo(doc_id));
         List<Object> resultArray = new ArrayList<>();
         for (Result row : query.execute()) {
@@ -101,7 +101,7 @@ public class QueryRequestHandler {
 
         Query search_query = QueryBuilder
                 .select(SelectResult.expression(Meta.id))
-                .from(DataSource.database(database))
+                .from(DataSource.collection(database.getDefaultCollection()))
                 .where(Expression.property(whr_prop).equalTo(Expression.value(whr_val))
                         .and(ArrayExpression.any(dep_schedule).in(Expression.property(schedule))
                                 .satisfies(departure_utc.greaterThan(Expression.value(departure_val)))));
@@ -119,7 +119,7 @@ public class QueryRequestHandler {
         Expression offset = Expression.value(args.get("offset"));
         Query search_query = QueryBuilder
             .select(SelectResult.all())
-            .from(DataSource.database(database))
+            .from(DataSource.collection(database.getDefaultCollection()))
             .limit(limit, offset);
         List<Object> resultArray = new ArrayList<>();
         ResultSet rows = search_query.execute();
@@ -140,7 +140,7 @@ public class QueryRequestHandler {
                 SelectResult.expression(Meta.id),
                 SelectResult.expression(Expression.property(select_property1)),
                 SelectResult.expression(Expression.property(select_property2)))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(database.getDefaultCollection()))
             .where(Expression.property(whr_key).equalTo(whr_val));
         List<Object> resultArray = new ArrayList<>();
         ResultSet rows = search_query.execute();
@@ -163,7 +163,7 @@ public class QueryRequestHandler {
                 SelectResult.expression(Meta.id),
                 SelectResult.expression(Expression.property(select_property1)),
                 SelectResult.expression(Expression.property(select_property2)))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(database.getDefaultCollection()))
             .where(Expression.property(whr_key).equalTo(exp_val));
         List<Object> resultArray = new ArrayList<>();
         ResultSet rows = search_query.execute();
@@ -185,7 +185,7 @@ public class QueryRequestHandler {
                 SelectResult.expression(Meta.id),
                 SelectResult.expression(Expression.property(select_property1)),
                 SelectResult.expression(Expression.property(select_property2)))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(database.getDefaultCollection()))
             .orderBy(Ordering.expression(Expression.property(whr_key).collate(with_locale)));
         List<Object> resultArray = new ArrayList<>();
         ResultSet rows = search_query.execute();
@@ -208,7 +208,7 @@ public class QueryRequestHandler {
         List<Object> resultArray = new ArrayList<>();
         Query query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(database.getDefaultCollection()))
             .where(Expression.property(whr_key1).equalTo(whr_val1)
                 .and(Expression.property(whr_key2).equalTo(whr_val2)
                     .or(Expression.property(whr_key3).equalTo(whr_val3)))
@@ -221,7 +221,6 @@ public class QueryRequestHandler {
 
     public List<Object> like(Args args) throws CouchbaseLiteException {
         Database database = args.get("database");
-        long out = database.getCount();
         String whr_key = args.get("whr_key");
         String select_property1 = args.get("select_property1");
         String select_property2 = args.get("select_property2");
@@ -234,7 +233,7 @@ public class QueryRequestHandler {
                 SelectResult.expression(Meta.id),
                 SelectResult.expression(Expression.property(select_property1)),
                 SelectResult.expression(Expression.property(select_property2)))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(database.getDefaultCollection()))
             .where(Expression.property(whr_key).equalTo(whr_val)
                 .and(Expression.property(like_key).like(like_val)));
         for (Result row : query.execute()) {
@@ -257,7 +256,7 @@ public class QueryRequestHandler {
                 SelectResult.expression(Meta.id),
                 SelectResult.expression(Expression.property(select_property1)),
                 SelectResult.expression(Expression.property(select_property2)))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(database.getDefaultCollection()))
             .where(Expression.property(whr_key).equalTo(whr_val)
                 .and(Expression.property(regex_key).regex(regex_val)));
         for (Result row : query.execute()) {
@@ -276,7 +275,7 @@ public class QueryRequestHandler {
             .select(
                 SelectResult.expression(Meta.id),
                 SelectResult.expression(Expression.property(select_property1)))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(database.getDefaultCollection()))
             .where(Expression.property(whr_key).equalTo(whr_val))
             .orderBy(Ordering.property(select_property1).ascending());
         for (Result row : query.execute()) {
@@ -296,7 +295,7 @@ public class QueryRequestHandler {
                 SelectResult.expression(Meta.id),
                 SelectResult.expression(Expression.property(select_property1)),
                 SelectResult.expression(Function.upper(Expression.property(select_property2))))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(database.getDefaultCollection()))
             .where((Function.contains(Expression.property(select_property1), substring)));
         for (Result row : query.execute()) {
             resultArray.add(row.toMap());
@@ -313,8 +312,8 @@ public class QueryRequestHandler {
             .select(
                 SelectResult.expression(Meta.id),
                 SelectResult.expression(Expression.property(select_property1)))
-            .from(DataSource.database(database))
-            .where(Expression.property(select_property1).isNullOrMissing())
+            .from(DataSource.collection(database.getDefaultCollection()))
+            .where(Expression.property(select_property1).isNotValued())
             .orderBy(Ordering.expression(Meta.id).ascending())
             .limit(limit);
         for (Result row : query.execute()) {
@@ -340,7 +339,7 @@ public class QueryRequestHandler {
             .select(
                 SelectResult.expression(Meta.id),
                 SelectResult.expression(Expression.property(select_property1)))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(database.getDefaultCollection()))
             .where(Expression.property(whr_key1).equalTo(whr_val1)
                 .and(Expression.property(whr_key2).equalTo(whr_val2)
                     .and(Expression.property(select_property1).collate(collation).equalTo(equal_to))));
@@ -377,8 +376,8 @@ public class QueryRequestHandler {
                 SelectResult.expression(Expression.property(prop3).from(main)),
                 SelectResult.expression(Expression.property(prop4).from(main)),
                 SelectResult.expression(Expression.property(prop5).from(main)))
-            .from(DataSource.database(db).as(main))
-            .join(Join.join(DataSource.database(db).as(secondary))
+            .from(DataSource.collection(db.getDefaultCollection()).as(main))
+            .join(Join.join(DataSource.collection(db.getDefaultCollection()).as(secondary))
                 .on(Meta.id.from(secondary).equalTo(Expression.property(joinKey).from(main))))
             .where(Expression.property(whrKey1).from(main).equalTo(whrVal1)
                 .and(Expression.property(whrKey2).from(secondary).equalTo(whrVal2))
@@ -403,8 +402,8 @@ public class QueryRequestHandler {
             .select(
                 SelectResult.all().from(main),
                 SelectResult.all().from((secondary)))
-            .from(DataSource.database(db).as(main))
-            .join(Join.leftJoin(DataSource.database(db).as(secondary))
+            .from(DataSource.collection(db.getDefaultCollection()).as(main))
+            .join(Join.leftJoin(DataSource.collection(db.getDefaultCollection()).as(secondary))
                 .on(Meta.id.from(main).equalTo(Expression.property(prop).from(secondary))))
             //.orderBy(Ordering.expression(Expression.property(prop).from(secondary)).ascending())
             .limit(Expression.intValue(limit));
@@ -428,8 +427,8 @@ public class QueryRequestHandler {
             .select(
                 SelectResult.all().from(main),
                 SelectResult.all().from((secondary)))
-            .from(DataSource.database(db).as(main))
-            .join(Join.leftOuterJoin(DataSource.database(db).as(secondary))
+            .from(DataSource.collection(db.getDefaultCollection()).as(main))
+            .join(Join.leftOuterJoin(DataSource.collection(db.getDefaultCollection()).as(secondary))
                 .on(Meta.id.from(main).equalTo(Expression.property(prop).from(secondary))))
             //.orderBy(Ordering.expression(Expression.property(prop).from(secondary)).ascending())
             .limit(Expression.intValue(limit));
@@ -474,8 +473,8 @@ public class QueryRequestHandler {
                 SelectResult.expression(Expression.property(prop1).from(main)),
                 SelectResult.expression(Expression.property(prop2).from(main)),
                 SelectResult.expression(Expression.property(prop3).from(secondary)))
-            .from(DataSource.database(db).as(main))
-            .join(Join.innerJoin(DataSource.database(db).as(secondary))
+            .from(DataSource.collection(db.getDefaultCollection()).as(main))
+            .join(Join.innerJoin(DataSource.collection(db.getDefaultCollection()).as(secondary))
                 .on(Expression.property(joinKey1).from(secondary).equalTo(Expression.property(joinKey2).from(main))
                     .and(Expression.property(whrKey1).from(secondary).equalTo(Expression.string(whrVal1)))
                     .and(Expression.property(whrKey2).from(main).equalTo(Expression.intValue(whrVal2)))))
@@ -520,8 +519,8 @@ public class QueryRequestHandler {
                 SelectResult.expression(Expression.property(prop1).from(main)).as(firstName),
                 SelectResult.expression(Expression.property(prop1).from(secondary)).as(secondName),
                 SelectResult.expression(Expression.property(prop2).from(secondary)))
-            .from(DataSource.database(db).as(main))
-            .join(Join.crossJoin(DataSource.database(db).as(secondary)))
+            .from(DataSource.collection(db.getDefaultCollection()).as(main))
+            .join(Join.crossJoin(DataSource.collection(db.getDefaultCollection()).as(secondary)))
             .where(Expression.property(whrKey1).from(main).equalTo(Expression.string(whrVal1))
                 .and(Expression.property(whrKey2).from(secondary).equalTo(Expression.string(whrVal2))))
             //.orderBy(Ordering.expression(Expression.property(prop1).from(main)).ascending())
@@ -541,7 +540,7 @@ public class QueryRequestHandler {
 
         Query query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(db))
+            .from(DataSource.collection(db.getDefaultCollection()))
             .where(Expression.property(prop).equalTo(val))
             .orderBy(Ordering.expression(Meta.id).ascending());
         for (Result row : query.execute()) {
@@ -559,7 +558,7 @@ public class QueryRequestHandler {
 
         Query query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(db))
+            .from(DataSource.collection(db.getDefaultCollection()))
             .where(Expression.property(prop).notEqualTo(val))
             .orderBy(Ordering.expression(Meta.id).ascending());
         for (Result row : query.execute()) {
@@ -577,7 +576,7 @@ public class QueryRequestHandler {
 
         Query query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(db))
+            .from(DataSource.collection(db.getDefaultCollection()))
             .where(Expression.property(prop).greaterThan(val))
             .orderBy(Ordering.expression(Meta.id).ascending());
         for (Result row : query.execute()) {
@@ -595,7 +594,7 @@ public class QueryRequestHandler {
 
         Query query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(db))
+            .from(DataSource.collection(db.getDefaultCollection()))
             .where(Expression.property(prop).greaterThanOrEqualTo(val))
             .orderBy(Ordering.expression(Meta.id).ascending());
         for (Result row : query.execute()) {
@@ -613,7 +612,7 @@ public class QueryRequestHandler {
 
         Query query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(db))
+            .from(DataSource.collection(db.getDefaultCollection()))
             .where(Expression.property(prop).lessThan(val))
             .orderBy(Ordering.expression(Meta.id).ascending());
         for (Result row : query.execute()) {
@@ -631,7 +630,7 @@ public class QueryRequestHandler {
 
         Query query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(db))
+            .from(DataSource.collection(db.getDefaultCollection()))
             .where(Expression.property(prop).lessThanOrEqualTo(val))
             .orderBy(Ordering.expression(Meta.id).ascending());
         for (Result row : query.execute()) {
@@ -650,7 +649,7 @@ public class QueryRequestHandler {
 
         Query query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(db))
+            .from(DataSource.collection(db.getDefaultCollection()))
             .where(Expression.property(prop).between(val1, val2))
             .orderBy(Ordering.expression(Meta.id).ascending());
         for (Result row : query.execute()) {
@@ -669,7 +668,7 @@ public class QueryRequestHandler {
 
         Query query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(db))
+            .from(DataSource.collection(db.getDefaultCollection()))
             .where(Expression.property(prop).in(Expression.value(val1), Expression.value(val2)))
             .orderBy(Ordering.expression(Meta.id).ascending());
         for (Result row : query.execute()) {
@@ -686,7 +685,7 @@ public class QueryRequestHandler {
 
         Query query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(db))
+            .from(DataSource.collection(db.getDefaultCollection()))
             .where(Expression.property(prop).is(Expression.value(null)))
             .orderBy(Ordering.expression(Meta.id).ascending());
         for (Result row : query.execute()) {
@@ -705,7 +704,7 @@ public class QueryRequestHandler {
 
         Query query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(db))
+            .from(DataSource.collection(db.getDefaultCollection()))
             .where(Expression.not(Expression.property(prop).between(val1, val2)))
             .orderBy(Ordering.expression(Expression.property(prop)).ascending());
         for (Result row : query.execute()) {
@@ -725,7 +724,7 @@ public class QueryRequestHandler {
             .select(
                 SelectResult.expression(Meta.id),
                 SelectResult.expression(Expression.property(prop)))
-            .from(DataSource.database(db))
+            .from(DataSource.collection(db.getDefaultCollection()))
             .where(Expression.property(prop).isNot(Expression.value(null)))
             .orderBy(Ordering.expression(Meta.id).ascending());
         for (Result row : query.execute()) {
@@ -750,16 +749,17 @@ public class QueryRequestHandler {
         else {
             ftsIndex = IndexBuilder.fullTextIndex(FullTextIndexItem.property(prop)).setLanguage(null);
         }
-        db.createIndex(index, ftsIndex);
-        FullTextExpression ftsExpression = FullTextExpression.index(index);
+        Collection collection = db.getDefaultCollection();
+        collection.createIndex(index, ftsIndex);
+        IndexExpression idx = Expression.fullTextIndex(index);
         List<Object> resultArray = new ArrayList<>();
 
         Query query = QueryBuilder
             .select(
                 SelectResult.expression(Meta.id),
                 SelectResult.expression(Expression.property(prop)))
-            .from(DataSource.database(db))
-            .where(Expression.property("type").equalTo(docType).and(ftsExpression.match(val)))
+            .from(DataSource.collection(db.getDefaultCollection()))
+            .where(Expression.property("type").equalTo(docType).and(FullTextFunction.match(idx, val)))
             .limit(limit);
         for (Result row : query.execute()) {
             resultArray.add(row.toMap());
@@ -785,8 +785,9 @@ public class QueryRequestHandler {
             ftsIndex = IndexBuilder.fullTextIndex(FullTextIndexItem.property(prop1), FullTextIndexItem.property(prop2))
                 .setLanguage(null);
         }
-        db.createIndex(index, ftsIndex);
-        FullTextExpression ftsExpression = FullTextExpression.index(index);
+        Collection collection = db.getDefaultCollection();
+        collection.createIndex(index, ftsIndex);
+        IndexExpression idx = Expression.fullTextIndex(index);
         List<Object> resultArray = new ArrayList<>();
 
         Query query = QueryBuilder
@@ -794,8 +795,8 @@ public class QueryRequestHandler {
                 SelectResult.expression(Meta.id),
                 SelectResult.expression(Expression.property(prop1)),
                 SelectResult.expression(Expression.property(prop2)))
-            .from(DataSource.database(db))
-            .where(Expression.property("type").equalTo(docType).and(ftsExpression.match(val)))
+            .from(DataSource.collection(db.getDefaultCollection()))
+            .where(Expression.property("type").equalTo(docType).and(FullTextFunction.match(idx, val)))
             .limit(limit);
         for (Result row : query.execute()) {
             resultArray.add(row.toMap());
@@ -812,16 +813,17 @@ public class QueryRequestHandler {
         String index = "singlePropertyIndex";
 
         FullTextIndex ftsIndex = IndexBuilder.fullTextIndex(FullTextIndexItem.property(prop));
-        db.createIndex(index, ftsIndex);
-        FullTextExpression ftsExpression = FullTextExpression.index(index);
+        Collection collection = db.getDefaultCollection();
+        collection.createIndex(index, ftsIndex);
+        IndexExpression idx = Expression.fullTextIndex(index);
         List<Object> resultArray = new ArrayList<>();
 
         Query query = QueryBuilder
             .select(
                 SelectResult.expression(Meta.id),
                 SelectResult.expression(Expression.property(prop)))
-            .from(DataSource.database(db))
-            .where(Expression.property("type").equalTo(docType).and(ftsExpression.match(val)))
+            .from(DataSource.collection(db.getDefaultCollection()))
+            .where(Expression.property("type").equalTo(docType).and(FullTextFunction.match(idx, val)))
             .orderBy(Ordering.expression(FullTextFunction.rank(index)).descending())
             .limit(limit);
         for (Result row : query.execute()) {
@@ -836,7 +838,7 @@ public class QueryRequestHandler {
         List<Object> resultArray = new ArrayList<>();
         Query query = QueryBuilder
             .select(SelectResult.expression(Meta.id))
-            .from(DataSource.database(database))
+            .from(DataSource.collection(database.getDefaultCollection()))
             .where(Expression.property("number1").modulo(Expression.intValue(2))
                 .equalTo(Expression.intValue(0)));
 
@@ -857,14 +859,19 @@ public class QueryRequestHandler {
     public void removeChangeListener(Args args) {
         Query query = args.get("query");
         MyQueryListener  changeListener = args.get("changeListener");
-        query.removeChangeListener(changeListener.getToken());
+        changeListener.getToken().remove();
     }
 
     public Query selectAll(Args args){
         Database database = args.get("database");
-        Query query = QueryBuilder
-                .select(SelectResult.all())
-                .from(DataSource.database(database));
+        Query query = null;
+        try {
+            query = QueryBuilder
+                    .select(SelectResult.all())
+                    .from(DataSource.collection(database.getDefaultCollection()));
+        } catch (CouchbaseLiteException e) {
+            throw new RuntimeException(e);
+        }
 
         return query;
     }
@@ -884,7 +891,7 @@ public class QueryRequestHandler {
         // define a query with Parameters object
         Query query = QueryBuilder
                 .select(SelectResult.all())
-                .from(DataSource.database(db))
+                .from(DataSource.collection(db.getDefaultCollection()))
                 .where(Expression.property(KEY).lessThanOrEqualTo(Expression.parameter("VALUE")));
 
         Parameters params = new Parameters();
@@ -917,7 +924,7 @@ public class QueryRequestHandler {
         query.setParameters(params);
 
         TimeUnit.MILLISECONDS.sleep(500);
-        query.removeChangeListener(token);
+        token.remove();
 
         if(liveQueryActivities.isEmpty()) {
             Log.d(TAG, "liveQueryActivities is empty");

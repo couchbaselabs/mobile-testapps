@@ -2,6 +2,7 @@ package com.couchbase.CouchbaseLiteServ;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.KeyStoreUtils;
+import com.couchbase.lite.KeyUsage;
 import com.couchbase.lite.TLSIdentity;
 import com.couchbase.mobiletestkit.javacommon.Context;
 import com.couchbase.mobiletestkit.javacommon.util.Log;
@@ -12,8 +13,6 @@ import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
@@ -25,15 +24,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.security.NoSuchProviderException;
-import java.security.UnrecoverableEntryException;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.net.URL;
 import java.net.URISyntaxException;
 
@@ -117,7 +114,10 @@ public class TestServerContext implements Context {
         String alias = UUID.randomUUID().toString();
         TLSIdentity identity = null;
         try {
-            identity = TLSIdentity.createIdentity(true, X509Attributes, certTime, alias);
+            Set<KeyUsage> keyUsage = new HashSet<>();
+            keyUsage.add(KeyUsage.SERVER_AUTH);
+            keyUsage.add(KeyUsage.CLIENT_AUTH);
+            identity = TLSIdentity.createIdentity(keyUsage, X509Attributes, certTime, alias);
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
         }
